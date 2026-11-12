@@ -1,0 +1,2275 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>GearUp - Praktik Bengkel Teknik Mesin</title>
+    <meta name="theme-color" content="#2A361E">
+    <meta name="description" content="GearUp: alat praktik, job sheet, dan kalkulator permesinan untuk mahasiswa Teknik Mesin.">
+    <link rel="manifest" href="./manifest.webmanifest">
+    <link rel="icon" type="image/svg+xml" href="./icon.svg">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        army: {
+                            50: '#F4F6F0',
+                            100: '#E6ECD9',
+                            200: '#C8D6B0',
+                            500: '#556B2F', // Olive Dark
+                            600: '#465926',
+                            700: '#3B4D2B', // Army Green
+                            800: '#2A361E', // Deep Army
+                            900: '#1D2614',
+                        },
+                        olive: {
+                            400: '#8FBC36',
+                            500: '#6B8E23', // Olive Drab
+                            600: '#556B2F',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #1D2614;
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        /* Mobile App Container Simulation on Desktop, Full on Mobile */
+        .app-shell {
+            max-width: 480px;
+            margin: 0 auto;
+            background-color: #F4F6F0;
+            min-height: 100vh;
+            position: relative;
+            box-shadow: 0 0 40px rgba(0,0,0,0.5);
+            padding-bottom: 84px;
+            overflow-x: hidden;
+        }
+        /* Hide scrollbars for horizontal sliders */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        /* Cat Mascot Animations */
+        @keyframes tailWag {
+            0%, 100% { transform: rotate(0deg); }
+            50% { transform: rotate(14deg); }
+        }
+        @keyframes catJump {
+            0% { transform: translateY(0) scale(1); }
+            30% { transform: translateY(-16px) scale(1.08); }
+            60% { transform: translateY(2px) scale(0.96); }
+            100% { transform: translateY(0) scale(1); }
+        }
+        .cat-tail {
+            transform-origin: 155px 72px;
+            animation: tailWag 3s ease-in-out infinite;
+        }
+        .cat-jumping {
+            animation: catJump 0.5s ease-in-out infinite;
+        }
+        /* Print Styles for Job Sheet Download */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #printArea, #printArea * {
+                visibility: visible;
+            }
+            #printArea {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                background: white;
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body class="text-slate-800 antialiased selection:bg-olive-500 selection:text-white">
+
+<!-- Main Mobile App Wrapper -->
+<div class="app-shell" id="appShell">
+
+    <!-- TOP GOJEK-STYLE HEADER WITH ARMY/OLIVE GRADIENT -->
+    <header class="bg-gradient-to-b from-army-800 via-army-700 to-army-600 text-white pt-4 pb-6 px-4 rounded-b-[28px] shadow-lg sticky top-0 z-30">
+        <!-- Top Bar: Brand + Secret Admin Trigger + Status -->
+        <div class="flex items-center justify-between mb-2">
+            <!-- Clicking Logo 3 times opens Admin Login -->
+            <div id="secretBrandTrigger" onclick="handleSecretTap()" class="flex items-center space-x-2.5 cursor-pointer select-none active:scale-95 transition-transform" title="Ketuk 3x untuk Panel Dosen/Admin">
+                <div class="w-10 h-10 rounded-2xl bg-olive-500 flex items-center justify-center shadow-inner border border-olive-400/40">
+                    <i class="fa-solid fa-gears text-xl text-white"></i>
+                </div>
+                <div>
+                    <div class="flex items-center space-x-1.5">
+                        <h1 class="font-extrabold text-xl tracking-tight text-white">GearUp</h1>
+                        <span id="adminBadgeHeader" class="hidden text-[10px] bg-amber-500 text-army-900 font-bold px-2 py-0.5 rounded-full uppercase">Mode Admin</span>
+                    </div>
+                    <p class="text-[11px] text-army-100/80 font-medium">Teknologi Mekanik & Praktik Bengkel</p>
+                </div>
+            </div>
+
+            <div class="flex items-center space-x-2">
+                <!-- Quick Button for Admin Panel if logged in, or subtle lock icon -->
+                <button onclick="openAdminModal()" class="w-9 h-9 rounded-full bg-army-900/40 hover:bg-army-900/70 flex items-center justify-center text-army-200/60 hover:text-white transition" title="Pengaturan Admin">
+                    <i class="fa-solid fa-user-shield text-xs"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- SEARCH BAR WITH BIG PLAIN CAT MASCOT PERCHED ON TOP -->
+        <div class="relative mt-9">
+            <!-- Big Plain Cat Mascot (No Text Inside SVG) perched right on top of the search bar -->
+            <div id="catMascotContainer" onclick="triggerCatPolsriRedirect()" 
+                 class="absolute -top-[52px] right-4 z-20 cursor-pointer group select-none"
+                 aria-label="Maskot Kucing Besar">
+                <!-- Visual Glow when clicked -->
+                <div id="catClickGlow" class="hidden absolute -inset-2 bg-olive-400/40 rounded-full blur-md animate-ping"></div>
+                
+                <!-- Large Plain Cat SVG (Loafing & Perching on Search Bar Edge) -->
+                <svg id="catSvg" class="w-28 h-16 drop-shadow-md transition-transform duration-200 group-hover:scale-105" viewBox="0 0 200 110" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Tail Curled Over Edge -->
+                    <path class="cat-tail" d="M152 74 C178 72, 192 50, 182 32 C176 22, 164 28, 168 40 C171 50, 162 62, 148 66 Z" fill="#E69F45" stroke="#3B2314" stroke-width="3.5" stroke-linejoin="round"/>
+                    <!-- Chubby Loaf Body -->
+                    <path d="M42 84 C36 52, 65 34, 104 34 C142 34, 164 52, 160 84 Z" fill="#F4B350" stroke="#3B2314" stroke-width="3.5" stroke-linejoin="round"/>
+                    <!-- Subtle Stripes on Back (Plain Cat Pattern, Zero Text) -->
+                    <path d="M98 35 C98 45, 98 48, 98 52" stroke="#C87D28" stroke-width="4" stroke-linecap="round"/>
+                    <path d="M114 36 C114 46, 114 50, 114 55" stroke="#C87D28" stroke-width="4" stroke-linecap="round"/>
+                    <path d="M130 39 C130 47, 130 50, 130 54" stroke="#C87D28" stroke-width="4" stroke-linecap="round"/>
+                    <!-- Cat Head -->
+                    <circle cx="62" cy="54" r="27" fill="#F4B350" stroke="#3B2314" stroke-width="3.5"/>
+                    <!-- Left Ear -->
+                    <path d="M39 40 L32 14 L55 29 Z" fill="#F4B350" stroke="#3B2314" stroke-width="3.5" stroke-linejoin="round"/>
+                    <path d="M40 36 L36 20 L51 30 Z" fill="#F29B9B"/>
+                    <!-- Right Ear -->
+                    <path d="M68 29 L88 13 L85 40 Z" fill="#F4B350" stroke="#3B2314" stroke-width="3.5" stroke-linejoin="round"/>
+                    <path d="M71 30 L84 19 L82 36 Z" fill="#F29B9B"/>
+                    <!-- Cute Eyes -->
+                    <circle id="catEyeL" cx="51" cy="52" r="4.2" fill="#231F20"/>
+                    <circle id="catEyeR" cx="72" cy="52" r="4.2" fill="#231F20"/>
+                    <circle cx="49.5" cy="50.5" r="1.5" fill="#FFFFFF"/>
+                    <circle cx="70.5" cy="50.5" r="1.5" fill="#FFFFFF"/>
+                    <!-- Pink Nose & Mouth -->
+                    <polygon points="59,58 65,58 62,62" fill="#E87A90"/>
+                    <path d="M56 64 Q62 68 62 62 Q62 68 68 64" stroke="#3B2314" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+                    <!-- Whiskers -->
+                    <line x1="26" y1="54" x2="39" y2="56" stroke="#3B2314" stroke-width="2" stroke-linecap="round"/>
+                    <line x1="25" y1="61" x2="39" y2="60" stroke="#3B2314" stroke-width="2" stroke-linecap="round"/>
+                    <line x1="84" y1="56" x2="97" y2="54" stroke="#3B2314" stroke-width="2" stroke-linecap="round"/>
+                    <line x1="84" y1="60" x2="98" y2="61" stroke="#3B2314" stroke-width="2" stroke-linecap="round"/>
+                    <!-- Paws Resting Over the Search Bar Top Edge -->
+                    <ellipse cx="48" cy="84" rx="9" ry="6.5" fill="#FFF8EB" stroke="#3B2314" stroke-width="3"/>
+                    <ellipse cx="76" cy="84" rx="9" ry="6.5" fill="#FFF8EB" stroke="#3B2314" stroke-width="3"/>
+                    <ellipse cx="132" cy="84" rx="8" ry="5.5" fill="#FFF8EB" stroke="#3B2314" stroke-width="3"/>
+                </svg>
+            </div>
+
+            <!-- Search Input Box -->
+            <div class="relative flex items-center bg-white rounded-2xl shadow-md overflow-hidden border-2 border-olive-500/40 focus-within:border-olive-400">
+                <div class="pl-4 pr-2 text-army-600">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </div>
+                <input id="globalSearchInput" type="text" oninput="handleGlobalSearch(this.value)"
+                       placeholder="Cari alat, mesin bubut, job sheet, rumus..."
+                       class="w-full py-3 pr-24 text-sm text-slate-800 placeholder-slate-400 focus:outline-none">
+                <button id="clearSearchBtn" onclick="clearGlobalSearch()" class="hidden absolute right-3 text-slate-400 hover:text-slate-600">
+                    <i class="fa-solid fa-circle-xmark"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- SEARCH RESULTS OVERLAY PANEL -->
+    <div id="searchResultsPanel" class="hidden px-4 pt-3 pb-6 bg-army-50 border-b border-army-200">
+        <div class="flex items-center justify-between mb-2">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-army-700">Hasil Pencarian Cepat</h3>
+            <button onclick="clearGlobalSearch()" class="text-xs text-olive-600 font-semibold">Tutup</button>
+        </div>
+        <div id="searchResultsList" class="space-y-2 max-h-80 overflow-y-auto"></div>
+    </div>
+
+    <div id="cloudNotice" class="hidden mx-4 mt-3 rounded-xl px-3 py-2 text-[11px] font-semibold bg-amber-50 text-amber-900 border border-amber-300"></div>
+    <!-- MAIN CONTENT CONTAINER -->
+    <main class="px-4 pt-4 space-y-5">
+
+        <!-- ================= VIEW 1: BERANDA (GOJEK SUPER-APP HOME) ================= -->
+        <section id="view-home" class="space-y-5">
+
+            <!-- HERO SPLASH BANNER (MANDATORY QUOTE) -->
+            <div class="relative rounded-3xl bg-gradient-to-br from-olive-600 via-army-700 to-army-900 text-white p-5 shadow-lg overflow-hidden border border-olive-400/30">
+                <div class="absolute -right-8 -bottom-8 opacity-10 pointer-events-none">
+                    <i class="fa-solid fa-screwdriver-wrench text-[140px]"></i>
+                </div>
+                <div class="relative z-10">
+                    <div class="inline-flex items-center space-x-1.5 bg-olive-400/20 border border-olive-400/40 text-olive-300 text-[11px] font-bold px-2.5 py-1 rounded-full mb-2.5">
+                        <i class="fa-solid fa-bolt"></i>
+                        <span>SMART WORKSHOP COMPANION</span>
+                    </div>
+                    <h2 class="text-xl font-extrabold leading-snug tracking-tight text-white mb-1.5">
+                        Belajar praktik, lebih mudah.
+                    </h2>
+                    <p class="text-xs text-army-100 leading-relaxed font-medium">
+                        Alat praktik, job sheet, dan kalkulator permesinan dalam satu aplikasi.
+                    </p>
+                    <div class="mt-4 flex flex-wrap gap-2">
+                        <button onclick="switchMainTab('tools')" class="bg-olive-400 hover:bg-olive-500 text-army-900 font-bold text-xs px-3.5 py-2 rounded-xl shadow transition flex items-center space-x-1.5">
+                            <i class="fa-solid fa-toolbox"></i>
+                            <span>Eksplor Alat & Sesi</span>
+                        </button>
+                        <button onclick="switchMainTab('calc')" class="bg-white/15 hover:bg-white/25 text-white font-semibold text-xs px-3.5 py-2 rounded-xl backdrop-blur-sm transition flex items-center space-x-1.5">
+                            <i class="fa-solid fa-calculator"></i>
+                            <span>Hitung Putaran (n)</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- GOJEK-STYLE WALLET / SUMMARY BAR (QUICK STATS & ADMIN ACCESS) -->
+            <div class="bg-white rounded-2xl p-3.5 shadow-sm border border-army-200/70 flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-xl bg-army-100 text-army-700 flex items-center justify-center font-bold">
+                        <i class="fa-solid fa-layer-group text-lg"></i>
+                    </div>
+                    <div>
+                        <p class="text-[11px] text-slate-500 font-medium">Kurikulum Bengkel</p>
+                        <p class="text-sm font-extrabold text-army-800"><span id="statTotalSemesters">4</span> Semester • <span id="statTotalSessions">9</span> Sesi</p>
+                    </div>
+                </div>
+                <div class="h-8 w-[1px] bg-slate-200"></div>
+                <div class="flex items-center space-x-3">
+                    <div>
+                        <p class="text-[11px] text-slate-500 font-medium text-right">Katalog Modul</p>
+                        <p class="text-sm font-extrabold text-olive-600 text-right"><span id="statTotalTools">0</span> Alat • <span id="statTotalJobs">0</span> Job</p>
+                    </div>
+                    <button onclick="switchMainTab('jobsheets')" class="w-9 h-9 rounded-xl bg-olive-500 text-white flex items-center justify-center shadow hover:bg-olive-600 transition">
+                        <i class="fa-solid fa-file-arrow-down text-sm"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- SEMESTER FILTER PILLS (GOJEK PROMO TABS) -->
+            <div>
+                <div class="flex items-center justify-between mb-2.5">
+                    <h3 class="font-extrabold text-army-900 text-sm flex items-center gap-1.5">
+                        <i class="fa-solid fa-compass text-olive-600"></i>
+                        <span>Menu Sesi Praktik per Semester</span>
+                    </h3>
+                    <span class="text-[11px] text-army-600 font-semibold">Pilih Sesi</span>
+                </div>
+
+                <!-- Semester Filter Buttons -->
+                <div class="flex space-x-2 overflow-x-auto no-scrollbar pb-2" id="homeSemesterPills">
+                    <button onclick="filterHomeSemester('all')" data-sem="all" class="sem-pill active-pill shrink-0 px-3.5 py-1.5 rounded-full text-xs font-bold bg-army-700 text-white shadow-sm transition">Semua (9 Sesi)</button>
+                    <button onclick="filterHomeSemester(1)" data-sem="1" class="sem-pill shrink-0 px-3.5 py-1.5 rounded-full text-xs font-bold bg-white text-army-800 border border-army-200 transition">Semester 1</button>
+                    <button onclick="filterHomeSemester(2)" data-sem="2" class="sem-pill shrink-0 px-3.5 py-1.5 rounded-full text-xs font-bold bg-white text-army-800 border border-army-200 transition">Semester 2</button>
+                    <button onclick="filterHomeSemester(3)" data-sem="3" class="sem-pill shrink-0 px-3.5 py-1.5 rounded-full text-xs font-bold bg-white text-army-800 border border-army-200 transition">Semester 3</button>
+                    <button onclick="filterHomeSemester(4)" data-sem="4" class="sem-pill shrink-0 px-3.5 py-1.5 rounded-full text-xs font-bold bg-white text-army-800 border border-army-200 transition">Semester 4</button>
+                </div>
+
+                <!-- GOJEK-STYLE 3x3 ICON MENU GRID -->
+                <div id="homeSessionGrid" class="grid grid-cols-3 gap-3 mt-2">
+                    <!-- Rendered dynamically via JS -->
+                </div>
+            </div>
+
+            <!-- QUICK SPINDLE RPM WIDGET ON HOME -->
+            <div class="bg-white rounded-3xl p-4 shadow-sm border border-army-200">
+                <div class="flex items-center justify-between mb-3">
+                    <div class="flex items-center space-x-2">
+                        <span class="w-8 h-8 rounded-xl bg-olive-500/15 text-olive-600 flex items-center justify-center">
+                            <i class="fa-solid fa-gauge-high"></i>
+                        </span>
+                        <div>
+                            <h4 class="font-bold text-xs text-army-900">Hitung Cepat Putaran Spindel (n)</h4>
+                            <p class="text-[10px] text-slate-500 font-mono">n = (1000 × Vc) / (π × d)</p>
+                        </div>
+                    </div>
+                    <button onclick="switchMainTab('calc')" class="text-[11px] font-bold text-olive-600 hover:underline">Lengkap →</button>
+                </div>
+                <div class="grid grid-cols-2 gap-2.5 mb-2.5">
+                    <div>
+                        <label class="text-[10px] font-semibold text-slate-600 block mb-1">Kecepatan Potong Vc (m/mnt)</label>
+                        <input id="quickVc" type="number" value="25" oninput="calcQuickRpm()" class="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 focus:border-olive-500 focus:outline-none font-semibold">
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-semibold text-slate-600 block mb-1">Diameter d (mm)</label>
+                        <input id="quickD" type="number" value="20" oninput="calcQuickRpm()" class="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 focus:border-olive-500 focus:outline-none font-semibold">
+                    </div>
+                </div>
+                <div class="bg-army-50 rounded-xl px-3.5 py-2.5 flex items-center justify-between border border-army-200">
+                    <span class="text-xs font-semibold text-army-800">Putaran Mesin (n):</span>
+                    <span class="text-base font-extrabold text-olive-600"><span id="quickRpmResult">398</span> RPM</span>
+                </div>
+            </div>
+
+            <!-- FEATURED JOB SHEETS CAROUSEL -->
+            <div>
+                <div class="flex items-center justify-between mb-2.5">
+                    <h3 class="font-extrabold text-army-900 text-sm flex items-center gap-1.5">
+                        <i class="fa-solid fa-file-signature text-olive-600"></i>
+                        <span>Job Sheet Praktik Terbaru</span>
+                    </h3>
+                    <button onclick="switchMainTab('jobsheets')" class="text-xs font-bold text-olive-600">Lihat Semua</button>
+                </div>
+                <div id="homeFeaturedJobs" class="space-y-2.5">
+                    <!-- Populated via JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= VIEW 2: DAFTAR ALAT & SESI PER SEMESTER ================= -->
+        <section id="view-tools" class="hidden space-y-4">
+            <div class="bg-army-800 text-white p-4 rounded-2xl shadow">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h2 class="font-extrabold text-base">Daftar Alat Kerja Praktik</h2>
+                        <p class="text-xs text-army-200">Terpisah per Semester, Sesi Bengkel & Golongan Kelas Alat</p>
+                    </div>
+                    <button onclick="openAdminModal('tool')" class="bg-olive-500 hover:bg-olive-400 text-white text-xs font-bold px-3 py-2 rounded-xl shadow flex items-center gap-1.5">
+                        <i class="fa-solid fa-plus"></i>
+                        <span>Tambah Alat</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Semester Selector Tabs -->
+            <div class="grid grid-cols-4 gap-1.5 bg-army-100 p-1.5 rounded-2xl" id="toolsSemesterTabs">
+                <button onclick="selectToolsSemester(1)" id="tabSemTools-1" class="py-2 rounded-xl text-xs font-bold bg-army-700 text-white shadow">Sem 1</button>
+                <button onclick="selectToolsSemester(2)" id="tabSemTools-2" class="py-2 rounded-xl text-xs font-bold text-army-800 hover:bg-white/50">Sem 2</button>
+                <button onclick="selectToolsSemester(3)" id="tabSemTools-3" class="py-2 rounded-xl text-xs font-bold text-army-800 hover:bg-white/50">Sem 3</button>
+                <button onclick="selectToolsSemester(4)" id="tabSemTools-4" class="py-2 rounded-xl text-xs font-bold text-army-800 hover:bg-white/50">Sem 4</button>
+            </div>
+
+            <!-- Session Sub-tabs inside Selected Semester -->
+            <div>
+                <p class="text-[11px] font-bold uppercase tracking-wider text-army-600 mb-1.5">Pilih Sesi Bengkel:</p>
+                <div id="toolsSessionButtons" class="flex space-x-2 overflow-x-auto no-scrollbar pb-1"></div>
+            </div>
+
+            <!-- Tool Class Category Filter -->
+            <div class="flex items-center space-x-1.5 overflow-x-auto no-scrollbar py-1" id="toolClassFilterBar">
+                <button onclick="filterToolClass('ALL')" data-cls="ALL" class="cls-btn px-3 py-1 rounded-lg text-[11px] font-bold bg-olive-600 text-white">Semua Golongan</button>
+                <button onclick="filterToolClass('Mesin Utama')" data-cls="Mesin Utama" class="cls-btn px-3 py-1 rounded-lg text-[11px] font-semibold bg-white text-slate-700 border">Mesin Utama</button>
+                <button onclick="filterToolClass('Alat Potong & Sayat')" data-cls="Alat Potong & Sayat" class="cls-btn px-3 py-1 rounded-lg text-[11px] font-semibold bg-white text-slate-700 border">Alat Potong</button>
+                <button onclick="filterToolClass('Alat Ukur & Lukis')" data-cls="Alat Ukur & Lukis" class="cls-btn px-3 py-1 rounded-lg text-[11px] font-semibold bg-white text-slate-700 border">Alat Ukur</button>
+                <button onclick="filterToolClass('Alat Cekam & Bantu')" data-cls="Alat Cekam & Bantu" class="cls-btn px-3 py-1 rounded-lg text-[11px] font-semibold bg-white text-slate-700 border">Alat Cekam</button>
+                <button onclick="filterToolClass('Alat Tempa & Las')" data-cls="Alat Tempa & Las" class="cls-btn px-3 py-1 rounded-lg text-[11px] font-semibold bg-white text-slate-700 border">Tempa/Las & K3</button>
+            </div>
+
+            <!-- Tools List Container -->
+            <div id="toolsListContainer" class="space-y-3"></div>
+        </section>
+
+        <!-- ================= VIEW 3: JOB SHEET PER SEMESTER & SESI ================= -->
+        <section id="view-jobsheets" class="hidden space-y-4">
+            <div class="bg-gradient-to-r from-army-800 to-olive-600 text-white p-4 rounded-2xl shadow">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h2 class="font-extrabold text-base">Modul & Job Sheet Praktik</h2>
+                        <p class="text-xs text-army-100">Lihat gambar panduan kerja, unduh PDF/Cetak & ganti gambar</p>
+                    </div>
+                    <button onclick="openAdminModal('jobsheet')" class="bg-white text-army-900 hover:bg-army-100 text-xs font-extrabold px-3 py-2 rounded-xl shadow flex items-center gap-1.5">
+                        <i class="fa-solid fa-file-circle-plus text-olive-600"></i>
+                        <span>+ Job Sheet</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Semester Selector Tabs for Job Sheets -->
+            <div class="grid grid-cols-4 gap-1.5 bg-army-100 p-1.5 rounded-2xl">
+                <button onclick="selectJobsSemester(1)" id="tabSemJobs-1" class="py-2 rounded-xl text-xs font-bold bg-army-700 text-white shadow">Sem 1</button>
+                <button onclick="selectJobsSemester(2)" id="tabSemJobs-2" class="py-2 rounded-xl text-xs font-bold text-army-800 hover:bg-white/50">Sem 2</button>
+                <button onclick="selectJobsSemester(3)" id="tabSemJobs-3" class="py-2 rounded-xl text-xs font-bold text-army-800 hover:bg-white/50">Sem 3</button>
+                <button onclick="selectJobsSemester(4)" id="tabSemJobs-4" class="py-2 rounded-xl text-xs font-bold text-army-800 hover:bg-white/50">Sem 4</button>
+            </div>
+
+            <!-- Session Sub-tabs for Job Sheets -->
+            <div>
+                <p class="text-[11px] font-bold uppercase tracking-wider text-army-600 mb-1.5">Filter Sesi Praktik:</p>
+                <div id="jobsSessionButtons" class="flex space-x-2 overflow-x-auto no-scrollbar pb-1"></div>
+            </div>
+
+            <!-- Job Sheets Cards Container -->
+            <div id="jobsListContainer" class="space-y-3.5"></div>
+        </section>
+
+        <!-- ================= VIEW 4: KALKULATOR PERMESINAN & TABEL VC ================= -->
+        <section id="view-calc" class="hidden space-y-4">
+            <div class="bg-army-800 text-white p-4 rounded-2xl shadow">
+                <h2 class="font-extrabold text-base flex items-center gap-2">
+                    <i class="fa-solid fa-calculator text-olive-400"></i>
+                    <span>Kalkulator Permesinan & Tabel Vc</span>
+                </h2>
+                <p class="text-xs text-army-200 mt-0.5">Spindel (n), Bubut, Milling, Shaping, Forging & Referensi Vc</p>
+            </div>
+
+            <!-- Sub-navigation for Calculators -->
+            <div class="flex space-x-1.5 overflow-x-auto no-scrollbar pb-1" id="calcSubTabs">
+                <button onclick="switchCalcTab('spindle')" data-calctab="spindle" class="calc-tab-btn shrink-0 px-3.5 py-2 rounded-xl text-xs font-bold bg-olive-600 text-white shadow">1. Putaran (n)</button>
+                <button onclick="switchCalcTab('bubut')" data-calctab="bubut" class="calc-tab-btn shrink-0 px-3.5 py-2 rounded-xl text-xs font-bold bg-white text-army-800 border">2. Bubut</button>
+                <button onclick="switchCalcTab('milling')" data-calctab="milling" class="calc-tab-btn shrink-0 px-3.5 py-2 rounded-xl text-xs font-bold bg-white text-army-800 border">3. Milling</button>
+                <button onclick="switchCalcTab('shaping')" data-calctab="shaping" class="calc-tab-btn shrink-0 px-3.5 py-2 rounded-xl text-xs font-bold bg-white text-army-800 border">4. Shaping</button>
+                <button onclick="switchCalcTab('forging')" data-calctab="forging" class="calc-tab-btn shrink-0 px-3.5 py-2 rounded-xl text-xs font-bold bg-white text-army-800 border">5. Forging</button>
+                <button onclick="switchCalcTab('vctable')" data-calctab="vctable" class="calc-tab-btn shrink-0 px-3.5 py-2 rounded-xl text-xs font-bold bg-amber-500 text-army-900 shadow"><i class="fa-solid fa-table mr-1"></i>Tabel Vc & Bor</button>
+            </div>
+
+            <!-- 1. KALKULATOR PUTARAN SPINDEL UTAMA: n = (1000 * Vc) / (pi * d) -->
+            <div id="calc-panel-spindle" class="calc-panel bg-white p-4 rounded-2xl shadow-sm border border-army-200 space-y-4">
+                <div class="bg-army-50 p-3 rounded-xl border border-army-200 flex items-center justify-between">
+                    <div>
+                        <span class="text-[10px] font-bold uppercase text-olive-600">Rumus Dasar Putaran Mesin</span>
+                        <p class="font-mono font-extrabold text-sm text-army-900 mt-0.5">n = (1000 × Vc) / (π × d)</p>
+                    </div>
+                    <button onclick="switchCalcTab('vctable')" class="text-xs bg-olive-500 text-white font-bold px-2.5 py-1.5 rounded-lg shadow">
+                        Cari Nilai Vc
+                    </button>
+                </div>
+
+                <div class="space-y-3">
+                    <div>
+                        <label class="text-xs font-bold text-slate-700 block mb-1">Kecepatan Potong / Cutting Speed ($V_c$) [m/menit]</label>
+                        <input id="spindle_vc" type="number" step="any" value="30" oninput="calculateSpindleMain()" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-olive-500 focus:outline-none text-sm font-bold">
+                    </div>
+                    <div>
+                        <label class="text-xs font-bold text-slate-700 block mb-1">Diameter Benda Kerja / Mata Bor ($d$) [mm]</label>
+                        <input id="spindle_d" type="number" step="any" value="25" oninput="calculateSpindleMain()" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-olive-500 focus:outline-none text-sm font-bold">
+                    </div>
+                </div>
+
+                <div class="bg-gradient-to-r from-army-800 to-army-700 text-white p-4 rounded-2xl space-y-2">
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs text-army-200">Putaran Spindel Teoritis ($n$):</span>
+                        <span class="text-2xl font-extrabold text-olive-400"><span id="spindle_res_n">381.97</span> RPM</span>
+                    </div>
+                    <div class="flex justify-between items-center text-xs border-t border-white/10 pt-2">
+                        <span class="text-army-200">Pembulatan Gearbox Standar:</span>
+                        <span class="font-bold text-white" id="spindle_res_round">382 RPM</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. KALKULATOR BUBUT (LATHE) -->
+            <div id="calc-panel-bubut" class="calc-panel hidden bg-white p-4 rounded-2xl shadow-sm border border-army-200 space-y-3.5">
+                <div class="border-b pb-2">
+                    <h3 class="font-extrabold text-sm text-army-900">Kalkulator Mesin Bubut (Turning)</h3>
+                    <p class="text-[11px] text-slate-500">Menghitung $n$, Kecepatan Makan ($V_f$), Waktu Pemesinan ($T_m$), dan $MRR$</p>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="text-[11px] font-bold text-slate-700">Cutting Speed $V_c$ (m/mnt)</label>
+                        <input id="lathe_vc" type="number" step="any" value="35" oninput="calculateLathe()" class="w-full mt-1 px-3 py-2 rounded-xl border text-xs font-bold">
+                    </div>
+                    <div>
+                        <label class="text-[11px] font-bold text-slate-700">Diameter Awal $d$ (mm)</label>
+                        <input id="lathe_d" type="number" step="any" value="40" oninput="calculateLathe()" class="w-full mt-1 px-3 py-2 rounded-xl border text-xs font-bold">
+                    </div>
+                    <div>
+                        <label class="text-[11px] font-bold text-slate-700">Gerak Makan $f$ (mm/put)</label>
+                        <input id="lathe_f" type="number" step="any" value="0.2" oninput="calculateLathe()" class="w-full mt-1 px-3 py-2 rounded-xl border text-xs font-bold">
+                    </div>
+                    <div>
+                        <label class="text-[11px] font-bold text-slate-700">Panjang Bubut $L$ (mm)</label>
+                        <input id="lathe_l" type="number" step="any" value="120" oninput="calculateLathe()" class="w-full mt-1 px-3 py-2 rounded-xl border text-xs font-bold">
+                    </div>
+                    <div class="col-span-2">
+                        <label class="text-[11px] font-bold text-slate-700">Kedalaman Potong $a_p$ (mm)</label>
+                        <input id="lathe_ap" type="number" step="any" value="1.5" oninput="calculateLathe()" class="w-full mt-1 px-3 py-2 rounded-xl border text-xs font-bold">
+                    </div>
+                </div>
+                <div class="bg-army-800 text-white p-3.5 rounded-2xl grid grid-cols-2 gap-3 text-xs">
+                    <div>
+                        <p class="text-army-200 text-[10px]">Putaran Spindel ($n$)</p>
+                        <p class="font-extrabold text-base text-olive-400"><span id="lathe_res_n">278.5</span> RPM</p>
+                    </div>
+                    <div>
+                        <p class="text-army-200 text-[10px]">Kecepatan Makan ($V_f = f \cdot n$)</p>
+                        <p class="font-extrabold text-base text-white"><span id="lathe_res_vf">55.7</span> mm/mnt</p>
+                    </div>
+                    <div>
+                        <p class="text-army-200 text-[10px]">Waktu Pemesinan ($T_m = L / V_f$)</p>
+                        <p class="font-extrabold text-base text-amber-400"><span id="lathe_res_tm">2.15</span> menit</p>
+                    </div>
+                    <div>
+                        <p class="text-army-200 text-[10px]">Penghilangan Bahan ($MRR$)</p>
+                        <p class="font-extrabold text-base text-white"><span id="lathe_res_mrr">10.5</span> cm³/mnt</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. KALKULATOR MILLING (FRAIS) -->
+            <div id="calc-panel-milling" class="calc-panel hidden bg-white p-4 rounded-2xl shadow-sm border border-army-200 space-y-3.5">
+                <div class="border-b pb-2">
+                    <h3 class="font-extrabold text-sm text-army-900">Kalkulator Mesin Frais (Milling)</h3>
+                    <p class="text-[11px] text-slate-500">Rumus: $n = \frac{1000 \cdot V_c}{\pi \cdot d}$ dan $V_f = f_z \cdot z \cdot n$</p>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="text-[11px] font-bold text-slate-700">Cutting Speed $V_c$ (m/mnt)</label>
+                        <input id="mill_vc" type="number" step="any" value="25" oninput="calculateMilling()" class="w-full mt-1 px-3 py-2 rounded-xl border text-xs font-bold">
+                    </div>
+                    <div>
+                        <label class="text-[11px] font-bold text-slate-700">Diameter Pisau $d$ (mm)</label>
+                        <input id="mill_d" type="number" step="any" value="16" oninput="calculateMilling()" class="w-full mt-1 px-3 py-2 rounded-xl border text-xs font-bold">
+                    </div>
+                    <div>
+                        <label class="text-[11px] font-bold text-slate-700">Jumlah Mata Potong ($z$)</label>
+                        <input id="mill_z" type="number" step="1" value="4" oninput="calculateMilling()" class="w-full mt-1 px-3 py-2 rounded-xl border text-xs font-bold">
+                    </div>
+                    <div>
+                        <label class="text-[11px] font-bold text-slate-700">Feed per Gigi $f_z$ (mm/gigi)</label>
+                        <input id="mill_fz" type="number" step="any" value="0.05" oninput="calculateMilling()" class="w-full mt-1 px-3 py-2 rounded-xl border text-xs font-bold">
+                    </div>
+                    <div class="col-span-2">
+                        <label class="text-[11px] font-bold text-slate-700">Panjang Langkah Meja $L$ (mm)</label>
+                        <input id="mill_l" type="number" step="any" value="150" oninput="calculateMilling()" class="w-full mt-1 px-3 py-2 rounded-xl border text-xs font-bold">
+                    </div>
+                </div>
+                <div class="bg-army-800 text-white p-3.5 rounded-2xl grid grid-cols-3 gap-2 text-xs">
+                    <div>
+                        <p class="text-army-200 text-[10px]">Putaran ($n$)</p>
+                        <p class="font-extrabold text-sm text-olive-400"><span id="mill_res_n">497</span> RPM</p>
+                    </div>
+                    <div>
+                        <p class="text-army-200 text-[10px]">Feed Meja ($V_f$)</p>
+                        <p class="font-extrabold text-sm text-white"><span id="mill_res_vf">99.5</span> mm/m</p>
+                    </div>
+                    <div>
+                        <p class="text-army-200 text-[10px]">Waktu ($T_m$)</p>
+                        <p class="font-extrabold text-sm text-amber-400"><span id="mill_res_tm">1.51</span> mnt</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. KALKULATOR SHAPING (MESIN SEKRAP) -->
+            <div id="calc-panel-shaping" class="calc-panel hidden bg-white p-4 rounded-2xl shadow-sm border border-army-200 space-y-3.5">
+                <div class="border-b pb-2">
+                    <h3 class="font-extrabold text-sm text-army-900">Kalkulator Mesin Sekrap (Shaping)</h3>
+                    <p class="text-[11px] text-slate-500">Menghitung jumlah langkah ganda/menit ($n_p$) & waktu sekrap</p>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="text-[11px] font-bold text-slate-700">Kecepatan Potong $V_c$ (m/mnt)</label>
+                        <input id="shape_vc" type="number" step="any" value="18" oninput="calculateShaping()" class="w-full mt-1 px-3 py-2 rounded-xl border text-xs font-bold">
+                    </div>
+                    <div>
+                        <label class="text-[11px] font-bold text-slate-700">Panjang Langkah $L$ (mm)</label>
+                        <input id="shape_l" type="number" step="any" value="200" oninput="calculateShaping()" class="w-full mt-1 px-3 py-2 rounded-xl border text-xs font-bold">
+                    </div>
+                    <div>
+                        <label class="text-[11px] font-bold text-slate-700">Rasio Balik Cepat ($k = v_m/v_r$)</label>
+                        <input id="shape_k" type="number" step="any" value="0.6" oninput="calculateShaping()" class="w-full mt-1 px-3 py-2 rounded-xl border text-xs font-bold">
+                    </div>
+                    <div>
+                        <label class="text-[11px] font-bold text-slate-700">Lebar Bidang Sekrap $B$ (mm)</label>
+                        <input id="shape_b" type="number" step="any" value="80" oninput="calculateShaping()" class="w-full mt-1 px-3 py-2 rounded-xl border text-xs font-bold">
+                    </div>
+                    <div class="col-span-2">
+                        <label class="text-[11px] font-bold text-slate-700">Gerak Makan Meja per Langkah $s$ (mm/langkah)</label>
+                        <input id="shape_s" type="number" step="any" value="0.5" oninput="calculateShaping()" class="w-full mt-1 px-3 py-2 rounded-xl border text-xs font-bold">
+                    </div>
+                </div>
+                <div class="bg-army-800 text-white p-3.5 rounded-2xl grid grid-cols-3 gap-2 text-xs">
+                    <div>
+                        <p class="text-army-200 text-[10px]">Langkah ($n_p$)</p>
+                        <p class="font-extrabold text-sm text-olive-400"><span id="shape_res_np">56.3</span> /mnt</p>
+                    </div>
+                    <div>
+                        <p class="text-army-200 text-[10px]">Kecepatan Makan</p>
+                        <p class="font-extrabold text-sm text-white"><span id="shape_res_vf">28.1</span> mm/m</p>
+                    </div>
+                    <div>
+                        <p class="text-army-200 text-[10px]">Waktu ($T_m$)</p>
+                        <p class="font-extrabold text-sm text-amber-400"><span id="shape_res_tm">2.84</span> mnt</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 5. KALKULATOR FORGING (KERJA TEMPA) -->
+            <div id="calc-panel-forging" class="calc-panel hidden bg-white p-4 rounded-2xl shadow-sm border border-army-200 space-y-3.5">
+                <div class="border-b pb-2">
+                    <h3 class="font-extrabold text-sm text-army-900">Kalkulator Perhitungan Forging (Tempa)</h3>
+                    <p class="text-[11px] text-slate-500">Kekekalan Volume ($V_1 = V_2$), Rasio Tempa & Estimasi Gaya Tempa ($F$)</p>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="text-[11px] font-bold text-slate-700">Diameter Awal $d_0$ (mm)</label>
+                        <input id="forge_d0" type="number" step="any" value="30" oninput="calculateForging()" class="w-full mt-1 px-3 py-2 rounded-xl border text-xs font-bold">
+                    </div>
+                    <div>
+                        <label class="text-[11px] font-bold text-slate-700">Tinggi Awal $h_0$ (mm)</label>
+                        <input id="forge_h0" type="number" step="any" value="60" oninput="calculateForging()" class="w-full mt-1 px-3 py-2 rounded-xl border text-xs font-bold">
+                    </div>
+                    <div>
+                        <label class="text-[11px] font-bold text-slate-700">Tinggi Akhir Tempa $h_1$ (mm)</label>
+                        <input id="forge_h1" type="number" step="any" value="35" oninput="calculateForging()" class="w-full mt-1 px-3 py-2 rounded-xl border text-xs font-bold">
+                    </div>
+                    <div>
+                        <label class="text-[11px] font-bold text-slate-700">Tegangan Alir Panas $k_f$ (MPa)</label>
+                        <input id="forge_kf" type="number" step="any" value="120" oninput="calculateForging()" class="w-full mt-1 px-3 py-2 rounded-xl border text-xs font-bold">
+                    </div>
+                </div>
+                <div class="bg-army-800 text-white p-3.5 rounded-2xl grid grid-cols-2 gap-3 text-xs">
+                    <div>
+                        <p class="text-army-200 text-[10px]">Volume Benda ($V$)</p>
+                        <p class="font-extrabold text-sm text-white"><span id="forge_res_vol">42.41</span> cm³</p>
+                    </div>
+                    <div>
+                        <p class="text-army-200 text-[10px]">Diameter Akhir ($d_1$)</p>
+                        <p class="font-extrabold text-sm text-olive-400"><span id="forge_res_d1">39.28</span> mm</p>
+                    </div>
+                    <div>
+                        <p class="text-army-200 text-[10px]">Reduksi Tinggi ($\Delta h$)</p>
+                        <p class="font-extrabold text-sm text-white"><span id="forge_res_red">41.7</span> %</p>
+                    </div>
+                    <div>
+                        <p class="text-army-200 text-[10px]">Estimasi Gaya Tempa ($F$)</p>
+                        <p class="font-extrabold text-sm text-amber-400"><span id="forge_res_force">174.5</span> kN</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 6. TABEL REFERENSI VC UNTUK BOR, BUBUT, MILLING, SEKRAP -->
+            <div id="calc-panel-vctable" class="calc-panel hidden bg-white p-4 rounded-2xl shadow-sm border border-army-200 space-y-3">
+                <div class="flex items-center justify-between border-b pb-2">
+                    <div>
+                        <h3 class="font-extrabold text-sm text-army-900">Tabel Standar Cutting Speed ($V_c$)</h3>
+                        <p class="text-[11px] text-slate-500">Klik angka pada tabel untuk langsung memasukkan nilai $V_c$ ke kalkulator!</p>
+                    </div>
+                </div>
+
+                <!-- Table 1: Tabel Vc Khusus Pengeboran (Drilling HSS & Carbide) + Feed Bor -->
+                <div>
+                    <h4 class="text-xs font-extrabold text-olive-600 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+                        <i class="fa-solid fa-bore-hole"></i>
+                        <span>A. Tabel Vc & Feed Rate untuk Mata Bor (Drilling)</span>
+                    </h4>
+                    <div class="overflow-x-auto rounded-xl border border-army-200">
+                        <table class="w-full text-left text-[11px]">
+                            <thead class="bg-army-800 text-white">
+                                <tr>
+                                    <th class="p-2">Material Benda Kerja</th>
+                                    <th class="p-2 text-center">Bor HSS (m/mnt)</th>
+                                    <th class="p-2 text-center">Bor Carbide (m/mnt)</th>
+                                    <th class="p-2 text-center">Feed (mm/put)</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-200">
+                                <tr class="hover:bg-army-50">
+                                    <td class="p-2 font-bold">Baja Lunak (St37 / Mild Steel)</td>
+                                    <td class="p-2 text-center"><button onclick="applyVcToCalc(28)" class="bg-olive-100 text-army-800 font-bold px-2 py-0.5 rounded hover:bg-olive-500 hover:text-white">25 - 30</button></td>
+                                    <td class="p-2 text-center"><button onclick="applyVcToCalc(70)" class="bg-olive-100 text-army-800 font-bold px-2 py-0.5 rounded hover:bg-olive-500 hover:text-white">60 - 80</button></td>
+                                    <td class="p-2 text-center font-mono">0.15 - 0.25</td>
+                                </tr>
+                                <tr class="hover:bg-army-50">
+                                    <td class="p-2 font-bold">Baja Karbon Sedang (S45C)</td>
+                                    <td class="p-2 text-center"><button onclick="applyVcToCalc(20)" class="bg-olive-100 text-army-800 font-bold px-2 py-0.5 rounded hover:bg-olive-500 hover:text-white">18 - 22</button></td>
+                                    <td class="p-2 text-center"><button onclick="applyVcToCalc(55)" class="bg-olive-100 text-army-800 font-bold px-2 py-0.5 rounded hover:bg-olive-500 hover:text-white">50 - 65</button></td>
+                                    <td class="p-2 text-center font-mono">0.10 - 0.20</td>
+                                </tr>
+                                <tr class="hover:bg-army-50">
+                                    <td class="p-2 font-bold">Baja Paduan / Tool Steel</td>
+                                    <td class="p-2 text-center"><button onclick="applyVcToCalc(12)" class="bg-olive-100 text-army-800 font-bold px-2 py-0.5 rounded hover:bg-olive-500 hover:text-white">10 - 15</button></td>
+                                    <td class="p-2 text-center"><button onclick="applyVcToCalc(38)" class="bg-olive-100 text-army-800 font-bold px-2 py-0.5 rounded hover:bg-olive-500 hover:text-white">35 - 45</button></td>
+                                    <td class="p-2 text-center font-mono">0.08 - 0.15</td>
+                                </tr>
+                                <tr class="hover:bg-army-50">
+                                    <td class="p-2 font-bold">Besi Tuang (Cast Iron)</td>
+                                    <td class="p-2 text-center"><button onclick="applyVcToCalc(22)" class="bg-olive-100 text-army-800 font-bold px-2 py-0.5 rounded hover:bg-olive-500 hover:text-white">20 - 25</button></td>
+                                    <td class="p-2 text-center"><button onclick="applyVcToCalc(60)" class="bg-olive-100 text-army-800 font-bold px-2 py-0.5 rounded hover:bg-olive-500 hover:text-white">50 - 70</button></td>
+                                    <td class="p-2 text-center font-mono">0.15 - 0.30</td>
+                                </tr>
+                                <tr class="hover:bg-army-50">
+                                    <td class="p-2 font-bold">Kuningan & Perunggu (Brass)</td>
+                                    <td class="p-2 text-center"><button onclick="applyVcToCalc(45)" class="bg-olive-100 text-army-800 font-bold px-2 py-0.5 rounded hover:bg-olive-500 hover:text-white">40 - 55</button></td>
+                                    <td class="p-2 text-center"><button onclick="applyVcToCalc(110)" class="bg-olive-100 text-army-800 font-bold px-2 py-0.5 rounded hover:bg-olive-500 hover:text-white">90 - 130</button></td>
+                                    <td class="p-2 text-center font-mono">0.20 - 0.35</td>
+                                </tr>
+                                <tr class="hover:bg-army-50">
+                                    <td class="p-2 font-bold">Aluminium Paduan</td>
+                                    <td class="p-2 text-center"><button onclick="applyVcToCalc(75)" class="bg-olive-100 text-army-800 font-bold px-2 py-0.5 rounded hover:bg-olive-500 hover:text-white">60 - 90</button></td>
+                                    <td class="p-2 text-center"><button onclick="applyVcToCalc(180)" class="bg-olive-100 text-army-800 font-bold px-2 py-0.5 rounded hover:bg-olive-500 hover:text-white">150 - 220</button></td>
+                                    <td class="p-2 text-center font-mono">0.20 - 0.40</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Table 2: Tabel Vc Bubut, Milling, dan Sekrap -->
+                <div class="pt-2">
+                    <h4 class="text-xs font-extrabold text-olive-600 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+                        <i class="fa-solid fa-gears"></i>
+                        <span>B. Tabel Vc Bubut, Milling (Frais) & Shaping (Sekrap) - Pahat HSS</span>
+                    </h4>
+                    <div class="overflow-x-auto rounded-xl border border-army-200">
+                        <table class="w-full text-left text-[11px]">
+                            <thead class="bg-army-700 text-white">
+                                <tr>
+                                    <th class="p-2">Material</th>
+                                    <th class="p-2 text-center">Bubut Kasar</th>
+                                    <th class="p-2 text-center">Bubut Halus</th>
+                                    <th class="p-2 text-center">Milling HSS</th>
+                                    <th class="p-2 text-center">Sekrap</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-200">
+                                <tr>
+                                    <td class="p-2 font-bold">Baja Lunak (St37)</td>
+                                    <td class="p-2 text-center"><button onclick="applyVcToCalc(30)" class="underline font-bold text-olive-600">30</button></td>
+                                    <td class="p-2 text-center"><button onclick="applyVcToCalc(42)" class="underline font-bold text-olive-600">42</button></td>
+                                    <td class="p-2 text-center"><button onclick="applyVcToCalc(25)" class="underline font-bold text-olive-600">25</button></td>
+                                    <td class="p-2 text-center"><button onclick="applyVcToCalc(18)" class="underline font-bold text-olive-600">18</button></td>
+                                </tr>
+                                <tr>
+                                    <td class="p-2 font-bold">Baja S45C</td>
+                                    <td class="p-2 text-center"><button onclick="applyVcToCalc(22)" class="underline font-bold text-olive-600">22</button></td>
+                                    <td class="p-2 text-center"><button onclick="applyVcToCalc(30)" class="underline font-bold text-olive-600">30</button></td>
+                                    <td class="p-2 text-center"><button onclick="applyVcToCalc(18)" class="underline font-bold text-olive-600">18</button></td>
+                                    <td class="p-2 text-center"><button onclick="applyVcToCalc(14)" class="underline font-bold text-olive-600">14</button></td>
+                                </tr>
+                                <tr>
+                                    <td class="p-2 font-bold">Besi Tuang</td>
+                                    <td class="p-2 text-center"><button onclick="applyVcToCalc(18)" class="underline font-bold text-olive-600">18</button></td>
+                                    <td class="p-2 text-center"><button onclick="applyVcToCalc(26)" class="underline font-bold text-olive-600">26</button></td>
+                                    <td class="p-2 text-center"><button onclick="applyVcToCalc(20)" class="underline font-bold text-olive-600">20</button></td>
+                                    <td class="p-2 text-center"><button onclick="applyVcToCalc(15)" class="underline font-bold text-olive-600">15</button></td>
+                                </tr>
+                                <tr>
+                                    <td class="p-2 font-bold">Aluminium</td>
+                                    <td class="p-2 text-center"><button onclick="applyVcToCalc(80)" class="underline font-bold text-olive-600">80</button></td>
+                                    <td class="p-2 text-center"><button onclick="applyVcToCalc(120)" class="underline font-bold text-olive-600">120</button></td>
+                                    <td class="p-2 text-center"><button onclick="applyVcToCalc(70)" class="underline font-bold text-olive-600">70</button></td>
+                                    <td class="p-2 text-center"><button onclick="applyVcToCalc(30)" class="underline font-bold text-olive-600">30</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PANDUAN DEPLOYMENT SINGKAT DI BAGIAN BAWAH BERANDA -->
+        <section class="bg-army-100/80 border border-army-200 rounded-2xl p-3.5 text-xs text-army-800">
+            <div class="flex items-center justify-between cursor-pointer" onclick="document.getElementById('deployGuideBox').classList.toggle('hidden')">
+                <div class="flex items-center space-x-2 font-bold">
+                    <i class="fa-solid fa-mobile-screen-button text-olive-600"></i>
+                    <span>Panduan Akses Mahasiswa di HP & Penyimpanan Besar</span>
+                </div>
+                <i class="fa-solid fa-chevron-down text-[10px]"></i>
+            </div>
+            <div id="deployGuideBox" class="hidden mt-2.5 pt-2.5 border-t border-army-200 space-y-1.5 text-[11px] leading-relaxed">
+                <p>1. <b>Akses HP:</b> website dapat dibuka melalui tautan HTTPS dari Netlify. Di HP, pilih menu browser dan "Tambahkan ke Layar Utama".</p>
+                <p>2. <b>Sinkronisasi:</b> data alat dan job sheet disimpan di Supabase, bukan hanya di perangkat admin. Mahasiswa dapat memuat ulang halaman untuk melihat perubahan.</p>
+                <p>3. <b>Keamanan:</b> akun dosen dibuat melalui Supabase. Tidak ada password admin bawaan.</p>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- GOJEK-STYLE BOTTOM NAVIGATION BAR -->
+    <nav class="fixed bottom-0 left-0 right-0 max-w-[480px] mx-auto bg-white border-t border-slate-200 px-3 py-2 flex justify-around items-center z-30 shadow-[0_-4px_20px_rgba(0,0,0,0.06)] rounded-t-2xl">
+        <button onclick="switchMainTab('home')" id="nav-home" class="nav-item flex flex-col items-center py-1 px-3 rounded-xl text-olive-600 font-bold transition">
+            <i class="fa-solid fa-house text-lg mb-0.5"></i>
+            <span class="text-[10px]">Beranda</span>
+        </button>
+        <button onclick="switchMainTab('tools')" id="nav-tools" class="nav-item flex flex-col items-center py-1 px-3 rounded-xl text-slate-400 hover:text-army-700 font-medium transition">
+            <i class="fa-solid fa-screwdriver-wrench text-lg mb-0.5"></i>
+            <span class="text-[10px]">Alat & Sesi</span>
+        </button>
+        <button onclick="switchMainTab('jobsheets')" id="nav-jobsheets" class="nav-item flex flex-col items-center py-1 px-3 rounded-xl text-slate-400 hover:text-army-700 font-medium transition">
+            <i class="fa-solid fa-book-open-reader text-lg mb-0.5"></i>
+            <span class="text-[10px]">Job Sheet</span>
+        </button>
+        <button onclick="switchMainTab('calc')" id="nav-calc" class="nav-item flex flex-col items-center py-1 px-3 rounded-xl text-slate-400 hover:text-army-700 font-medium transition">
+            <i class="fa-solid fa-calculator text-lg mb-0.5"></i>
+            <span class="text-[10px]">Kalkulator</span>
+        </button>
+    </nav>
+
+</div>
+
+<!-- ================= MODAL 1: JOB SHEET DETAIL, IMAGE UPLOAD & DOWNLOAD ================= -->
+<div id="jobDetailModal" class="hidden fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="bg-white w-full max-w-[480px] max-h-[92vh] rounded-t-3xl sm:rounded-3xl overflow-hidden flex flex-col shadow-2xl">
+        <!-- Modal Header -->
+        <div class="bg-army-800 text-white px-4 py-3.5 flex items-center justify-between">
+            <div>
+                <span id="modalJobBadge" class="text-[10px] font-bold uppercase bg-olive-500 px-2 py-0.5 rounded-full">Semester 1 • Kerja Bangku</span>
+                <h3 id="modalJobTitle" class="font-extrabold text-sm mt-1">Judul Job Sheet</h3>
+            </div>
+            <button onclick="closeJobDetailModal()" class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <!-- Modal Body (Printable Area) -->
+        <div id="printArea" class="p-4 overflow-y-auto space-y-4 text-xs">
+            <!-- Guide Images Gallery -->
+            <div>
+                <div class="flex items-center justify-between mb-2">
+                    <span class="font-extrabold text-army-800 uppercase tracking-wider text-[11px]">
+                        <i class="fa-regular fa-images text-olive-600 mr-1"></i>Gambar Kerja & Panduan Praktik
+                    </span>
+                    <label id="detailUploadLabel" class="hidden cursor-pointer bg-olive-100 hover:bg-olive-200 text-army-800 font-bold px-2.5 py-1 rounded-lg text-[11px] items-center gap-1 transition">
+                        <i class="fa-solid fa-camera"></i>
+                        <span>+ Tambah / Ganti Gambar</span>
+                        <input type="file" accept="image/*" multiple class="hidden" onchange="handleDirectJobImageUpload(event)">
+                    </label>
+                </div>
+                <div id="modalJobGallery" class="space-y-2.5"></div>
+            </div>
+
+            <!-- Alat & K3 -->
+            <div class="grid grid-cols-2 gap-2.5">
+                <div class="bg-army-50 p-3 rounded-xl border border-army-200">
+                    <h4 class="font-extrabold text-army-900 mb-1"><i class="fa-solid fa-helmet-safety text-amber-600 mr-1"></i>APD & K3</h4>
+                    <p id="modalJobK3" class="text-slate-600 text-[11px] leading-relaxed"></p>
+                </div>
+                <div class="bg-army-50 p-3 rounded-xl border border-army-200">
+                    <h4 class="font-extrabold text-army-900 mb-1"><i class="fa-solid fa-ruler-combined text-olive-600 mr-1"></i>Bahan & Dimensi</h4>
+                    <p id="modalJobMaterial" class="text-slate-600 text-[11px] leading-relaxed"></p>
+                </div>
+            </div>
+
+            <!-- Langkah Kerja -->
+            <div class="bg-white border border-slate-200 rounded-xl p-3.5">
+                <h4 class="font-extrabold text-army-900 mb-2">Langkah Kerja & Prosedur Operasi Standar (SOP):</h4>
+                <ol id="modalJobSteps" class="list-decimal list-inside space-y-1.5 text-slate-700 leading-relaxed"></ol>
+            </div>
+        </div>
+
+        <!-- Modal Footer Actions (Download / Print) -->
+        <div class="p-3.5 bg-slate-50 border-t flex items-center justify-between gap-2">
+            <button onclick="downloadJobSheetHTML()" class="flex-1 bg-olive-600 hover:bg-olive-500 text-white font-bold text-xs py-2.5 px-3 rounded-xl shadow flex items-center justify-center gap-1.5">
+                <i class="fa-solid fa-download"></i>
+                <span>Unduh File Job Sheet</span>
+            </button>
+            <button onclick="window.print()" class="bg-army-800 hover:bg-army-700 text-white font-bold text-xs py-2.5 px-3.5 rounded-xl shadow flex items-center justify-center gap-1.5">
+                <i class="fa-solid fa-print"></i>
+                <span>Cetak / PDF</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ================= MODAL 2: PANEL ADMIN (LOGIN + CRUD ALAT & JOBSHEET + SUPABASE) ================= -->
+<div id="adminModal" class="hidden fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="bg-white w-full max-w-[480px] max-h-[92vh] rounded-t-3xl sm:rounded-3xl overflow-hidden flex flex-col shadow-2xl">
+        <!-- Header -->
+        <div class="bg-gradient-to-r from-army-900 to-army-700 text-white px-4 py-3.5 flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+                <i class="fa-solid fa-user-shield text-olive-400"></i>
+                <h3 class="font-extrabold text-sm">Panel Dosen & Administrator GearUp</h3>
+            </div>
+            <button onclick="closeAdminModal()" class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <!-- View A: Admin Login Form -->
+        <div id="adminLoginSection" class="p-5 space-y-4">
+            <div class="bg-army-50 border border-army-200 rounded-2xl p-3.5 text-xs text-army-800">
+                <p class="font-bold mb-1"><i class="fa-solid fa-lock text-olive-600 mr-1"></i>Akses Terproteksi Dosen / Instruktur</p>
+                <p class="text-[11px] text-slate-600">Masuk menggunakan email dan password dosen yang dibuat di Supabase. Hanya akun yang terdaftar sebagai admin yang dapat mengubah data.</p>
+            </div>
+            <div>
+                <label class="text-xs font-bold text-slate-700 block mb-1">Email Admin</label>
+                <input id="adminEmailInput" type="email" placeholder="dosen@kampus.ac.id" autocomplete="username" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:border-olive-500 focus:outline-none">
+            </div>
+            <div>
+                <label class="text-xs font-bold text-slate-700 block mb-1">Password Admin</label>
+                <input id="adminPasswordInput" type="password" placeholder="Masukkan password admin..." onkeydown="if(event.key==='Enter') verifyAdminLogin()" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:border-olive-500 focus:outline-none">
+            </div>
+            <button onclick="verifyAdminLogin()" class="w-full bg-olive-600 hover:bg-olive-500 text-white font-extrabold py-2.5 rounded-xl text-xs shadow">
+                Masuk ke Mode Admin
+            </button>
+        </div>
+
+        <!-- View B: Admin Dashboard Content (Shown after login) -->
+        <div id="adminDashboardSection" class="hidden p-4 overflow-y-auto space-y-4 text-xs">
+            <!-- Supabase Storage Storage Status Bar -->
+            <div class="bg-army-900 text-white p-3 rounded-2xl flex items-center justify-between">
+                <div>
+                    <p class="text-[10px] text-olive-400 font-bold uppercase">Database Online &amp; Penyimpanan Gambar</p>
+                    <p class="text-xs font-semibold mt-0.5" id="idbStorageStatus">Supabase • tersinkron untuk seluruh mahasiswa</p>
+                </div>
+                <button onclick="logoutAdmin()" class="text-[11px] bg-red-500/20 text-red-300 border border-red-400/30 px-2.5 py-1 rounded-lg font-bold">
+                    Keluar
+                </button>
+            </div>
+
+            <!-- Admin Sub-Tabs -->
+            <div class="grid grid-cols-3 gap-1.5 bg-slate-100 p-1 rounded-xl">
+                <button onclick="switchAdminSubTab('formJob')" id="admTab-formJob" class="py-2 rounded-lg font-bold bg-army-700 text-white">+ Job Sheet</button>
+                <button onclick="switchAdminSubTab('formTool')" id="admTab-formTool" class="py-2 rounded-lg font-bold text-slate-700">+ Alat Kerja</button>
+                <button onclick="switchAdminSubTab('settings')" id="admTab-settings" class="py-2 rounded-lg font-bold text-slate-700">Password & Data</button>
+            </div>
+
+            <!-- SUB-TAB 1: ADD / EDIT JOB SHEET & LARGE IMAGES -->
+            <div id="adminSub-formJob" class="space-y-3">
+                <h4 class="font-extrabold text-army-900 text-xs" id="formJobHeading">Tambah / Update Job Sheet & Gambar Panduan</h4>
+                <input type="hidden" id="editJobId">
+                <div class="grid grid-cols-2 gap-2.5">
+                    <div>
+                        <label class="font-bold text-slate-700 block mb-1">Pilih Sesi & Semester</label>
+                        <select id="admJobSession" class="w-full px-2.5 py-2 rounded-xl border text-xs font-semibold bg-white"></select>
+                    </div>
+                    <div>
+                        <label class="font-bold text-slate-700 block mb-1">Bahan & Ukuran</label>
+                        <input id="admJobMaterial" type="text" placeholder="St37 Ø25 x 100 mm" class="w-full px-2.5 py-2 rounded-xl border text-xs">
+                    </div>
+                </div>
+                <div>
+                    <label class="font-bold text-slate-700 block mb-1">Judul Job Sheet</label>
+                    <input id="admJobTitle" type="text" placeholder="Contoh: Job Sheet Bubut Bertingkat & Ulir" class="w-full px-3 py-2 rounded-xl border text-xs font-semibold">
+                </div>
+                <div>
+                    <label class="font-bold text-slate-700 block mb-1">Perlengkapan K3 / Keselamatan</label>
+                    <input id="admJobK3" type="text" placeholder="Kacamata pengaman, Wearpack, Sepatu Safety" class="w-full px-3 py-2 rounded-xl border text-xs">
+                </div>
+                <div>
+                    <label class="font-bold text-slate-700 block mb-1">Langkah Kerja (Pisahkan tiap langkah dengan baris baru / Enter)</label>
+                    <textarea id="admJobSteps" rows="4" placeholder="1. Siapkan benda kerja dan cek ukuran awal&#10;2. Pasang benda kerja pada chuck..." class="w-full px-3 py-2 rounded-xl border text-xs"></textarea>
+                </div>
+                <div>
+                    <label class="font-bold text-slate-700 block mb-1">Unggah File Gambar Kerja / Panduan (Bisa pilih banyak file besar)</label>
+                    <input id="admJobImagesInput" type="file" accept="image/*" multiple onchange="previewAdminJobImages(event)" class="w-full text-xs file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:bg-olive-600 file:text-white font-semibold">
+                    <div id="admJobImagePreview" class="flex gap-2 overflow-x-auto pt-2"></div>
+                </div>
+                <button onclick="saveJobSheetFromAdmin()" class="w-full bg-olive-600 hover:bg-olive-500 text-white font-extrabold py-2.5 rounded-xl shadow">
+                    <i class="fa-solid fa-floppy-disk mr-1"></i>Simpan Job Sheet ke Database
+                </button>
+            </div>
+
+            <!-- SUB-TAB 2: ADD / EDIT ALAT PRAKTIK -->
+            <div id="adminSub-formTool" class="hidden space-y-3">
+                <h4 class="font-extrabold text-army-900 text-xs" id="formToolHeading">Tambah / Edit Daftar Alat Kerja Praktik</h4>
+                <input type="hidden" id="editToolId">
+                <div class="grid grid-cols-2 gap-2.5">
+                    <div>
+                        <label class="font-bold text-slate-700 block mb-1">Sesi & Semester</label>
+                        <select id="admToolSession" class="w-full px-2.5 py-2 rounded-xl border text-xs font-semibold bg-white"></select>
+                    </div>
+                    <div>
+                        <label class="font-bold text-slate-700 block mb-1">Golongan Kelas Alat</label>
+                        <select id="admToolClass" class="w-full px-2.5 py-2 rounded-xl border text-xs font-semibold bg-white">
+                            <option value="Mesin Utama">Mesin Utama</option>
+                            <option value="Alat Potong & Sayat">Alat Potong & Sayat</option>
+                            <option value="Alat Ukur & Lukis">Alat Ukur & Lukis</option>
+                            <option value="Alat Cekam & Bantu">Alat Cekam & Bantu</option>
+                            <option value="Alat Tempa & Las">Alat Tempa & Las</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label class="font-bold text-slate-700 block mb-1">Nama Alat / Mesin</label>
+                    <input id="admToolName" type="text" placeholder="Contoh: Jangka Sorong Vernier 0.02 mm" class="w-full px-3 py-2 rounded-xl border text-xs font-semibold">
+                </div>
+                <div>
+                    <label class="font-bold text-slate-700 block mb-1">Fungsi & Spesifikasi Teknis</label>
+                    <textarea id="admToolDesc" rows="2" placeholder="Fungsi dan spesifikasi teknis alat..." class="w-full px-3 py-2 rounded-xl border text-xs"></textarea>
+                </div>
+                <div>
+                    <label class="font-bold text-slate-700 block mb-1">Unggah / Ganti Foto Alat</label>
+                    <input id="admToolImageInput" type="file" accept="image/*" onchange="previewAdminToolImage(event)" class="w-full text-xs file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:bg-olive-600 file:text-white font-semibold">
+                    <div id="admToolImagePreview" class="pt-2"></div>
+                </div>
+                <button onclick="saveToolFromAdmin()" class="w-full bg-olive-600 hover:bg-olive-500 text-white font-extrabold py-2.5 rounded-xl shadow">
+                    <i class="fa-solid fa-floppy-disk mr-1"></i>Simpan Alat ke Database
+                </button>
+            </div>
+
+            <!-- SUB-TAB 3: CHANGE PASSWORD & BACKUP DATABASE -->
+            <div id="adminSub-settings" class="hidden space-y-4">
+                <div class="bg-slate-50 p-3.5 rounded-2xl border space-y-2.5">
+                    <h4 class="font-extrabold text-army-900">Ganti Password Admin</h4>
+                    <input id="newAdminPassInput" type="password" placeholder="Masukkan password admin baru..." class="w-full px-3 py-2 rounded-xl border text-xs">
+                    <button onclick="changeAdminPassword()" class="bg-army-800 text-white font-bold px-4 py-2 rounded-xl text-xs">
+                        Simpan Password Baru
+                    </button>
+                </div>
+
+                <div class="bg-olive-50 p-3.5 rounded-2xl border border-olive-200 space-y-2.5">
+                    <h4 class="font-extrabold text-army-900">Publikasikan 25 Alat &amp; 9 Job Sheet Bawaan</h4>
+                    <p class="text-[11px] text-slate-600">Klik sekali setelah akun admin selesai disiapkan. Data yang telah diedit tidak akan ditimpa.</p>
+                    <button onclick="publishInitialCatalog()" class="w-full bg-olive-600 text-white font-bold py-2 rounded-xl text-xs">Publikasikan Data Awal ke Cloud</button>
+                </div>
+                <div class="bg-slate-50 p-3.5 rounded-2xl border space-y-2.5">
+                    <h4 class="font-extrabold text-army-900">Backup & Pulihkan Database (Termasuk Gambar)</h4>
+                    <p class="text-[11px] text-slate-600">Ekspor seluruh data Alat dan Job Sheet beserta gambar ke file JSON atau muat ulang dari backup.</p>
+                    <div class="flex gap-2">
+                        <button onclick="exportFullDatabase()" class="flex-1 bg-olive-600 text-white font-bold py-2 rounded-xl text-xs">
+                            <i class="fa-solid fa-download mr-1"></i>Backup JSON
+                        </button>
+                        <label class="flex-1 bg-army-700 text-white font-bold py-2 rounded-xl text-xs text-center cursor-pointer">
+                            <i class="fa-solid fa-upload mr-1"></i>Import JSON
+                            <input type="file" accept=".json" class="hidden" onchange="importFullDatabase(event)">
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- NON-BLOCKING TOAST NOTIFICATION -->
+<div id="toastBox" class="fixed top-4 left-1/2 -translate-x-1/2 z-50 hidden bg-army-900 text-white text-xs font-bold px-4 py-2.5 rounded-2xl shadow-xl border border-olive-400/40 flex items-center space-x-2">
+    <i class="fa-solid fa-circle-check text-olive-400"></i>
+    <span id="toastMessage">Berhasil disimpan</span>
+</div>
+
+<script src="./config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+    /********************************************************************
+     * 1. STRUKTUR DATA KURIKULUM 4 SEMESTER & 9 SESI PRAKTIK BENGKEL
+     ********************************************************************/
+    const SESSIONS_CONFIG = [
+        // SEMESTER 1
+        { id: 's1_bangku', sem: 1, order: 1, name: 'Kerja Bangku', icon: 'fa-screwdriver-wrench', color: 'bg-olive-500', desc: 'Kikir, Gergaji, Tap & Snei, Alat Ukur Presisi' },
+        { id: 's1_plat',   sem: 1, order: 2, name: 'Kerja Plat',   icon: 'fa-sheet-plastic',      color: 'bg-army-600',  desc: 'Pemotongan, Lipat (Bending), Roll & Sambungan Plat' },
+        { id: 's1_tempa',  sem: 1, order: 3, name: 'Kerja Tempa',  icon: 'fa-fire-flame-curved',  color: 'bg-amber-600', desc: 'Dapur Tempa, Anvil, Upsetting & Drawing Out' },
+        // SEMESTER 2
+        { id: 's2_gerinda',sem: 2, order: 4, name: 'Gerinda',      icon: 'fa-compact-disc',       color: 'bg-olive-600', desc: 'Surface Grinding, Cylindrical & Pengasahan Pahat' },
+        { id: 's2_shaping',sem: 2, order: 5, name: 'Shaping',      icon: 'fa-arrows-left-right',  color: 'bg-army-700',  desc: 'Mesin Sekrap Horizontal, Alur Pasak & Bidang Rata' },
+        { id: 's2_bubut',  sem: 2, order: 6, name: 'Bubut',        icon: 'fa-rotate',             color: 'bg-olive-500', desc: 'Turning Rata, Bertingkat, Tirus, Kartel & Ulir' },
+        // SEMESTER 3
+        { id: 's3_las',    sem: 3, order: 7, name: 'Las (Welding)',icon: 'fa-bolt-lightning',     color: 'bg-amber-600', desc: 'Las Busur Listrik SMAW, MIG/MAG, TIG & K3 Las' },
+        { id: 's3_milling',sem: 3, order: 8, name: 'Milling',      icon: 'fa-gear',               color: 'bg-army-700',  desc: 'Frais Vertikal/Universal, Kepala Pembagi & Roda Gigi' },
+        // SEMESTER 4
+        { id: 's4_ragum',  sem: 4, order: 9, name: 'Pabrikasi (Ragum)', icon: 'fa-industry',      color: 'bg-army-800',  desc: 'Proyek Pembuatan Ragum Presisi & Perakitan Total' }
+    ];
+
+    // Helper SVG Blueprint Generator for Default Technical Guide Images
+    function createTechnicalBlueprintSVG(title, subtitle, code) {
+        const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="800" height="450" viewBox="0 0 800 450">
+            <rect width="800" height="450" fill="#1D2614"/>
+            <g stroke="#3B4D2B" stroke-width="1">
+                <line x1="0" y1="50" x2="800" y2="50"/><line x1="0" y1="100" x2="800" y2="100"/><line x1="0" y1="150" x2="800" y2="150"/>
+                <line x1="0" y1="200" x2="800" y2="200"/><line x1="0" y1="250" x2="800" y2="250"/><line x1="0" y1="300" x2="800" y2="300"/>
+                <line x1="0" y1="350" x2="800" y2="350"/><line x1="0" y1="400" x2="800" y2="400"/>
+                <line x1="100" y1="0" x2="100" y2="450"/><line x1="200" y1="0" x2="200" y2="450"/><line x1="300" y1="0" x2="300" y2="450"/>
+                <line x1="400" y1="0" x2="400" y2="450"/><line x1="500" y1="0" x2="500" y2="450"/><line x1="600" y1="0" x2="600" y2="450"/><line x1="700" y1="0" x2="700" y2="450"/>
+            </g>
+            <rect x="20" y="20" width="760" height="410" fill="none" stroke="#8FBC36" stroke-width="3"/>
+            <!-- Technical Drawing Centerpiece -->
+            <g stroke="#E6ECD9" stroke-width="2.5" fill="none">
+                <rect x="160" y="130" width="280" height="140" rx="6"/>
+                <circle cx="230" cy="200" r="35"/>
+                <circle cx="370" cy="200" r="22"/>
+                <line x1="130" y1="200" x2="470" y2="200" stroke="#8FBC36" stroke-dasharray="10,5"/>
+                <line x1="230" y1="140" x2="230" y2="260" stroke="#8FBC36" stroke-dasharray="10,5"/>
+                <polygon points="520,270 640,270 640,160 570,160 570,210 520,210" stroke="#8FBC36" stroke-width="3"/>
+            </g>
+            <!-- Title Block ISO Standard -->
+            <rect x="440" y="340" width="340" height="90" fill="#2A361E" stroke="#8FBC36" stroke-width="2"/>
+            <text x="460" y="370" fill="#8FBC36" font-family="monospace" font-size="15" font-weight="bold">GEARUP TEKNOLOGI MEKANIK</text>
+            <text x="460" y="395" fill="#FFFFFF" font-family="sans-serif" font-size="16" font-weight="bold">${title}</text>
+            <text x="460" y="416" fill="#C8D6B0" font-family="monospace" font-size="12">${subtitle} | KODE: ${code}</text>
+        </svg>`;
+        return 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
+    }
+
+    // Default Comprehensive Tools Catalog across all 9 sessions
+    const INITIAL_TOOLS = [
+        // 1. Kerja Bangku
+        { id: 't1', sessionId: 's1_bangku', name: 'Kikir Rata & Segitiga (Bastard/Halus)', cls: 'Alat Potong & Sayat', spec: 'Panjang 10 inch, Baja Karbon Tinggi untuk meratakan dan menyiku bidang benda kerja.', image: createTechnicalBlueprintSVG('Kikir Rata & Presisi', 'Golongan: Alat Sayat Bangku', 'KB-01') },
+        { id: 't2', sessionId: 's1_bangku', name: 'Jangka Sorong (Vernier Caliper) 0.02 mm', cls: 'Alat Ukur & Lukis', spec: 'Kapasitas 0-150 mm, ketelitian 0.02 mm untuk ukur diameter luar, dalam, dan kedalaman.', image: createTechnicalBlueprintSVG('Vernier Caliper 0.02mm', 'Golongan: Alat Ukur Presisi', 'KB-02') },
+        { id: 't3', sessionId: 's1_bangku', name: 'Ragum Kerja Bangku (Bench Vise)', cls: 'Alat Cekam & Bantu', spec: 'Lebar rahang 125 mm, besi tuang nodular untuk menjepit benda kerja saat mengikir/menggergaji.', image: createTechnicalBlueprintSVG('Ragum Bangku 125mm', 'Golongan: Alat Cekam', 'KB-03') },
+        { id: 't4', sessionId: 's1_bangku', name: 'Tap & Snei Set (M6 - M12)', cls: 'Alat Potong & Sayat', spec: 'HSS Hand Tap (No.1, 2, 3) dan Snei pembuatan ulir dalam serta ulir luar manual.', image: createTechnicalBlueprintSVG('Tap & Snei Set Metrik', 'Golongan: Alat Potong Ulir', 'KB-04') },
+        // 2. Kerja Plat
+        { id: 't5', sessionId: 's1_plat', name: 'Mesin Lipat Plat (Box & Pan Brake Bending)', cls: 'Mesin Utama', spec: 'Kapasitas tebal plat maks 2.0 mm, panjang kerja 1200 mm untuk penekukan sudut presisi.', image: createTechnicalBlueprintSVG('Mesin Bending Plat', 'Golongan: Mesin Pembentuk', 'KP-01') },
+        { id: 't6', sessionId: 's1_plat', name: 'Gunting Plat Tangan (Lurus & Lengkung)', cls: 'Alat Potong & Sayat', spec: 'Baja tempa keras untuk memotong lembaran baja tipis/galvanis hingga tebal 1.2 mm.', image: createTechnicalBlueprintSVG('Gunting Plat Manual', 'Golongan: Alat Potong Plat', 'KP-02') },
+        { id: 't7', sessionId: 's1_plat', name: 'Mesin Roll Silinder Plat (Slip Roll)', cls: 'Mesin Utama', spec: '3 Poros pengerol untuk membentuk silinder dan kerucut dari lembaran plat.', image: createTechnicalBlueprintSVG('Mesin Roll 3 Poros', 'Golongan: Mesin Utama Plat', 'KP-03') },
+        // 3. Kerja Tempa
+        { id: 't8', sessionId: 's1_tempa', name: 'Dapur Tempa (Forging Furnace) & Blower', cls: 'Mesin Utama', spec: 'Pemanas benda kerja hingga suhu tempa austenit (850°C - 1150°C).', image: createTechnicalBlueprintSVG('Dapur Tempa & Blower', 'Golongan: Pemanas Tempa', 'KT-01') },
+        { id: 't9', sessionId: 's1_tempa', name: 'Paron / Landasan Tempa (Anvil Baja)', cls: 'Alat Tempa & Las', spec: 'Berat 75 kg dengan tanduk kerucut (horn) dan lubang hardy untuk pembentukan panas.', image: createTechnicalBlueprintSVG('Paron Tempa (Anvil)', 'Golongan: Landasan Tempa', 'KT-02') },
+        { id: 't10', sessionId: 's1_tempa', name: 'Palu Tempa (Sledge Hammer) & Tang Penjepit', cls: 'Alat Tempa & Las', spec: 'Palu 1.5 - 3 kg dan Tongs penjepit baja membara.', image: createTechnicalBlueprintSVG('Palu & Tang Tempa', 'Golongan: Perkakas Tempa', 'KT-03') },
+        // 4. Gerinda
+        { id: 't11', sessionId: 's2_gerinda', name: 'Mesin Gerinda Datar (Surface Grinding)', cls: 'Mesin Utama', spec: 'Meja magnetik hidrolik, ketelitian 0.002 mm untuk penggerindaan rata presisi tinggi.', image: createTechnicalBlueprintSVG('Surface Grinding Machine', 'Golongan: Mesin Utama', 'GR-01') },
+        { id: 't12', sessionId: 's2_gerinda', name: 'Mesin Gerinda Duduk (Pedestal Grinder)', cls: 'Mesin Utama', spec: 'Roda gerinda kasar & halus untuk pengasahan sudut pahat bubut HSS dan pahat sekrap.', image: createTechnicalBlueprintSVG('Pedestal Tool Grinder', 'Golongan: Mesin Asah Pahat', 'GR-02') },
+        { id: 't13', sessionId: 's2_gerinda', name: 'Diamond Dresser & Batu Gerinda Silikon Karbida', cls: 'Alat Potong & Sayat', spec: 'Alat truing dan dressing permukaan batu gerinda agar tetap tajam dan silindris.', image: createTechnicalBlueprintSVG('Batu Gerinda & Dresser', 'Golongan: Alat Abrasive', 'GR-03') },
+        // 5. Shaping
+        { id: 't14', sessionId: 's2_shaping', name: 'Mesin Sekrap Horizontal (Shaper Machine)', cls: 'Mesin Utama', spec: 'Gerak langkah bolak-balik ram untuk menyekrap rata, bertingkat, dan alur pasak.', image: createTechnicalBlueprintSVG('Mesin Sekrap Horizontal', 'Golongan: Mesin Utama', 'SH-01') },
+        { id: 't15', sessionId: 's2_shaping', name: 'Pahat Sekrap HSS Kasar & Halus', cls: 'Alat Potong & Sayat', spec: 'Baja kecepatan tinggi (HSS) dengan sudut bebas dan sudut garuk khusus langkah sekrap.', image: createTechnicalBlueprintSVG('Pahat Sekrap HSS', 'Golongan: Alat Potong', 'SH-02') },
+        // 6. Bubut
+        { id: 't16', sessionId: 's2_bubut', name: 'Mesin Bubut Konvensional Presisi', cls: 'Mesin Utama', spec: 'Dilengkapi eretan memanjang, melintang, atas, kepala lepas, dan gearbox ulir metrik/inchi.', image: createTechnicalBlueprintSVG('Mesin Bubut Konvensional', 'Golongan: Mesin Utama', 'BB-01') },
+        { id: 't17', sessionId: 's2_bubut', name: 'Pahat Bubut HSS & Insert Carbide (Rata/Ulir/Dalam)', cls: 'Alat Potong & Sayat', spec: 'Pahat bubut luar, pahat alur, pahat ulir metrik 60°, dan boring bar.', image: createTechnicalBlueprintSVG('Set Pahat Bubut & Carbide', 'Golongan: Alat Potong', 'BB-02') },
+        { id: 't18', sessionId: 's2_bubut', name: 'Mikrometer Luar 0-25 mm & Dial Indicator', cls: 'Alat Ukur & Lukis', spec: 'Ketelitian 0.01 mm untuk kontrol kualitas dimensi silindris dan kesenteran benda kerja.', image: createTechnicalBlueprintSVG('Mikrometer Luar 0.01mm', 'Golongan: Alat Ukur Presisi', 'BB-03') },
+        // 7. Las
+        { id: 't19', sessionId: 's3_las', name: 'Mesin Las Busur Listrik SMAW & MIG/MAG', cls: 'Mesin Utama', spec: 'Inverter DC 200A-300A untuk pengelasan elektroda terbungkus (E6013/E7018) dan kawat CO2.', image: createTechnicalBlueprintSVG('Mesin Las SMAW & MIG', 'Golongan: Mesin Utama Las', 'LS-01') },
+        { id: 't20', sessionId: 's3_las', name: 'Helm Las Auto-Darkening, Apron Kulit & Palu Terak', cls: 'Alat Tempa & Las', spec: 'Pelindung radiasi sinar busur UV/IR dan alat pembersih slag hasil pengelasan.', image: createTechnicalBlueprintSVG('APD Las & Palu Terak', 'Golongan: Alat Las & K3', 'LS-02') },
+        // 8. Milling
+        { id: 't21', sessionId: 's3_milling', name: 'Mesin Frais Universal & Vertikal (Milling Machine)', cls: 'Mesin Utama', spec: 'Spindel vertikal/horizontal untuk pembuatan bidang rata, alur T, dan roda gigi.', image: createTechnicalBlueprintSVG('Mesin Frais Universal', 'Golongan: Mesin Utama', 'ML-01') },
+        { id: 't22', sessionId: 's3_milling', name: 'Endmill Cutter, Face Mill & Pisau Modul', cls: 'Alat Potong & Sayat', spec: 'Pisau frais HSS/Carbide 2-4 flute dan pisau modul pembuatan profil roda gigi lurus.', image: createTechnicalBlueprintSVG('Endmill & Pisau Frais', 'Golongan: Alat Potong Frais', 'ML-02') },
+        { id: 't23', sessionId: 's3_milling', name: 'Kepala Pembagi (Dividing Head) & Ragum Frais', cls: 'Alat Cekam & Bantu', spec: 'Rasio 40:1 untuk pembagian sudut keliling roda gigi dan segi banyak beraturan.', image: createTechnicalBlueprintSVG('Dividing Head 40:1', 'Golongan: Alat Bantu Frais', 'ML-03') },
+        // 9. Pabrikasi Ragum
+        { id: 't24', sessionId: 's4_ragum', name: 'Stasiun Pabrikasi Terpadu (Bubut, Frais, Gerinda, Las)', cls: 'Mesin Utama', spec: 'Integrasi seluruh mesin bengkel untuk memproduksi komponen Ragum Mesin Presisi.', image: createTechnicalBlueprintSVG('Lini Pabrikasi Ragum', 'Golongan: Stasiun Terpadu', 'PB-01') },
+        { id: 't25', sessionId: 's4_ragum', name: 'Pahat Bubut Ulir Trapesium (Trapezoidal Thread Tool)', cls: 'Alat Potong & Sayat', spec: 'Sudut profil 30° (Metrik Tr) untuk membuat poros ulir penggerak utama ragum.', image: createTechnicalBlueprintSVG('Pahat Ulir Trapesium 30°', 'Golongan: Alat Potong Khusus', 'PB-02') }
+    ];
+
+    // Default Job Sheets across all 9 sessions
+    const INITIAL_JOBSHEETS = [
+        {
+            id: 'j1', sessionId: 's1_bangku',
+            title: 'Job Sheet 01: Pengikiran Bidang Rata, Siku & Pembuatan Mal Radius/Tap',
+            material: 'Baja Lunak St37 (60 x 50 x 12 mm)',
+            k3: 'Wearpack, Sepatu Safety, Kacamata Bening, Bersihkan beram dengan sikat (bukan ditiup).',
+            steps: [
+                'Periksa ukuran awal pelat St37 menggunakan jangka sorong.',
+                'Jepit benda kerja pada ragum kerja bangku dan kikir bidang dasar (Bidang I) hingga rata menggunakan kikir kasar lalu kikir halus.',
+                'Kikir bidang samping (Bidang II dan III) hingga mencapai kesikuan 90° terhadap Bidang I (periksa dengan penyiku presisi).',
+                'Lakukan pelukisan benda kerja menggunakan cairan pelukis, meja perata, height gauge, dan penitik pusat lubang.',
+                'Lakukan pengeboran bertahap (Ø5 mm dan Ø8.5 mm), countersink, lalu buat ulir dalam M10 x 1.5 menggunakan Tap No.1, 2, dan 3 secara tegak lurus.'
+            ],
+            images: [createTechnicalBlueprintSVG('GAMBAR KERJA BANGKU & TAP M10', 'Semester 1 - Kerja Bangku', 'JS-KB01')]
+        },
+        {
+            id: 'j2', sessionId: 's1_plat',
+            title: 'Job Sheet 02: Pembuatan Kotak Perkakas (Toolbox) & Sambungan Lipat Plat',
+            material: 'Plat Baja Lapis Seng / BJLS Tebal 0.8 mm (400 x 300 mm)',
+            k3: 'Sarung tangan kulit anti-gores, Sepatu Safety, Kacamata.',
+            steps: [
+                'Hitung bentangan plat (allowance penekukan) dan lukis pola bentangan di atas lembaran plat menggunakan penggores dan mistar baja.',
+                'Potong bagian luar dan coakan sudut menggunakan gunting plat tangan atau mesin potong guillotine.',
+                'Lakukan pelipatan tepi pengaman (hemming) agar sisi kotak tidak tajam.',
+                'Tekuk ke-4 sisi dinding kotak sebesar 90° menggunakan mesin lipat Box & Pan Brake sesuai urutan tekukan.',
+                'Rapatkan sambungan lipat/keling paku rivet pada sudut-sudut kotak dan periksa kerataan.'
+            ],
+            images: [createTechnicalBlueprintSVG('BENTANGAN TOOLBOX PLAT 0.8MM', 'Semester 1 - Kerja Plat', 'JS-KP02')]
+        },
+        {
+            id: 'j3', sessionId: 's1_tempa',
+            title: 'Job Sheet 03: Penempaan Pahat Tangan & Pembentukan Upsetting-Drawing Out',
+            material: 'Baja Karbon Sedang S45C Ø22 x 160 mm',
+            k3: 'Apron kulit tahan panas, Sarung tangan tahan panas, Pelindung wajah, Sepatu Safety.',
+            steps: [
+                'Nyalakan dapur tempa dan panaskan ujung baja S45C hingga berwarna merah cerah kekuningan (±1000°C).',
+                'Angkat benda kerja dengan tang penjepit (tongs) yang sesuai ukuran diameter batang.',
+                'Lakukan proses Upsetting (pembesaran penampang) atau Drawing Out (pemanjangan ujung) di atas landasan paron (anvil) dengan pukulan palu tempa terukur.',
+                'Bentuk bagian mata pahat meruncing simetris dengan sudut ±60°.',
+                'Lakukan proses perlakuan panas (quenching ujung pahat pada air/oli lalu tempering) untuk memperoleh kekerasan optimal.'
+            ],
+            images: [createTechnicalBlueprintSVG('PROSES TEMPA PAHAT BAJA S45C', 'Semester 1 - Kerja Tempa', 'JS-KT03')]
+        },
+        {
+            id: 'j4', sessionId: 's2_gerinda',
+            title: 'Job Sheet 04: Pengasahan Geometri Pahat Bubut HSS & Surface Grinding Presisi',
+            material: 'Batang HSS 12 x 12 x 100 mm & Blok Baja параллел',
+            k3: 'Kacamata pelindung wajib, Masker debu gerinda, Cek celah penahan (tool rest) maks 2 mm dari batu.',
+            steps: [
+                'Periksa kondisi batu gerinda duduk dan lakukan dressing jika permukaan batu tidak rata.',
+                'Asah bidang bebas ujung (end relief angle 8°-10°) dan bidang bebas sisi (side relief angle 8°-10°) pahat HSS.',
+                'Asah sudut garuk atas (back/side rake angle 12°-14°) dan beri sedikit radius ujung (nose radius 0.4 mm).',
+                'Dinginkan pahat HSS secara berkala ke dalam air pendingin agar struktur kekerasan baja HSS tidak turun akibat overheat.',
+                'Ukur seluruh sudut geometri pahat menggunakan busur derajat dan mal pahat, lalu lanjutkan praktik Surface Grinding blok paralel.'
+            ],
+            images: [createTechnicalBlueprintSVG('GEOMETRI SUDUT PAHAT HSS & GERINDA', 'Semester 2 - Gerinda', 'JS-GR04')]
+        },
+        {
+            id: 'j5', sessionId: 's2_shaping',
+            title: 'Job Sheet 05: Penyekrapan Balok Bertingkat & Alur V pada Mesin Sekrap',
+            material: 'Besi Tuang / Baja St37 (100 x 60 x 50 mm)',
+            k3: 'Kacamata safety, Pastikan kunci ragum dilepas sebelum mesin dinyalakan, Jangan berdiri tepat di depan langkah ram.',
+            steps: [
+                'Jepit benda kerja pada ragum mesin sekrap di atas paralel blok dan luruskan dengan dial indicator.',
+                'Atur panjang langkah ram ($L = l + l_a + l_u$) dan posisi titik mati depan/belakang.',
+                'Hitung dan atur jumlah langkah ganda per menit ($n_p$) berdasarkan kecepatan potong $V_c$.',
+                'Lakukan penyekrapan rata seluruh 6 bidang hingga siku 90° satu sama lain.',
+                'Miringkan eretan pahat sebesar 45° untuk menyekrap alur V dan bidang bertingkat sesuai gambar kerja.'
+            ],
+            images: [createTechnicalBlueprintSVG('BALOK BERTINGKAT & ALUR V SEKRAP', 'Semester 2 - Shaping', 'JS-SH05')]
+        },
+        {
+            id: 'j6', sessionId: 's2_bubut',
+            title: 'Job Sheet 06: Pembubutan Poros Bertingkat, Tirus, Alur, Kartel & Ulir Metrik',
+            material: 'Baja St37 Ø38 x 150 mm',
+            k3: 'Kacamata safety, Dilarang memakai sarung tangan kain saat mengoperasikan spindel berputar, Lepas kunci chuck segera.',
+            steps: [
+                'Hitung putaran spindel $n = (1000 \cdot V_c)/(\pi \cdot d)$ dan atur tuas kecepatan mesin bubut.',
+                'Lakukan pembubutan muka (facing) kedua ujung dan pembuatan lubang senter (center drill).',
+                'Bubut rata bertingkat Ø35 mm, Ø28 mm, dan Ø20 mm dengan toleransi ukuran ±0.05 mm menggunakan mikrometer.',
+                'Buat kartel (knurling) pada bagian pemegang Ø35 mm dengan putaran rendah (±1/3 putaran normal) dan lumasi oli.',
+                'Miringkan eretan atas untuk membubut tirus, buat alur bebas pahat, lalu bubut ulir luar Metrik M20 x 2.5.'
+            ],
+            images: [createTechnicalBlueprintSVG('POROS BUBUT BERTINGKAT & ULIR M20', 'Semester 2 - Bubut', 'JS-BB06')]
+        },
+        {
+            id: 'j7', sessionId: 's3_las',
+            title: 'Job Sheet 07: Pengelasan Sambungan Tumpul (Butt Joint 1G) & Sudut (Fillet 1F/2F)',
+            material: 'Plat Baja Karbon Rendah St37 Tebal 6 mm & Elektroda E6013 Ø3.2 mm',
+            k3: 'Kedok las/Helm Auto-Darkening, Apron kulit, Sarung tangan las kulit panjang, Exhaust fan menyala.',
+            steps: [
+                'Siapkan dua bilah plat St37, buat kampuh V (sudut bevel 30° tiap sisi) untuk sambungan Butt Joint 1G.',
+                'Atur kuat arus mesin las SMAW pada kisaran 90A - 115A untuk elektroda Ø3.2 mm.',
+                'Lakukan las catat (tack weld) pada kedua ujung pelat dengan celah akar (root gap) 2 mm.',
+                'Lakukan pengelasan tembusan (root pass) diikuti pengisian (filler) dan penutup (capping) dengan sudut elektroda 70°-80°.',
+                'Bersihkan terak (slag) menggunakan palu terak dan sikat baja, lalu lakukan inspeksi visual cacat las (undercut, porosity, spatter).'
+            ],
+            images: [createTechnicalBlueprintSVG('SAMBUNGAN LAS 1G KAMPUH V & FILLET', 'Semester 3 - Las SMAW', 'JS-LS07')]
+        },
+        {
+            id: 'j8', sessionId: 's3_milling',
+            title: 'Job Sheet 08: Pengefraisan Balok Persegi Enam & Pembuatan Roda Gigi Lurus',
+            material: 'Bakalan Roda Gigi Baja S45C Ø66 x 20 mm (Modul m = 2, Jumlah Gigi z = 30)',
+            k3: 'Kacamata safety, Pastikan arbor dan kepala pembagi terkunci kokoh sebelum pisau menyentuh benda.',
+            steps: [
+                'Periksa diameter luar bakalan roda gigi: $D_k = m \cdot (z + 2) = 2 \cdot (30 + 2) = 64.0\text{ mm}$.',
+                'Pasang bakalan pada mandrel di antara kepala pembagi (Dividing Head rasio 40:1) dan kepala lepas.',
+                'Hitung putaran engkol pembagi: $N_c = 40 / z = 40 / 30 = 1\text{ putaran penuh} + 6\text{ lubang pada piringan 18 lubang}$.',
+                'Setting titik tengah pisau frais modul $m=2$ No. 5 tepat di sumbu benda dan atur kedalaman pemotongan $h = 2.25 \cdot m = 4.50\text{ mm}$.',
+                'Frais profil gigi satu per satu secara berurutan hingga 30 gigi terbentuk sempurna.'
+            ],
+            images: [createTechnicalBlueprintSVG('FRAIS RODA GIGI LURUS M=2 Z=30', 'Semester 3 - Milling', 'JS-ML08')]
+        },
+        {
+            id: 'j9', sessionId: 's4_ragum',
+            title: 'Job Sheet 09 (Proyek Pabrikasi): Pembuatan & Perakitan Ragum Mesin Presisi',
+            material: 'Baja St37 & S45C (Landasan, Rahang Tetap, Rahang Geser, Poros Ulir Tr16x4)',
+            k3: 'Seluruh standar APD bengkel pemesinan & fabrikasi wajib dipatuhi.',
+            steps: [
+                'Tahap 1 (Pemotongan & Sekrap/Milling): Potong bahan untuk Base Plate, Rahang Tetap, dan Rahang Geser, lalu frais bidang jalan (sliding way) hingga presisi dan sejajar.',
+                'Tahap 2 (Pengeboran & Ulir): Bor dan tap lubang pengikat mur pengantar serta pelat penjepit mulut ragum (jaw plate).',
+                'Tahap 3 (Bubut Poros Utama): Bubut poros penggerak utama dan buat ulir Trapesium luar Tr16x4 serta mur pasangannya dari perunggu/baja.',
+                'Tahap 4 (Gerinda Datar): Haluskan permukaan jaw plate yang telah dikeraskan pada mesin Surface Grinding.',
+                'Tahap 5 (Perakitan & Quality Control): Rakit seluruh komponen ragum, uji kelancaran putaran ulir, dan ukur kesejajaran mulut ragum menggunakan Dial Indicator (toleransi maks 0.03 mm).'
+            ],
+            images: [createTechnicalBlueprintSVG('ASSEMBLY PABRIKASI RAGUM MESIN', 'Semester 4 - Pabrikasi Ragum', 'JS-PB09')]
+        }
+    ];
+
+    /********************************************************************
+     * 2. SUPABASE CLOUD ENGINE — DATA BISA DILIHAT SELURUH MAHASISWA
+     * Publik boleh membaca. Hanya admin terdaftar boleh mengubah.
+     ********************************************************************/
+    const conf = window.GEARUP_CONFIG || {};
+    const cloudConfigured = /^https:\/\/.+\.supabase\.co\/?$/.test(conf.supabaseUrl || '')
+        && typeof conf.supabaseAnonKey === 'string' && conf.supabaseAnonKey.length > 40;
+    let cloud = null;
+    const tableName = { tools: 'gearup_tools', jobsheets: 'gearup_jobsheets' };
+
+    let appState = {
+        tools: [], jobsheets: [], activeToolsSem: 1, activeToolsSession: 's1_bangku',
+        activeToolClass: 'ALL', activeJobsSem: 1, activeJobsSession: 'ALL',
+        currentViewingJobId: null, isAdminAuthenticated: false,
+        pendingJobImages: [], pendingToolImage: null
+    };
+
+    function escapeHtml(value) {
+        return String(value ?? '').replace(/[&<>"']/g, char => ({
+            '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+        }[char]));
+    }
+
+    function displayNotice(message, isProblem = true) {
+        const el = document.getElementById('cloudNotice');
+        if (!el) return;
+        el.textContent = message;
+        el.classList.remove('hidden');
+        el.className = isProblem
+            ? 'mx-4 mt-3 rounded-xl px-3 py-2 text-[11px] font-semibold bg-amber-50 text-amber-900 border border-amber-300'
+            : 'mx-4 mt-3 rounded-xl px-3 py-2 text-[11px] font-semibold bg-olive-50 text-army-800 border border-olive-200';
+    }
+
+    function encodeRow(storeName, obj) {
+        if (storeName === 'tools') return {
+            id: obj.id, session_id: obj.sessionId, name: obj.name,
+            cls: obj.cls, spec: obj.spec, image: obj.image || ''
+        };
+        return {
+            id: obj.id, session_id: obj.sessionId, title: obj.title,
+            material: obj.material || '', k3: obj.k3 || '',
+            steps: obj.steps || [], images: obj.images || []
+        };
+    }
+
+    function decodeRow(storeName, obj) {
+        if (storeName === 'tools') return {
+            id: obj.id, sessionId: obj.session_id, name: obj.name,
+            cls: obj.cls, spec: obj.spec, image: obj.image || ''
+        };
+        return {
+            id: obj.id, sessionId: obj.session_id, title: obj.title,
+            material: obj.material || '', k3: obj.k3 || '',
+            steps: obj.steps || [], images: obj.images || []
+        };
+    }
+
+    async function idbGetAll(storeName) {
+        if (!cloud) throw new Error('Supabase belum dikonfigurasi.');
+        const { data, error } = await cloud.from(tableName[storeName]).select('*').limit(1000);
+        if (error) throw error;
+        return (data || []).map(item => decodeRow(storeName, item));
+    }
+
+    async function idbPut(storeName, item) {
+        if (!cloud || !appState.isAdminAuthenticated) throw new Error('Hanya admin online yang dapat menyimpan data.');
+        const { error } = await cloud.from(tableName[storeName]).upsert(encodeRow(storeName, item));
+        if (error) throw error;
+    }
+
+    async function idbDelete(storeName, key) {
+        if (!cloud || !appState.isAdminAuthenticated) throw new Error('Hanya admin online yang dapat menghapus data.');
+        const { error } = await cloud.from(tableName[storeName]).delete().eq('id', key);
+        if (error) throw error;
+    }
+
+    async function reloadCloudData() {
+        const [tools, jobs] = await Promise.all([idbGetAll('tools'), idbGetAll('jobsheets')]);
+        // Perlihatkan modul bawaan saat tabel cloud belum diisi.
+        appState.tools = tools.length ? tools : [...INITIAL_TOOLS];
+        appState.jobsheets = jobs.length ? jobs : [...INITIAL_JOBSHEETS];
+        renderAllViews();
+    }
+
+    async function restoreAdminSession() {
+        const { data: { session } } = await cloud.auth.getSession();
+        if (!session) return;
+        const { data: isAdmin, error } = await cloud.rpc('gearup_is_admin');
+        if (!error && isAdmin === true) {
+            appState.isAdminAuthenticated = true;
+            document.getElementById('adminBadgeHeader').classList.remove('hidden');
+        }
+    }
+
+    async function loadOrSeedDatabase() {
+        if (!cloudConfigured || typeof supabase === 'undefined') {
+            appState.tools = [...INITIAL_TOOLS];
+            appState.jobsheets = [...INITIAL_JOBSHEETS];
+            displayNotice('MODE CONTOH: Website bisa dilihat, tetapi pengelolaan admin dan penyimpanan online belum aktif. Lengkapi config.js dan setup_database.sql.');
+            return;
+        }
+        try {
+            cloud = supabase.createClient(conf.supabaseUrl, conf.supabaseAnonKey);
+            await reloadCloudData();
+            await restoreAdminSession();
+            if (appState.isAdminAuthenticated) renderAllViews();
+            displayNotice('GearUp terhubung ke database online. Pembaruan dari dosen tersedia untuk mahasiswa saat halaman dimuat ulang.', false);
+        } catch (err) {
+            console.error('Supabase error:', err);
+            appState.tools = [...INITIAL_TOOLS];
+            appState.jobsheets = [...INITIAL_JOBSHEETS];
+            displayNotice('Koneksi database gagal: ' + err.message + '. Konten contoh tetap bisa dilihat; pemeriksaan config.js / SQL diperlukan.');
+        }
+    }
+
+    async function updateStorageEstimate() {
+        const el = document.getElementById('idbStorageStatus');
+        if (el) el.textContent = 'Supabase Storage • Semua mahasiswa melihat gambar yang sama';
+    }
+
+    async function uploadMediaFiles(fileList, folder) {
+        if (!cloud || !appState.isAdminAuthenticated) throw new Error('Akses upload hanya untuk admin.');
+        const allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+        const urls = [];
+        for (const file of Array.from(fileList)) {
+            if (!allowed.includes(file.type)) throw new Error('Gambar harus JPG, PNG, WEBP, atau GIF.');
+            if (file.size > 8 * 1024 * 1024) throw new Error('Ukuran maksimal 8 MB per gambar.');
+            const extension = ({'image/jpeg':'jpg','image/png':'png','image/webp':'webp','image/gif':'gif'})[file.type];
+            const unique = crypto.randomUUID ? crypto.randomUUID() : Date.now() + '-' + Math.random().toString(36).slice(2);
+            const path = `${folder}/${unique}.${extension}`;
+            const { error } = await cloud.storage.from('gearup-media').upload(path, file, {
+                cacheControl: '3600', upsert: false, contentType: file.type
+            });
+            if (error) throw error;
+            urls.push(cloud.storage.from('gearup-media').getPublicUrl(path).data.publicUrl);
+        }
+        return urls;
+    }
+
+    async function publishInitialCatalog(options = {}) {
+        if (!appState.isAdminAuthenticated || !cloud) return showToast('Masuk sebagai admin terlebih dahulu.');
+        try {
+            for (const [type, list] of [['tools', INITIAL_TOOLS], ['jobsheets', INITIAL_JOBSHEETS]]) {
+                const records = list.map(item => encodeRow(type, item));
+                const { error } = await cloud.from(tableName[type]).upsert(records, { onConflict: 'id', ignoreDuplicates: true });
+                if (error) throw error;
+            }
+            await reloadCloudData();
+            if (!options.quiet) showToast('25 alat dan 9 job sheet tersedia di database online.');
+        } catch (err) {
+            showToast('Publikasi gagal: ' + err.message);
+        }
+    }
+
+    /********************************************************************
+     * 3. MASKOT KUCING BESAR -> KLIK 1 DETIK REDIRECT POLSRI
+     ********************************************************************/
+    let catRedirectLocked = false;
+    function triggerCatPolsriRedirect() {
+        if (catRedirectLocked) return;
+        catRedirectLocked = true;
+
+        const catSvg = document.getElementById('catSvg');
+        const glow = document.getElementById('catClickGlow');
+        catSvg.classList.add('cat-jumping');
+        glow.classList.remove('hidden');
+
+        // Exact 1000ms (1 second) delay before redirecting to https://mesin.polsri.ac.id/
+        setTimeout(() => {
+            catSvg.classList.remove('cat-jumping');
+            glow.classList.add('hidden');
+            catRedirectLocked = false;
+            window.open('https://mesin.polsri.ac.id/', '_blank', 'noopener');
+            window.location.href = 'https://mesin.polsri.ac.id/';
+        }, 1000);
+    }
+
+    /********************************************************************
+     * 4. RENDERING UI (BERANDA, ALAT & SESI, JOB SHEET)
+     ********************************************************************/
+    function renderAllViews() {
+        document.getElementById('statTotalTools').textContent = appState.tools.length;
+        document.getElementById('statTotalJobs').textContent = appState.jobsheets.length;
+        renderHomeSessionGrid('all');
+        renderHomeFeaturedJobs();
+        renderToolsView();
+        renderJobsheetsView();
+        populateAdminSelects();
+    }
+
+    function filterHomeSemester(sem) {
+        document.querySelectorAll('.sem-pill').forEach(btn => {
+            if (String(btn.dataset.sem) === String(sem)) {
+                btn.className = 'sem-pill shrink-0 px-3.5 py-1.5 rounded-full text-xs font-bold bg-army-700 text-white shadow-sm transition';
+            } else {
+                btn.className = 'sem-pill shrink-0 px-3.5 py-1.5 rounded-full text-xs font-bold bg-white text-army-800 border border-army-200 transition';
+            }
+        });
+        renderHomeSessionGrid(sem);
+    }
+
+    function renderHomeSessionGrid(semFilter) {
+        const container = document.getElementById('homeSessionGrid');
+        const filtered = semFilter === 'all'
+            ? SESSIONS_CONFIG
+            : SESSIONS_CONFIG.filter(s => s.sem === Number(semFilter));
+
+        container.innerHTML = filtered.map(s => {
+            const toolCount = appState.tools.filter(t => t.sessionId === s.id).length;
+            const jobCount = appState.jobsheets.filter(j => j.sessionId === s.id).length;
+            return `
+                <div onclick="openSessionDirectly('${s.id}', ${s.sem})" 
+                     class="bg-white hover:bg-army-50 active:scale-95 transition cursor-pointer rounded-2xl p-3 shadow-sm border border-army-200/80 flex flex-col items-center text-center">
+                    <div class="w-12 h-12 rounded-2xl ${s.color} text-white flex items-center justify-center shadow-md mb-2 relative">
+                        <i class="fa-solid ${s.icon} text-lg"></i>
+                        <span class="absolute -top-1.5 -right-1.5 bg-army-900 text-olive-400 text-[9px] font-extrabold px-1.5 py-0.5 rounded-full border border-olive-400/40">S${s.sem}</span>
+                    </div>
+                    <h4 class="font-extrabold text-xs text-army-900 leading-tight">${s.order}. ${s.name}</h4>
+                    <p class="text-[10px] text-slate-500 mt-0.5">${toolCount} Alat • ${jobCount} Job</p>
+                </div>
+            `;
+        }).join('');
+    }
+
+    function openSessionDirectly(sessionId, sem) {
+        appState.activeToolsSem = sem;
+        appState.activeToolsSession = sessionId;
+        switchMainTab('tools');
+        selectToolsSemester(sem, sessionId);
+    }
+
+    function renderHomeFeaturedJobs() {
+        const container = document.getElementById('homeFeaturedJobs');
+        const list = appState.jobsheets.slice(0, 4);
+        container.innerHTML = list.map(job => {
+            const sess = SESSIONS_CONFIG.find(s => s.id === job.sessionId) || SESSIONS_CONFIG[0];
+            return `
+                <div onclick="openJobDetailModal('${job.id}')" class="bg-white p-3 rounded-2xl shadow-sm border border-army-200 flex items-center justify-between cursor-pointer hover:border-olive-500 transition">
+                    <div class="flex items-center space-x-3 pr-2">
+                        <img src="${(job.images && job.images[0]) || ''}" alt="Job" class="w-14 h-14 rounded-xl object-cover border border-army-200 shrink-0">
+                        <div>
+                            <span class="text-[10px] font-bold text-olive-600 uppercase">Semester ${sess.sem} • ${sess.name}</span>
+                            <h4 class="font-bold text-xs text-army-900 line-clamp-1">${escapeHtml(job.title)}</h4>
+                            <p class="text-[10px] text-slate-500 mt-0.5"><i class="fa-solid fa-file-arrow-down mr-1"></i>Klik untuk lihat & unduh panduan</p>
+                        </div>
+                    </div>
+                    <i class="fa-solid fa-chevron-right text-xs text-slate-400"></i>
+                </div>
+            `;
+        }).join('');
+    }
+
+    // ---------------- TOOLS VIEW ----------------
+    function selectToolsSemester(sem, forcedSessionId = null) {
+        appState.activeToolsSem = sem;
+        for (let i = 1; i <= 4; i++) {
+            const tab = document.getElementById(`tabSemTools-${i}`);
+            if (i === sem) {
+                tab.className = 'py-2 rounded-xl text-xs font-bold bg-army-700 text-white shadow';
+            } else {
+                tab.className = 'py-2 rounded-xl text-xs font-bold text-army-800 hover:bg-white/50';
+            }
+        }
+        const semSessions = SESSIONS_CONFIG.filter(s => s.sem === sem);
+        if (forcedSessionId) {
+            appState.activeToolsSession = forcedSessionId;
+        } else if (!semSessions.some(s => s.id === appState.activeToolsSession)) {
+            appState.activeToolsSession = semSessions[0].id;
+        }
+        renderToolsView();
+    }
+
+    function selectToolsSession(sessionId) {
+        appState.activeToolsSession = sessionId;
+        renderToolsView();
+    }
+
+    function filterToolClass(cls) {
+        appState.activeToolClass = cls;
+        document.querySelectorAll('.cls-btn').forEach(btn => {
+            if (btn.dataset.cls === cls) {
+                btn.className = 'cls-btn px-3 py-1 rounded-lg text-[11px] font-bold bg-olive-600 text-white';
+            } else {
+                btn.className = 'cls-btn px-3 py-1 rounded-lg text-[11px] font-semibold bg-white text-slate-700 border';
+            }
+        });
+        renderToolsView();
+    }
+
+    function renderToolsView() {
+        const semSessions = SESSIONS_CONFIG.filter(s => s.sem === appState.activeToolsSem);
+        const sessBtnContainer = document.getElementById('toolsSessionButtons');
+        sessBtnContainer.innerHTML = semSessions.map(s => {
+            const isActive = s.id === appState.activeToolsSession;
+            return `
+                <button onclick="selectToolsSession('${s.id}')" 
+                        class="shrink-0 px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 transition ${isActive ? 'bg-olive-600 text-white shadow' : 'bg-white text-army-800 border border-army-200'}">
+                    <i class="fa-solid ${s.icon}"></i>
+                    <span>${s.order}. ${s.name}</span>
+                </button>
+            `;
+        }).join('');
+
+        let filteredTools = appState.tools.filter(t => t.sessionId === appState.activeToolsSession);
+        if (appState.activeToolClass !== 'ALL') {
+            filteredTools = filteredTools.filter(t => t.cls === appState.activeToolClass);
+        }
+
+        const listEl = document.getElementById('toolsListContainer');
+        if (filteredTools.length === 0) {
+            listEl.innerHTML = `<div class="bg-white p-6 rounded-2xl text-center text-xs text-slate-500 border">Belum ada alat pada kategori golongan ini.</div>`;
+            return;
+        }
+
+        const currentSess = SESSIONS_CONFIG.find(s => s.id === appState.activeToolsSession);
+        listEl.innerHTML = filteredTools.map(tool => `
+            <div class="bg-white rounded-2xl p-3.5 shadow-sm border border-army-200 flex gap-3 items-start">
+                <img src="${escapeHtml(tool.image)}" alt="${escapeHtml(tool.name)}" class="w-20 h-20 rounded-xl object-cover border border-army-200 shrink-0">
+                <div class="flex-1 min-w-0">
+                    <div class="flex items-center justify-between gap-1">
+                        <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-md bg-army-100 text-army-800">${escapeHtml(tool.cls)}</span>
+                        <span class="text-[10px] text-slate-400 font-semibold">Sem ${currentSess.sem}</span>
+                    </div>
+                    <h4 class="font-extrabold text-xs text-army-900 mt-1">${escapeHtml(tool.name)}</h4>
+                    <p class="text-[11px] text-slate-600 mt-1 leading-relaxed">${escapeHtml(tool.spec)}</p>
+                    ${appState.isAdminAuthenticated ? `
+                        <div class="mt-2 pt-2 border-t flex gap-2">
+                            <button onclick="editToolInAdmin('${tool.id}')" class="text-[11px] font-bold text-olive-600"><i class="fa-solid fa-pen mr-1"></i>Edit/Ganti Foto</button>
+                            <button onclick="deleteToolItem('${tool.id}')" class="text-[11px] font-bold text-red-600"><i class="fa-solid fa-trash mr-1"></i>Hapus</button>
+                        </div>
+                    ` : ''}
+                </div>
+            </div>
+        `).join('');
+    }
+
+    // ---------------- JOB SHEETS VIEW ----------------
+    function selectJobsSemester(sem) {
+        appState.activeJobsSem = sem;
+        appState.activeJobsSession = 'ALL';
+        for (let i = 1; i <= 4; i++) {
+            const tab = document.getElementById(`tabSemJobs-${i}`);
+            if (i === sem) {
+                tab.className = 'py-2 rounded-xl text-xs font-bold bg-army-700 text-white shadow';
+            } else {
+                tab.className = 'py-2 rounded-xl text-xs font-bold text-army-800 hover:bg-white/50';
+            }
+        }
+        renderJobsheetsView();
+    }
+
+    function selectJobsSession(sessId) {
+        appState.activeJobsSession = sessId;
+        renderJobsheetsView();
+    }
+
+    function renderJobsheetsView() {
+        const semSessions = SESSIONS_CONFIG.filter(s => s.sem === appState.activeJobsSem);
+        const btnBar = document.getElementById('jobsSessionButtons');
+        btnBar.innerHTML = `
+            <button onclick="selectJobsSession('ALL')" class="shrink-0 px-3 py-1.5 rounded-xl text-xs font-bold ${appState.activeJobsSession === 'ALL' ? 'bg-olive-600 text-white' : 'bg-white text-army-800 border'}">Semua Sesi Sem ${appState.activeJobsSem}</button>
+        ` + semSessions.map(s => `
+            <button onclick="selectJobsSession('${s.id}')" class="shrink-0 px-3 py-1.5 rounded-xl text-xs font-bold ${appState.activeJobsSession === s.id ? 'bg-olive-600 text-white' : 'bg-white text-army-800 border'}">${s.order}. ${s.name}</button>
+        `).join('');
+
+        const validSessionIds = appState.activeJobsSession === 'ALL'
+            ? semSessions.map(s => s.id)
+            : [appState.activeJobsSession];
+
+        const filteredJobs = appState.jobsheets.filter(j => validSessionIds.includes(j.sessionId));
+        const container = document.getElementById('jobsListContainer');
+
+        container.innerHTML = filteredJobs.map(job => {
+            const sess = SESSIONS_CONFIG.find(s => s.id === job.sessionId) || SESSIONS_CONFIG[0];
+            const coverImg = (job.images && job.images[0]) ? job.images[0] : '';
+            return `
+                <div class="bg-white rounded-2xl overflow-hidden shadow-sm border border-army-200">
+                    <div class="relative h-40 bg-army-900 cursor-pointer" onclick="openJobDetailModal('${job.id}')">
+                        <img src="${escapeHtml(coverImg)}" alt="${escapeHtml(job.title)}" class="w-full h-full object-cover">
+                        <div class="absolute top-2.5 left-2.5 bg-army-900/85 backdrop-blur-sm text-olive-400 text-[10px] font-extrabold px-2.5 py-1 rounded-full border border-olive-400/30">
+                            Semester ${sess.sem} • ${sess.name}
+                        </div>
+                        <div class="absolute bottom-2.5 right-2.5 bg-black/70 text-white text-[10px] font-bold px-2.5 py-1 rounded-lg">
+                            <i class="fa-regular fa-images mr-1"></i>${(job.images || []).length} Gambar Panduan
+                        </div>
+                    </div>
+                    <div class="p-3.5">
+                        <h3 class="font-extrabold text-sm text-army-900 leading-snug">${escapeHtml(job.title)}</h3>
+                        <p class="text-[11px] text-slate-500 mt-1"><i class="fa-solid fa-cube text-olive-600 mr-1"></i>Bahan: ${escapeHtml(job.material)}</p>
+                        <div class="mt-3 flex items-center gap-2">
+                            <button onclick="openJobDetailModal('${job.id}')" class="flex-1 bg-army-800 hover:bg-army-700 text-white font-bold text-xs py-2 rounded-xl transition flex items-center justify-center gap-1.5">
+                                <i class="fa-solid fa-eye"></i>
+                                <span>Buka & Unduh Job Sheet</span>
+                            </button>
+                            ${appState.isAdminAuthenticated ? `<label class="cursor-pointer bg-olive-100 hover:bg-olive-200 text-army-900 font-bold text-xs py-2 px-3 rounded-xl transition flex items-center gap-1" title="Ganti / Tambah Gambar Panduan">
+                                <i class="fa-solid fa-camera text-olive-600"></i>
+                                <span>Ganti Gambar</span>
+                                <input type="file" accept="image/*" multiple class="hidden" onchange="quickReplaceJobImage('${job.id}', event)">
+                            </label>` : ''}
+                            ${appState.isAdminAuthenticated ? `
+                                 <button onclick="editJobInAdmin('${job.id}')" class="bg-olive-100 text-olive-700 text-xs font-bold px-2 py-2 rounded-xl">Edit</button>
+                                <button onclick="deleteJobItem('${job.id}')" class="bg-red-100 text-red-600 p-2 rounded-xl"><i class="fa-solid fa-trash"></i></button>
+                            ` : ''}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    /********************************************************************
+     * 5. MODAL JOB SHEET & UPLOAD GAMBAR BERUKURAN BESAR (SUPABASE)
+     ********************************************************************/
+    function openJobDetailModal(jobId) {
+        const job = appState.jobsheets.find(j => j.id === jobId);
+        if (!job) return;
+        appState.currentViewingJobId = jobId;
+        const sess = SESSIONS_CONFIG.find(s => s.id === job.sessionId) || SESSIONS_CONFIG[0];
+
+        document.getElementById('modalJobBadge').textContent = `Semester ${sess.sem} • Sesi ${sess.name}`;
+        document.getElementById('modalJobTitle').textContent = job.title;
+        document.getElementById('modalJobK3').textContent = job.k3;
+        document.getElementById('modalJobMaterial').textContent = job.material;
+
+        const stepsEl = document.getElementById('modalJobSteps');
+        stepsEl.innerHTML = (job.steps || []).map(st => `<li>${escapeHtml(st)}</li>`).join('');
+
+        renderModalJobGallery(job);
+        document.getElementById('detailUploadLabel').classList.toggle('hidden', !appState.isAdminAuthenticated);
+        document.getElementById('detailUploadLabel').classList.toggle('flex', appState.isAdminAuthenticated);
+        document.getElementById('jobDetailModal').classList.remove('hidden');
+    }
+
+    function renderModalJobGallery(job) {
+        const gal = document.getElementById('modalJobGallery');
+        const imgs = job.images || [];
+        gal.innerHTML = imgs.map((imgData, idx) => `
+            <div class="relative rounded-2xl overflow-hidden border border-army-200 bg-army-900">
+                <img src="${escapeHtml(imgData)}" alt="Gambar Kerja ${idx + 1}" class="w-full max-h-72 object-contain mx-auto">
+                <div class="bg-army-800/90 text-white px-3 py-1.5 flex items-center justify-between text-[11px]">
+                    <span>Gambar Panduan #${idx + 1}</span>
+                    <div class="flex items-center space-x-3">
+                        <a href="${escapeHtml(imgData)}" download="Gambar-JobSheet-${job.id}-${idx+1}.png" class="text-olive-400 font-bold hover:underline">
+                            <i class="fa-solid fa-download mr-1"></i>Unduh Gambar
+                        </a>
+                        ${appState.isAdminAuthenticated && imgs.length > 1 ? `<button onclick="removeSingleJobImage('${job.id}', ${idx})" class="text-red-300 hover:text-red-400"><i class="fa-solid fa-trash"></i></button>` : ''}
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function closeJobDetailModal() {
+        document.getElementById('jobDetailModal').classList.add('hidden');
+    }
+
+    // Read multiple large image files as DataURLs and store in Supabase Storage
+    function readFilesAsDataURLs(fileList) {
+        const promises = Array.from(fileList).map(file => {
+            return new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.onload = (e) => resolve(e.target.result);
+                reader.readAsDataURL(file);
+            });
+        });
+        return Promise.all(promises);
+    }
+
+
+async function handleDirectJobImageUpload(event) {
+    if (!appState.isAdminAuthenticated) return showToast('Hanya admin yang dapat mengganti gambar.');
+    const files = event.target.files;
+    if (!files || !files.length || !appState.currentViewingJobId) return;
+    try {
+        const job = appState.jobsheets.find(j => j.id === appState.currentViewingJobId);
+        if (!job) return;
+        const imageUrls = await uploadMediaFiles(files, `jobs/${job.id}`);
+        job.images = job.images?.length === 1 && job.images[0].startsWith('data:image/svg+xml')
+            ? imageUrls : [...(job.images || []), ...imageUrls];
+        await idbPut('jobsheets', job);
+        renderModalJobGallery(job);
+        renderAllViews();
+        showToast('Gambar berhasil diunggah online!');
+    } catch (err) { showToast('Upload gagal: ' + err.message); }
+    finally { event.target.value = ''; }
+}
+
+
+async function quickReplaceJobImage(jobId, event) {
+    if (!appState.isAdminAuthenticated) return showToast('Hanya admin yang dapat mengganti gambar.');
+    const files = event.target.files;
+    if (!files || !files.length) return;
+    try {
+        const job = appState.jobsheets.find(j => j.id === jobId);
+        if (!job) return;
+        const urls = await uploadMediaFiles(files, `jobs/${jobId}`);
+        job.images = urls;
+        await idbPut('jobsheets', job);
+        renderAllViews();
+        showToast('Gambar Job Sheet berhasil diganti online!');
+    } catch (err) { showToast('Upload gagal: ' + err.message); }
+}
+
+
+async function removeSingleJobImage(jobId, imgIndex) {
+    if (!appState.isAdminAuthenticated) return showToast('Akses ditolak.');
+    const job = appState.jobsheets.find(j => j.id === jobId);
+    if (!job || !job.images || job.images.length <= 1) return;
+    try {
+        const updated = {...job, images: job.images.filter((_, i) => i !== imgIndex)};
+        await idbPut('jobsheets', updated);
+        appState.jobsheets = appState.jobsheets.map(j => j.id === jobId ? updated : j);
+        renderModalJobGallery(updated);
+        renderAllViews();
+        showToast('Gambar dihapus dari daftar Job Sheet.');
+    } catch (err) { showToast('Gagal menghapus: ' + err.message); }
+}
+
+    function downloadJobSheetHTML() {
+        const job = appState.jobsheets.find(j => j.id === appState.currentViewingJobId);
+        if (!job) return;
+        const sess = SESSIONS_CONFIG.find(s => s.id === job.sessionId) || SESSIONS_CONFIG[0];
+        const imagesHtml = (job.images || []).map((src, i) => `<div style="margin-bottom:16px;text-align:center;"><img src="${escapeHtml(src)}" style="max-width:100%;border:2px solid #3B4D2B;border-radius:8px;"/><p>Gambar Panduan #${i+1}</p></div>`).join('');
+        const stepsHtml = (job.steps || []).map(s => `<li style="margin-bottom:8px;">${escapeHtml(s)}</li>`).join('');
+
+        const docContent = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${escapeHtml(job.title)}</title>
+        <style>body{font-family:Arial,sans-serif;max-width:800px;margin:20px auto;padding:20px;color:#1D2614}
+        .hdr{background:#2A361E;color:white;padding:16px;border-radius:10px;margin-bottom:20px}
+        .box{background:#F4F6F0;padding:12px;border-left:5px solid #556B2F;margin-bottom:16px}</style></head>
+        <body>
+            <div class="hdr"><h2>GEARUP - JOB SHEET PRAKTIK BENGKEL</h2><p>Semester ${sess.sem} | Sesi: ${sess.name}</p></div>
+            <h3>${escapeHtml(job.title)}</h3>
+            <div class="box"><b>Bahan & Dimensi:</b> ${escapeHtml(job.material)}<br><b>Keselamatan Kerja (K3):</b> ${escapeHtml(job.k3)}</div>
+            <h4>Gambar Kerja & Panduan:</h4>${imagesHtml}
+            <h4>Langkah Kerja:</h4><ol>${stepsHtml}</ol>
+        </body></html>`;
+
+        const blob = new Blob([docContent], { type: 'text/html' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `${job.title.replace(/[^a-zA-Z0-9]/g, '_')}.html`;
+        a.click();
+        showToast('File Job Sheet berhasil diunduh!');
+    }
+
+    /********************************************************************
+     * 6. KALKULATOR PERMESINAN LENGKAP (SPINDEL, BUBUT, MILL, SEKRAP, FORGING)
+     ********************************************************************/
+    function switchCalcTab(tabName) {
+        document.querySelectorAll('.calc-panel').forEach(p => p.classList.add('hidden'));
+        document.getElementById(`calc-panel-${tabName}`).classList.remove('hidden');
+
+        document.querySelectorAll('.calc-tab-btn').forEach(btn => {
+            if (btn.dataset.calctab === tabName) {
+                btn.className = 'calc-tab-btn shrink-0 px-3.5 py-2 rounded-xl text-xs font-bold bg-olive-600 text-white shadow';
+            } else if (btn.dataset.calctab === 'vctable') {
+                btn.className = 'calc-tab-btn shrink-0 px-3.5 py-2 rounded-xl text-xs font-bold bg-amber-500 text-army-900 shadow';
+            } else {
+                btn.className = 'calc-tab-btn shrink-0 px-3.5 py-2 rounded-xl text-xs font-bold bg-white text-army-800 border';
+            }
+        });
+    }
+
+    // Quick RPM on Home
+    function calcQuickRpm() {
+        const vc = parseFloat(document.getElementById('quickVc').value) || 0;
+        const d = parseFloat(document.getElementById('quickD').value) || 1;
+        const n = (1000 * vc) / (Math.PI * d);
+        document.getElementById('quickRpmResult').textContent = Math.round(n);
+    }
+
+    // 1. Main Spindle n = (1000 * Vc) / (pi * d)
+    function calculateSpindleMain() {
+        const vc = parseFloat(document.getElementById('spindle_vc').value) || 0;
+        const d = parseFloat(document.getElementById('spindle_d').value) || 1;
+        const n = (1000 * vc) / (Math.PI * d);
+        document.getElementById('spindle_res_n').textContent = n.toFixed(2);
+        document.getElementById('spindle_res_round').textContent = `${Math.round(n)} RPM`;
+    }
+
+    // 2. Lathe (Bubut)
+    function calculateLathe() {
+        const vc = parseFloat(document.getElementById('lathe_vc').value) || 0;
+        const d = parseFloat(document.getElementById('lathe_d').value) || 1;
+        const f = parseFloat(document.getElementById('lathe_f').value) || 0.1;
+        const l = parseFloat(document.getElementById('lathe_l').value) || 0;
+        const ap = parseFloat(document.getElementById('lathe_ap').value) || 0;
+
+        const n = (1000 * vc) / (Math.PI * d);
+        const vf = f * n;
+        const tm = vf > 0 ? (l / vf) : 0;
+        const mrr = vc * ap * f; // cm3/min
+
+        document.getElementById('lathe_res_n').textContent = n.toFixed(1);
+        document.getElementById('lathe_res_vf').textContent = vf.toFixed(1);
+        document.getElementById('lathe_res_tm').textContent = tm.toFixed(2);
+        document.getElementById('lathe_res_mrr').textContent = mrr.toFixed(2);
+    }
+
+    // 3. Milling (Frais)
+    function calculateMilling() {
+        const vc = parseFloat(document.getElementById('mill_vc').value) || 0;
+        const d = parseFloat(document.getElementById('mill_d').value) || 1;
+        const z = parseFloat(document.getElementById('mill_z').value) || 1;
+        const fz = parseFloat(document.getElementById('mill_fz').value) || 0.05;
+        const l = parseFloat(document.getElementById('mill_l').value) || 0;
+
+        const n = (1000 * vc) / (Math.PI * d);
+        const vf = fz * z * n;
+        const tm = vf > 0 ? (l / vf) : 0;
+
+        document.getElementById('mill_res_n').textContent = Math.round(n);
+        document.getElementById('mill_res_vf').textContent = vf.toFixed(1);
+        document.getElementById('mill_res_tm').textContent = tm.toFixed(2);
+    }
+
+    // 4. Shaping (Sekrap)
+    function calculateShaping() {
+        const vc = parseFloat(document.getElementById('shape_vc').value) || 0;
+        const l = parseFloat(document.getElementById('shape_l').value) || 1;
+        const k = parseFloat(document.getElementById('shape_k').value) || 0.6;
+        const b = parseFloat(document.getElementById('shape_b').value) || 0;
+        const s = parseFloat(document.getElementById('shape_s').value) || 0.5;
+
+        const np = (1000 * vc) / (l * (1 + k));
+        const vf = np * s;
+        const tm = vf > 0 ? (b / vf) : 0;
+
+        document.getElementById('shape_res_np').textContent = np.toFixed(1);
+        document.getElementById('shape_res_vf').textContent = vf.toFixed(1);
+        document.getElementById('shape_res_tm').textContent = tm.toFixed(2);
+    }
+
+    // 5. Forging (Tempa)
+    function calculateForging() {
+        const d0 = parseFloat(document.getElementById('forge_d0').value) || 1;
+        const h0 = parseFloat(document.getElementById('forge_h0').value) || 1;
+        const h1 = parseFloat(document.getElementById('forge_h1').value) || 1;
+        const kf = parseFloat(document.getElementById('forge_kf').value) || 100;
+
+        const volMm3 = (Math.PI / 4) * d0 * d0 * h0;
+        const a1Mm2 = volMm3 / h1;
+        const d1 = Math.sqrt((4 * a1Mm2) / Math.PI);
+        const reductionPct = ((h0 - h1) / h0) * 100;
+        // Shape factor with friction approx: 1 + 0.15 * (d1 / h1)
+        const shapeFactor = 1 + 0.15 * (d1 / h1);
+        const forceKN = (kf * shapeFactor * a1Mm2) / 1000;
+
+        document.getElementById('forge_res_vol').textContent = (volMm3 / 1000).toFixed(2);
+        document.getElementById('forge_res_d1').textContent = d1.toFixed(2);
+        document.getElementById('forge_res_red').textContent = reductionPct.toFixed(1);
+        document.getElementById('forge_res_force').textContent = forceKN.toFixed(1);
+    }
+
+    // Click Vc value from table to populate calculators
+    function applyVcToCalc(vcValue) {
+        document.getElementById('spindle_vc').value = vcValue;
+        document.getElementById('lathe_vc').value = vcValue;
+        document.getElementById('mill_vc').value = vcValue;
+        document.getElementById('shape_vc').value = vcValue;
+        calculateSpindleMain();
+        calculateLathe();
+        calculateMilling();
+        calculateShaping();
+        switchCalcTab('spindle');
+        showToast(`Nilai Vc = ${vcValue} m/menit diterapkan ke kalkulator!`);
+    }
+
+    /********************************************************************
+     * 7. IKON ADMIN TERSEMBUNYI, PASSWORD ADMIN & CRUD DATABASE
+     ********************************************************************/
+    let secretTapCount = 0;
+    let secretTapTimer = null;
+
+    function handleSecretTap() {
+        secretTapCount++;
+        clearTimeout(secretTapTimer);
+        if (secretTapCount >= 3) {
+            secretTapCount = 0;
+            openAdminModal();
+        } else {
+            secretTapTimer = setTimeout(() => { secretTapCount = 0; }, 900);
+        }
+    }
+
+    function openAdminModal(targetTab = null) {
+        document.getElementById('adminModal').classList.remove('hidden');
+        if (appState.isAdminAuthenticated) {
+            document.getElementById('adminLoginSection').classList.add('hidden');
+            document.getElementById('adminDashboardSection').classList.remove('hidden');
+            if (targetTab === 'tool') switchAdminSubTab('formTool');
+            if (targetTab === 'jobsheet') switchAdminSubTab('formJob');
+        } else {
+            document.getElementById('adminLoginSection').classList.remove('hidden');
+            document.getElementById('adminDashboardSection').classList.add('hidden');
+            document.getElementById('adminPasswordInput').focus();
+        }
+    }
+
+    function closeAdminModal() {
+        document.getElementById('adminModal').classList.add('hidden');
+    }
+
+
+async function verifyAdminLogin() {
+    if (!cloud) return showToast('Aktifkan Supabase di config.js terlebih dahulu.');
+    const email = document.getElementById('adminEmailInput').value.trim();
+    const password = document.getElementById('adminPasswordInput').value;
+    if (!email || !password) return showToast('Masukkan email dan password admin.');
+    const { error } = await cloud.auth.signInWithPassword({ email, password });
+    if (error) return showToast('Login gagal: ' + error.message);
+    const { data: allowed, error: roleError } = await cloud.rpc('gearup_is_admin');
+    if (roleError || allowed !== true) {
+        await cloud.auth.signOut();
+        return showToast('Akun ini belum didaftarkan sebagai admin GearUp.');
+    }
+    appState.isAdminAuthenticated = true;
+    document.getElementById('adminBadgeHeader').classList.remove('hidden');
+    document.getElementById('adminLoginSection').classList.add('hidden');
+    document.getElementById('adminDashboardSection').classList.remove('hidden');
+    document.getElementById('adminPasswordInput').value = '';
+    renderAllViews();
+    showToast('Login admin berhasil. Data kini tersimpan online.');
+}
+
+
+async function logoutAdmin() {
+    if (cloud) await cloud.auth.signOut();
+    appState.isAdminAuthenticated = false;
+    document.getElementById('adminBadgeHeader').classList.add('hidden');
+    closeAdminModal();
+    renderAllViews();
+    showToast('Berhasil keluar dari akun admin.');
+}
+
+
+async function changeAdminPassword() {
+    if (!appState.isAdminAuthenticated) return showToast('Login admin diperlukan.');
+    const newPass = document.getElementById('newAdminPassInput').value.trim();
+    if (newPass.length < 10) return showToast('Gunakan password baru minimal 10 karakter.');
+    const { error } = await cloud.auth.updateUser({ password: newPass });
+    if (error) return showToast('Gagal mengganti password: ' + error.message);
+    document.getElementById('newAdminPassInput').value = '';
+    showToast('Password Supabase admin berhasil diperbarui.');
+}
+
+    function switchAdminSubTab(tab) {
+        ['formJob', 'formTool', 'settings'].forEach(t => {
+            document.getElementById(`adminSub-${t}`).classList.toggle('hidden', t !== tab);
+            const btn = document.getElementById(`admTab-${t}`);
+            btn.className = t === tab
+                ? 'py-2 rounded-lg font-bold bg-army-700 text-white'
+                : 'py-2 rounded-lg font-bold text-slate-700';
+        });
+    }
+
+    function populateAdminSelects() {
+        const opts = SESSIONS_CONFIG.map(s => `<option value="${s.id}">Sem ${s.sem} - ${s.order}. ${s.name}</option>`).join('');
+        document.getElementById('admJobSession').innerHTML = opts;
+        document.getElementById('admToolSession').innerHTML = opts;
+    }
+
+
+async function previewAdminJobImages(e) {
+    if (!appState.isAdminAuthenticated) return;
+    const files = Array.from(e.target.files || []);
+    appState.pendingJobImages = files;
+    document.getElementById('admJobImagePreview').innerHTML = files.map(f =>
+        `<img src="${URL.createObjectURL(f)}" class="w-16 h-16 rounded-lg object-cover border">`
+    ).join('');
+}
+
+
+async function previewAdminToolImage(e) {
+    if (!appState.isAdminAuthenticated) return;
+    const file = (e.target.files || [])[0];
+    if (!file) return;
+    appState.pendingToolImage = file;
+    document.getElementById('admToolImagePreview').innerHTML =
+        `<img src="${URL.createObjectURL(file)}" class="w-20 h-20 rounded-xl object-cover border">`;
+}
+
+
+async function saveJobSheetFromAdmin() {
+    if (!appState.isAdminAuthenticated) return showToast('Login admin diperlukan.');
+    const editId = document.getElementById('editJobId').value;
+    const sessionId = document.getElementById('admJobSession').value;
+    const title = document.getElementById('admJobTitle').value.trim();
+    const material = document.getElementById('admJobMaterial').value.trim() || 'Standar Bengkel';
+    const k3 = document.getElementById('admJobK3').value.trim() || 'APD Standar Bengkel Mesin';
+    const stepsRaw = document.getElementById('admJobSteps').value.trim();
+    if (!title) return showToast('Judul Job Sheet wajib diisi!');
+    try {
+        const existing = editId ? appState.jobsheets.find(j => j.id === editId) : null;
+        const id = editId || 'job_' + Date.now();
+        const steps = stepsRaw ? stepsRaw.split('\n').map(s => s.trim()).filter(Boolean) : ['Siapkan alat dan bahan sesuai SOP.'];
+        const images = appState.pendingJobImages.length
+            ? await uploadMediaFiles(appState.pendingJobImages, `jobs/${id}`)
+            : existing?.images || [createTechnicalBlueprintSVG(title.toUpperCase(), 'Job Sheet Praktik', 'JS-NEW')];
+        const job = { id, sessionId, title, material, k3, steps, images };
+        await idbPut('jobsheets', job);
+        appState.jobsheets = editId
+            ? appState.jobsheets.map(j => j.id === id ? job : j)
+            : [job, ...appState.jobsheets];
+        appState.pendingJobImages = [];
+        ['editJobId', 'admJobTitle', 'admJobSteps', 'admJobMaterial', 'admJobK3'].forEach(x => document.getElementById(x).value = '');
+        document.getElementById('admJobImagesInput').value = '';
+        document.getElementById('admJobImagePreview').innerHTML = '';
+        renderAllViews();
+        closeAdminModal();
+        showToast(editId ? 'Job Sheet berhasil diperbarui online.' : 'Job Sheet berhasil ditambahkan online.');
+    } catch (err) { showToast('Gagal menyimpan: ' + err.message); }
+}
+
+
+async function saveToolFromAdmin() {
+    if (!appState.isAdminAuthenticated) return showToast('Login admin diperlukan.');
+    const editId = document.getElementById('editToolId').value;
+    const sessionId = document.getElementById('admToolSession').value;
+    const cls = document.getElementById('admToolClass').value;
+    const name = document.getElementById('admToolName').value.trim();
+    const spec = document.getElementById('admToolDesc').value.trim() || 'Alat praktik standar bengkel.';
+    if (!name) return showToast('Nama alat wajib diisi.');
+    try {
+        const existing = editId ? appState.tools.find(t => t.id === editId) : null;
+        const id = editId || ('tool_' + Date.now());
+        const image = appState.pendingToolImage
+            ? (await uploadMediaFiles([appState.pendingToolImage], `tools/${id}`))[0]
+            : (existing?.image || createTechnicalBlueprintSVG(name, cls, 'ALAT'));
+        const item = { id, sessionId, cls, name, spec, image };
+        await idbPut('tools', item);
+        appState.tools = editId ? appState.tools.map(t => t.id === id ? item : t) : [item, ...appState.tools];
+        document.getElementById('editToolId').value = '';
+        document.getElementById('admToolName').value = '';
+        document.getElementById('admToolDesc').value = '';
+        document.getElementById('admToolImageInput').value = '';
+        document.getElementById('admToolImagePreview').innerHTML = '';
+        appState.pendingToolImage = null;
+        renderAllViews();
+        closeAdminModal();
+        showToast('Data alat praktik tersimpan online!');
+    } catch (err) { showToast('Gagal menyimpan: ' + err.message); }
+}
+
+    function editToolInAdmin(toolId) {
+        const t = appState.tools.find(x => x.id === toolId);
+        if (!t) return;
+        document.getElementById('editToolId').value = t.id;
+        document.getElementById('admToolSession').value = t.sessionId;
+        document.getElementById('admToolClass').value = t.cls;
+        document.getElementById('admToolName').value = t.name;
+        document.getElementById('admToolDesc').value = t.spec;
+        document.getElementById('admToolImagePreview').innerHTML = `<img src="${escapeHtml(t.image)}" class="w-20 h-20 rounded-xl object-cover border">`;
+        openAdminModal('tool');
+    }
+
+    function editJobInAdmin(jobId) {
+        if (!appState.isAdminAuthenticated) return;
+        const job = appState.jobsheets.find(j => j.id === jobId);
+        if (!job) return;
+        openAdminModal('jobsheet');
+        document.getElementById('editJobId').value = job.id;
+        document.getElementById('admJobSession').value = job.sessionId;
+        document.getElementById('admJobTitle').value = job.title;
+        document.getElementById('admJobMaterial').value = job.material;
+        document.getElementById('admJobK3').value = job.k3;
+        document.getElementById('admJobSteps').value = (job.steps || []).join('\n');
+        document.getElementById('admJobImagePreview').innerHTML = (job.images || []).map(src =>
+            `<img src="${escapeHtml(src)}" class="w-16 h-16 rounded-lg object-cover border">`
+        ).join('');
+        appState.pendingJobImages = [];
+        document.getElementById('formJobHeading').textContent = 'Edit Job Sheet & Gambar Panduan';
+    }
+
+
+async function deleteToolItem(toolId) {
+    if (!appState.isAdminAuthenticated || !confirm('Hapus alat ini dari semua mahasiswa?')) return;
+    try {
+        await idbDelete('tools', toolId);
+        appState.tools = appState.tools.filter(t => t.id !== toolId);
+        renderAllViews();
+        showToast('Alat berhasil dihapus online.');
+    } catch (err) { showToast('Gagal menghapus: ' + err.message); }
+}
+
+
+async function deleteJobItem(jobId) {
+    if (!appState.isAdminAuthenticated || !confirm('Hapus Job Sheet ini dari semua mahasiswa?')) return;
+    try {
+        await idbDelete('jobsheets', jobId);
+        appState.jobsheets = appState.jobsheets.filter(j => j.id !== jobId);
+        renderAllViews();
+        showToast('Job Sheet berhasil dihapus online.');
+    } catch (err) { showToast('Gagal menghapus: ' + err.message); }
+}
+
+    function exportFullDatabase() {
+        const payload = {
+            exportedAt: new Date().toISOString(),
+            tools: appState.tools,
+            jobsheets: appState.jobsheets
+        };
+        const blob = new Blob([JSON.stringify(payload)], { type: 'application/json' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `GearUp_Backup_${new Date().toISOString().slice(0,10)}.json`;
+        a.click();
+        showToast('Backup database berhasil diunduh!');
+    }
+
+
+function importFullDatabase(event) {
+    if (!appState.isAdminAuthenticated) return showToast('Login admin diperlukan.');
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = async e => {
+        try {
+            const data = JSON.parse(e.target.result);
+            if (!Array.isArray(data.tools) || !Array.isArray(data.jobsheets))
+                throw new Error('JSON harus memiliki tools dan jobsheets.');
+            for (const t of data.tools) await idbPut('tools', t);
+            for (const j of data.jobsheets) await idbPut('jobsheets', j);
+            await reloadCloudData();
+            showToast('Data berhasil diimpor ke Supabase.');
+        } catch (err) { showToast('Import gagal: ' + err.message); }
+    };
+    reader.readAsText(file);
+}
+
+/********************************************************************
+ * 8. PENCARIAN GLOBAL & NAVIGASI BAWAH
+ ********************************************************************/
+
+    function handleGlobalSearch(query) {
+        const q = query.trim().toLowerCase();
+        const panel = document.getElementById('searchResultsPanel');
+        const clearBtn = document.getElementById('clearSearchBtn');
+        const listEl = document.getElementById('searchResultsList');
+
+        if (!q) {
+            panel.classList.add('hidden');
+            clearBtn.classList.add('hidden');
+            return;
+        }
+        clearBtn.classList.remove('hidden');
+        panel.classList.remove('hidden');
+
+        const matchedTools = appState.tools.filter(t =>
+            t.name.toLowerCase().includes(q) || t.cls.toLowerCase().includes(q) || t.spec.toLowerCase().includes(q)
+        );
+        const matchedJobs = appState.jobsheets.filter(j =>
+            j.title.toLowerCase().includes(q) || j.material.toLowerCase().includes(q)
+        );
+
+        let html = '';
+        matchedJobs.forEach(j => {
+            html += `<div onclick="openJobDetailModal('${j.id}')" class="bg-white p-2.5 rounded-xl border flex items-center justify-between cursor-pointer">
+                <div><span class="text-[10px] font-bold text-olive-600 uppercase">Job Sheet</span><p class="text-xs font-bold text-army-900">${escapeHtml(j.title)}</p></div>
+                <i class="fa-solid fa-arrow-up-right-from-square text-xs text-slate-400"></i>
+            </div>`;
+        });
+        matchedTools.forEach(t => {
+            const s = SESSIONS_CONFIG.find(x => x.id === t.sessionId) || SESSIONS_CONFIG[0];
+            html += `<div onclick="openSessionDirectly('${t.sessionId}', ${s.sem}); clearGlobalSearch();" class="bg-white p-2.5 rounded-xl border flex items-center justify-between cursor-pointer">
+                <div><span class="text-[10px] font-bold text-army-600 uppercase">Alat • ${s.name}</span><p class="text-xs font-bold text-army-900">${escapeHtml(t.name)}</p></div>
+                <span class="text-[10px] bg-army-100 px-2 py-0.5 rounded font-semibold">${escapeHtml(t.cls)}</span>
+            </div>`;
+        });
+
+        listEl.innerHTML = html || `<p class="text-xs text-slate-500 py-2">Tidak ditemukan alat atau job sheet untuk "${escapeHtml(query)}".</p>`;
+    }
+
+    function clearGlobalSearch() {
+        document.getElementById('globalSearchInput').value = '';
+        document.getElementById('searchResultsPanel').classList.add('hidden');
+        document.getElementById('clearSearchBtn').classList.add('hidden');
+    }
+
+    function switchMainTab(tab) {
+        ['home', 'tools', 'jobsheets', 'calc'].forEach(t => {
+            document.getElementById(`view-${t}`).classList.toggle('hidden', t !== tab);
+            const navBtn = document.getElementById(`nav-${t}`);
+            if (t === tab) {
+                navBtn.className = 'nav-item flex flex-col items-center py-1 px-3 rounded-xl text-olive-600 font-bold transition';
+            } else {
+                navBtn.className = 'nav-item flex flex-col items-center py-1 px-3 rounded-xl text-slate-400 hover:text-army-700 font-medium transition';
+            }
+        });
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function showToast(msg) {
+        const box = document.getElementById('toastBox');
+        document.getElementById('toastMessage').textContent = msg;
+        box.classList.remove('hidden');
+        setTimeout(() => box.classList.add('hidden'), 2800);
+    }
+
+    // Initialize Application on Load
+    window.addEventListener('DOMContentLoaded', async () => {
+        await loadOrSeedDatabase();
+        renderAllViews();
+        calculateSpindleMain();
+        calculateLathe();
+        calculateMilling();
+        calculateShaping();
+        calculateForging();
+        if ('serviceWorker' in navigator && location.protocol === 'https:') {
+            navigator.serviceWorker.register('./sw.js').catch(err => console.warn('Service Worker:', err));
+        }
+    });
+</script>
+</body>
+</html>

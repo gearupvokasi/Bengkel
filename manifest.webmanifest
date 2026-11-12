@@ -1,0 +1,16 @@
+{
+  "name": "GearUp – Praktik Bengkel Teknik Mesin",
+  "short_name": "GearUp",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#F4F6F0",
+  "theme_color": "#2A361E",
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
