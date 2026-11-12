@@ -34,7 +34,7 @@
       cls: obj.cls, spec: obj.spec || '', image: obj.image || ''
     };
     return {id: obj.id, session_id: obj.sessionId, title: obj.title,
-      material: obj.material || '', k3: obj.k3 || '', steps: obj.steps || [], images: obj.images || []};
+      material: obj.material || '', k3: obj.k3 || '', steps: obj.steps || [], images: obj.images || [], pdfs: obj.pdfs || []};
   }
   function fromCloud(type, obj) {
     if (type === 'tools') return {
@@ -42,7 +42,7 @@
       cls: obj.cls, spec: obj.spec || '', image: obj.image || ''
     };
     return {id: obj.id, sessionId: obj.session_id, title: obj.title,
-      material: obj.material || '', k3: obj.k3 || '', steps: obj.steps || [], images: obj.images || []};
+      material: obj.material || '', k3: obj.k3 || '', steps: obj.steps || [], images: obj.images || [], pdfs: obj.pdfs || []};
   }
   const authenticated = () => Boolean(client && appState.isAdminAuthenticated);
   const requireAdmin = () => {
@@ -272,11 +272,19 @@
       let images = existing?.images || [];
       if (appState.pendingJobImages.length) images = await uploadImages(appState.pendingJobImages, 'jobsheets');
       if (!images.length) images = [createTechnicalBlueprintSVG(title, 'Job Sheet Praktik', id)];
+      let pdfs = [...(existing?.pdfs || [])];
+      if (pendingPdfFiles.length) {
+        const uploaded = await uploadPdfFiles(pendingPdfFiles, id);
+        pdfs = pdfs.concat(uploaded);
+      }
       const job = {id, sessionId:$('admJobSession').value, title,
         material:$('admJobMaterial').value.trim() || 'Standar Bengkel',
         k3:$('admJobK3').value.trim() || 'APD Standar Bengkel Mesin',
-        steps:$('admJobSteps').value.trim().split('\n').map(x=>x.trim()).filter(Boolean), images};
+        steps:$('admJobSteps').value.trim().split('\n').map(x=>x.trim()).filter(Boolean), images, pdfs};
       await idbPut('jobsheets', job);
+      pendingPdfFiles = [];
+      if ($('gearupPdfInput')) $('gearupPdfInput').value = '';
+      if ($('gearupPdfPendingList')) $('gearupPdfPendingList').textContent = '';
       appState.pendingJobImages = [];
       $('editJobId').value = '';
       $('admJobTitle').value = '';
@@ -328,6 +336,10 @@
     $('admJobImagePreview').innerHTML = (job.images||[]).map(src=>`<img src="${escapeHTML(src)}" class="w-16 h-16 rounded-lg object-cover border">`).join('');
     appState.pendingJobImages = [];
     $('admJobImagesInput').value = '';
+    pendingPdfFiles = [];
+    if ($('gearupPdfInput')) $('gearupPdfInput').value = '';
+    if ($('gearupPdfPendingList')) $('gearupPdfPendingList').textContent = '';
+    renderAdminPdfAttachments(job);
     if ($('formJobHeading')) $('formJobHeading').textContent = 'Edit Data Job Sheet';
   };
 
@@ -371,6 +383,7 @@
     $('jobDetailModal')?.querySelectorAll('label').forEach(label => {
       if (label.querySelector('input[type=file]')) label.style.display=authenticated()?'':'none';
     });
+    renderDetailPdfAttachments(jobId);
   };
   window.deleteToolItem = async id => {
     if (!authenticated() || !confirm('Hapus alat ini dari database online?')) return;
@@ -422,5 +435,228 @@
     settings.append(div);
     $('gearupSeedNow').addEventListener('click', window.publishInitialCatalog);
   }
+  // ===================== JOB SHEET PDF EXTENSION =====================
+  // Katalog PDF disimpan pada kolom gearup_jobsheets.pdfs (JSONB).
+  // PDF diunggah sebagai file asli, bukan base64/IndexedDB.
+  const PDF_MAX_BYTES = 10 * 1024 * 1024;
+  let pendingPdfFiles = [];
+  const pdfBucket = 'gearup-media';
+
+  function validPdfUrl(value) {
+    try {
+      const u = new URL(value);
+      const apiOrigin = new URL(config.supabaseUrl).origin;
+      return u.protocol === 'https:' && u.origin === apiOrigin &&
+        u.pathname.startsWith('/storage/v1/object/public/gearup-media/');
+    } catch { return false; }
+  }
+  function pdfDownloadUrl(url, name) {
+    const u = new URL(url);
+    u.searchParams.set('download', name || 'Job-Sheet.pdf');
+    return u.href;
+  }
+  function pdfLink(url, name, download) {
+    const a = document.createElement('a');
+    a.href = download ? pdfDownloadUrl(url, name) : url;
+    a.target = '_blank';
+    a.rel = 'noopener noreferrer';
+    a.textContent = download ? 'Unduh PDF' : 'Buka PDF';
+    a.className = download
+      ? 'inline-flex bg-olive-600 text-white px-3 py-2 rounded-lg text-xs font-bold'
+      : 'inline-flex bg-army-800 text-white px-3 py-2 rounded-lg text-xs font-bold';
+    return a;
+  }
+  function getSavedJob(id) {
+    return appState.jobsheets.find(j => j.id === id);
+  }
+  async function uploadPdfFiles(files, jobId) {
+    requireAdmin();
+    if (!client) throw new Error('Supabase belum tersambung.');
+    const results = [];
+    for (const file of Array.from(files || [])) {
+      if (!file || !/\.pdf$/i.test(file.name) || !['', 'application/pdf'].includes(file.type)) {
+        throw new Error('Hanya file dengan format PDF (.pdf) yang diperbolehkan.');
+      }
+      if (file.size <= 0 || file.size > PDF_MAX_BYTES) {
+        throw new Error('Maksimum 10 MB per file PDF dan file tidak boleh kosong.');
+      }
+      // Periksa tanda tangan PDF agar berkas bukan sekadar file lain yang diubah ekstensinya.
+      const header = await file.slice(0, 5).text();
+      if (header !== '%PDF-') throw new Error('File bukan PDF yang valid.');
+      const unique = crypto.randomUUID?.() || (`${Date.now()}-${Math.random().toString(36).slice(2)}`);
+      const safeId = String(jobId).replace(/[^a-z0-9_-]/gi, '_').slice(0, 90);
+      const path = `job-pdf/${safeId}/${unique}.pdf`;
+      const {error} = await client.storage.from(pdfBucket)
+        .upload(path, file, {contentType:'application/pdf', cacheControl:'3600', upsert:false});
+      if (error) throw error;
+      const url = client.storage.from(pdfBucket).getPublicUrl(path).data.publicUrl;
+      results.push({name:file.name.slice(0,180), size:file.size, url, path,
+        uploadedAt:new Date().toISOString()});
+    }
+    return results;
+  }
+  function renderAdminPdfAttachments(job) {
+    const host = $('gearupPdfExistingList');
+    if (!host) return;
+    host.replaceChildren();
+    const entries = job?.pdfs || [];
+    if (!entries.length) {
+      host.textContent = 'Belum ada PDF pada job sheet ini.';
+      return;
+    }
+    entries.forEach((entry, idx) => {
+      const row = document.createElement('div');
+      row.className = 'flex gap-2 items-center justify-between bg-white rounded-lg p-2 border border-army-200';
+      const label = document.createElement('span');
+      label.className = 'text-xs text-army-900 min-w-0 break-all';
+      label.textContent = '📄 ' + (entry.name || `PDF ${idx + 1}`);
+      row.append(label);
+      const remove = document.createElement('button');
+      remove.type = 'button';
+      remove.className = 'text-xs font-bold text-red-600 shrink-0';
+      remove.textContent = 'Hapus';
+      remove.addEventListener('click', () => removePdfAttachment(job.id, idx));
+      row.append(remove);
+      host.append(row);
+    });
+  }
+  function renderDetailPdfAttachments(jobId) {
+    const job = getSavedJob(jobId);
+    const parent = $('printArea');
+    if (!parent || !job) return;
+    let section = $('gearupPdfDetail');
+    if (!section) {
+      section = document.createElement('section');
+      section.id = 'gearupPdfDetail';
+      section.className = 'bg-army-50 border border-army-200 rounded-xl p-3 space-y-2';
+      parent.append(section);
+    }
+    section.replaceChildren();
+    const title = document.createElement('h4');
+    title.className = 'font-extrabold text-army-900 text-xs';
+    title.textContent = '📄 Lampiran File PDF';
+    section.append(title);
+    const items = (job.pdfs || []).filter(pdf => validPdfUrl(pdf.url));
+    if (!items.length) {
+      const empty = document.createElement('p');
+      empty.className = 'text-xs text-slate-500';
+      empty.textContent = 'Belum ada lampiran PDF untuk job sheet ini.';
+      section.append(empty);
+    }
+    items.forEach((pdf, idx) => {
+      const row = document.createElement('div');
+      row.className = 'bg-white border border-army-200 rounded-xl p-2.5 space-y-2';
+      const name = document.createElement('p');
+      name.className = 'font-semibold text-xs text-army-900 break-all';
+      name.textContent = `${idx + 1}. ${pdf.name || 'Job-Sheet.pdf'}`;
+      const actions = document.createElement('div');
+      actions.className = 'flex flex-wrap gap-2';
+      actions.append(pdfLink(pdf.url, pdf.name, false), pdfLink(pdf.url, pdf.name, true));
+      row.append(name, actions);
+      section.append(row);
+    });
+    if (authenticated()) {
+      const uploadLabel = document.createElement('label');
+      uploadLabel.className = 'block bg-olive-100 p-3 rounded-xl border border-army-200 text-xs font-bold text-army-900 cursor-pointer';
+      uploadLabel.textContent = '+ Admin: Tambah PDF ke Job Sheet Ini (maks. 10 MB/file)';
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.multiple = true;
+      input.accept = '.pdf,application/pdf';
+      input.className = 'block w-full mt-2 text-xs font-normal';
+      input.addEventListener('change', async () => {
+        const files = Array.from(input.files || []);
+        if (!files.length) return;
+        input.disabled = true;
+        try {
+          const added = await uploadPdfFiles(files, jobId);
+          const next = {...job, pdfs: [...(job.pdfs || []), ...added]};
+          await idbPut('jobsheets', next);
+          Object.assign(job, next);
+          renderAllViews();
+          renderDetailPdfAttachments(jobId);
+          showToast('PDF berhasil diunggah dan tersedia untuk mahasiswa.');
+        } catch (error) {
+          fail('Gagal mengunggah PDF', error);
+        } finally { input.disabled = false; input.value=''; }
+      });
+      uploadLabel.append(input);
+      section.append(uploadLabel);
+    }
+  }
+  async function removePdfAttachment(jobId, index) {
+    if (!authenticated()) return showToast('Login sebagai dosen terlebih dahulu.');
+    const job = getSavedJob(jobId);
+    const attachment = job?.pdfs?.[index];
+    if (!attachment || !confirm(`Hapus lampiran PDF "${attachment.name || 'tanpa nama'}"?`)) return;
+    try {
+      const updated = {...job, pdfs: job.pdfs.filter((_, i) => i !== index)};
+      await idbPut('jobsheets', updated);
+      Object.assign(job, updated);
+      let deletionFailed = false;
+      if (attachment.path?.startsWith('job-pdf/')) {
+        const {error} = await client.storage.from(pdfBucket).remove([attachment.path]);
+        deletionFailed = Boolean(error);
+      }
+      renderAdminPdfAttachments(job);
+      renderAllViews();
+      if ($('jobDetailModal') && !$('jobDetailModal').classList.contains('hidden')) renderDetailPdfAttachments(jobId);
+      showToast(deletionFailed
+        ? 'Lampiran terlepas dari materi, tetapi file di Storage gagal dihapus.'
+        : 'Lampiran PDF berhasil dihapus.');
+    } catch (error) { fail('Gagal menghapus PDF', error); }
+  }
+  // Sisipkan input PDF ke formulir Job Sheet TANPA perlu mengubah HTML aslinya.
+  const formJobPanel = $('adminSub-formJob');
+  if (formJobPanel && !$('gearupPdfInput')) {
+    const panel = document.createElement('div');
+    panel.id = 'gearupPdfFormSection';
+    panel.className = 'p-3 rounded-xl border border-army-200 bg-army-50 space-y-2';
+    const heading = document.createElement('label');
+    heading.className = 'block text-xs font-extrabold text-army-900';
+    heading.textContent = '📄 Lampiran PDF (opsional, bisa beberapa PDF)';
+    heading.htmlFor = 'gearupPdfInput';
+    const input = document.createElement('input');
+    input.id = 'gearupPdfInput';
+    input.type = 'file';
+    input.accept = '.pdf,application/pdf';
+    input.multiple = true;
+    input.className = 'w-full text-xs file:mr-2 file:px-3 file:py-1.5 file:rounded-lg file:bg-olive-600 file:text-white';
+    const help = document.createElement('p');
+    help.className = 'text-[11px] text-slate-600';
+    help.textContent = 'Maksimum 10 MB per PDF. Jika mengedit, PDF lama tetap ada kecuali Anda menghapusnya.';
+    const pending = document.createElement('div');
+    pending.id = 'gearupPdfPendingList';
+    pending.className = 'text-[11px] text-olive-700 break-words';
+    const existingTitle = document.createElement('p');
+    existingTitle.className = 'text-[11px] font-bold text-army-700 mt-2';
+    existingTitle.textContent = 'PDF yang sudah terpasang:';
+    const existing = document.createElement('div');
+    existing.id = 'gearupPdfExistingList';
+    existing.className = 'space-y-1 text-[11px] text-slate-500';
+    existing.textContent = 'Pilih Edit Materi untuk melihat lampiran PDF sebelumnya.';
+    input.addEventListener('change', () => {
+      pendingPdfFiles = Array.from(input.files || []);
+      pending.textContent = pendingPdfFiles.length
+        ? `Siap diunggah: ${pendingPdfFiles.map(x=>x.name).join(', ')}` : '';
+    });
+    panel.append(heading, input, help, pending, existingTitle, existing);
+    const saveButton = formJobPanel.querySelector('button[onclick="saveJobSheetFromAdmin()"]');
+    if (saveButton) formJobPanel.insertBefore(panel, saveButton);
+    else formJobPanel.append(panel);
+  }
+  // Saat admin membuka form Job Sheet baru, jangan tampilkan berkas milik edit sebelumnya.
+  const originalOpenAdminModal = window.openAdminModal;
+  window.openAdminModal = function(targetTab = null) {
+    originalOpenAdminModal(targetTab);
+    if (targetTab === 'jobsheet' && !$('editJobId')?.value) {
+      pendingPdfFiles = [];
+      if ($('gearupPdfInput')) $('gearupPdfInput').value = '';
+      if ($('gearupPdfPendingList')) $('gearupPdfPendingList').textContent='';
+      if ($('gearupPdfExistingList')) $('gearupPdfExistingList').textContent='Belum ada PDF.';
+    }
+  };
+  window.GEARUP_PDF_READY = true;
+
   window.GEARUP_CLOUD_ADAPTER_READY = true;
 })();
