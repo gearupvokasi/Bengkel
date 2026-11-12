@@ -3,11 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>GearUp - Praktik Bengkel Teknik Mesin </title>
-    <meta name="theme-color" content="#2A361E">
-    <meta name="description" content="GearUp: alat praktik, job sheet, dan kalkulator permesinan untuk mahasiswa Teknik Mesin.">
-    <link rel="manifest" href="./manifest.webmanifest">
-    <link rel="icon" type="image/svg+xml" href="./icon.svg">
+    <title>GearUp - Praktik Bengkel Teknik Mesin</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Font Awesome Icons -->
@@ -208,7 +204,6 @@
         <div id="searchResultsList" class="space-y-2 max-h-80 overflow-y-auto"></div>
     </div>
 
-    <div id="cloudNotice" class="hidden mx-4 mt-3 rounded-xl px-3 py-2 text-[11px] font-semibold bg-amber-50 text-amber-900 border border-amber-300"></div>
     <!-- MAIN CONTENT CONTAINER -->
     <main class="px-4 pt-4 space-y-5">
 
@@ -301,18 +296,18 @@
                         </span>
                         <div>
                             <h4 class="font-bold text-xs text-army-900">Hitung Cepat Putaran Spindel (n)</h4>
-                            <p class="text-[10px] text-slate-500 font-mono">n = (1000 × Vc) / (π × d)</p>
+                            <p class="text-[10px] text-slate-500 font-mono">n = (1000 × Vc) ÷ (π × d)</p>
                         </div>
                     </div>
                     <button onclick="switchMainTab('calc')" class="text-[11px] font-bold text-olive-600 hover:underline">Lengkap →</button>
                 </div>
                 <div class="grid grid-cols-2 gap-2.5 mb-2.5">
                     <div>
-                        <label class="text-[10px] font-semibold text-slate-600 block mb-1">Kecepatan Potong Vc (m/mnt)</label>
+                        <label class="text-[10px] font-semibold text-slate-600 block mb-1">Kecepatan Potong Vc (m/menit)</label>
                         <input id="quickVc" type="number" value="25" oninput="calcQuickRpm()" class="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 focus:border-olive-500 focus:outline-none font-semibold">
                     </div>
                     <div>
-                        <label class="text-[10px] font-semibold text-slate-600 block mb-1">Diameter d (mm)</label>
+                        <label class="text-[10px] font-semibold text-slate-600 block mb-1">Diameter Benda / Pahat d (mm)</label>
                         <input id="quickD" type="number" value="20" oninput="calcQuickRpm()" class="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 focus:border-olive-500 focus:outline-none font-semibold">
                     </div>
                 </div>
@@ -366,14 +361,27 @@
                 <div id="toolsSessionButtons" class="flex space-x-2 overflow-x-auto no-scrollbar pb-1"></div>
             </div>
 
-            <!-- Tool Class Category Filter -->
-            <div class="flex items-center space-x-1.5 overflow-x-auto no-scrollbar py-1" id="toolClassFilterBar">
-                <button onclick="filterToolClass('ALL')" data-cls="ALL" class="cls-btn px-3 py-1 rounded-lg text-[11px] font-bold bg-olive-600 text-white">Semua Golongan</button>
-                <button onclick="filterToolClass('Mesin Utama')" data-cls="Mesin Utama" class="cls-btn px-3 py-1 rounded-lg text-[11px] font-semibold bg-white text-slate-700 border">Mesin Utama</button>
-                <button onclick="filterToolClass('Alat Potong & Sayat')" data-cls="Alat Potong & Sayat" class="cls-btn px-3 py-1 rounded-lg text-[11px] font-semibold bg-white text-slate-700 border">Alat Potong</button>
-                <button onclick="filterToolClass('Alat Ukur & Lukis')" data-cls="Alat Ukur & Lukis" class="cls-btn px-3 py-1 rounded-lg text-[11px] font-semibold bg-white text-slate-700 border">Alat Ukur</button>
-                <button onclick="filterToolClass('Alat Cekam & Bantu')" data-cls="Alat Cekam & Bantu" class="cls-btn px-3 py-1 rounded-lg text-[11px] font-semibold bg-white text-slate-700 border">Alat Cekam</button>
-                <button onclick="filterToolClass('Alat Tempa & Las')" data-cls="Alat Tempa & Las" class="cls-btn px-3 py-1 rounded-lg text-[11px] font-semibold bg-white text-slate-700 border">Tempa/Las & K3</button>
+            <!-- Tool Class Category Filter (10 Golongan Standar Bengkel Vokasi) -->
+            <div class="bg-white p-3 rounded-2xl border border-army-200 shadow-sm space-y-2">
+                <div class="flex items-center justify-between">
+                    <span class="text-[11px] font-extrabold text-army-900 uppercase tracking-wider">
+                        <i class="fa-solid fa-layer-group text-olive-600 mr-1"></i>Filter Golongan Kelas Alat (10 Standar Vokasi):
+                    </span>
+                    <span id="activeClassBadge" class="text-[10px] font-bold text-olive-600">Semua Golongan</span>
+                </div>
+                <div class="flex items-center space-x-1.5 overflow-x-auto no-scrollbar py-0.5" id="toolClassFilterBar">
+                    <button onclick="filterToolClass('ALL')" data-cls="ALL" class="cls-btn shrink-0 px-3 py-1.5 rounded-xl text-[11px] font-bold bg-olive-600 text-white shadow-sm">Semua Golongan (10)</button>
+                    <button onclick="filterToolClass('Golongan 1: Alat Ukur & Pemeriksaan')" data-cls="Golongan 1: Alat Ukur & Pemeriksaan" class="cls-btn shrink-0 px-3 py-1.5 rounded-xl text-[11px] font-semibold bg-army-50 text-army-800 border border-army-200">1. Alat Ukur & Pemeriksaan</button>
+                    <button onclick="filterToolClass('Golongan 2: Alat Penanda & Lukis')" data-cls="Golongan 2: Alat Penanda & Lukis" class="cls-btn shrink-0 px-3 py-1.5 rounded-xl text-[11px] font-semibold bg-army-50 text-army-800 border border-army-200">2. Alat Penanda & Lukis</button>
+                    <button onclick="filterToolClass('Golongan 3: Alat Pemotong & Penyayat Manual')" data-cls="Golongan 3: Alat Pemotong & Penyayat Manual" class="cls-btn shrink-0 px-3 py-1.5 rounded-xl text-[11px] font-semibold bg-army-50 text-army-800 border border-army-200">3. Pemotong & Penyayat Manual</button>
+                    <button onclick="filterToolClass('Golongan 4: Alat Pencekam & Penjepit')" data-cls="Golongan 4: Alat Pencekam & Penjepit" class="cls-btn shrink-0 px-3 py-1.5 rounded-xl text-[11px] font-semibold bg-army-50 text-army-800 border border-army-200">4. Alat Pencekam & Penjepit</button>
+                    <button onclick="filterToolClass('Golongan 5: Alat Pemukul & Pembentuk')" data-cls="Golongan 5: Alat Pemukul & Pembentuk" class="cls-btn shrink-0 px-3 py-1.5 rounded-xl text-[11px] font-semibold bg-army-50 text-army-800 border border-army-200">5. Pemukul & Pembentuk</button>
+                    <button onclick="filterToolClass('Golongan 6: Alat Potong Mesin & Pahat')" data-cls="Golongan 6: Alat Potong Mesin & Pahat" class="cls-btn shrink-0 px-3 py-1.5 rounded-xl text-[11px] font-semibold bg-army-50 text-army-800 border border-army-200">6. Alat Potong Mesin & Pahat</button>
+                    <button onclick="filterToolClass('Golongan 7: Alat Asah & Abrasive')" data-cls="Golongan 7: Alat Asah & Abrasive" class="cls-btn shrink-0 px-3 py-1.5 rounded-xl text-[11px] font-semibold bg-army-50 text-army-800 border border-army-200">7. Alat Asah & Abrasive</button>
+                    <button onclick="filterToolClass('Golongan 8: Alat Penyambungan & Pengelasan')" data-cls="Golongan 8: Alat Penyambungan & Pengelasan" class="cls-btn shrink-0 px-3 py-1.5 rounded-xl text-[11px] font-semibold bg-army-50 text-army-800 border border-army-200">8. Penyambungan & Las</button>
+                    <button onclick="filterToolClass('Golongan 9: Alat Bantu Mesin & Pemegang Pahat')" data-cls="Golongan 9: Alat Bantu Mesin & Pemegang Pahat" class="cls-btn shrink-0 px-3 py-1.5 rounded-xl text-[11px] font-semibold bg-army-50 text-army-800 border border-army-200">9. Alat Bantu Mesin & Holder</button>
+                    <button onclick="filterToolClass('Golongan 10: Alat Keselamatan Kerja (APD)')" data-cls="Golongan 10: Alat Keselamatan Kerja (APD)" class="cls-btn shrink-0 px-3 py-1.5 rounded-xl text-[11px] font-semibold bg-army-50 text-army-800 border border-army-200">10. Keselamatan Kerja (APD)</button>
+                </div>
             </div>
 
             <!-- Tools List Container -->
@@ -420,7 +428,7 @@
                     <i class="fa-solid fa-calculator text-olive-400"></i>
                     <span>Kalkulator Permesinan & Tabel Vc</span>
                 </h2>
-                <p class="text-xs text-army-200 mt-0.5">Spindel (n), Bubut, Milling, Shaping, Forging & Referensi Vc</p>
+                <p class="text-xs text-army-200 mt-0.5">Perhitungan Standar Teknologi Mekanik: Spindel (n), Bubut, Frais, Sekrap, Tempa & Vc</p>
             </div>
 
             <!-- Sub-navigation for Calculators -->
@@ -433,217 +441,243 @@
                 <button onclick="switchCalcTab('vctable')" data-calctab="vctable" class="calc-tab-btn shrink-0 px-3.5 py-2 rounded-xl text-xs font-bold bg-amber-500 text-army-900 shadow"><i class="fa-solid fa-table mr-1"></i>Tabel Vc & Bor</button>
             </div>
 
-            <!-- 1. KALKULATOR PUTARAN SPINDEL UTAMA: n = (1000 * Vc) / (pi * d) -->
+            <!-- 1. KALKULATOR PUTARAN SPINDEL UTAMA: n = (1000 × Vc) / (π × d) -->
             <div id="calc-panel-spindle" class="calc-panel bg-white p-4 rounded-2xl shadow-sm border border-army-200 space-y-4">
-                <div class="bg-army-50 p-3 rounded-xl border border-army-200 flex items-center justify-between">
+                <div class="bg-army-50 p-3.5 rounded-xl border border-army-200 flex items-center justify-between">
                     <div>
-                        <span class="text-[10px] font-bold uppercase text-olive-600">Rumus Dasar Putaran Mesin</span>
-                        <p class="font-mono font-extrabold text-sm text-army-900 mt-0.5">n = (1000 × Vc) / (π × d)</p>
+                        <span class="text-[10px] font-bold uppercase text-olive-600">Rumus Dasar Kecepatan Putaran Spindel</span>
+                        <p class="font-mono font-extrabold text-sm text-army-900 mt-0.5">n = (1000 × Vc) ÷ (π × d)</p>
+                        <p class="text-[10px] text-slate-500 mt-0.5">Konstanta π = 3,1416 | Satuan n dalam putaran/menit (RPM)</p>
                     </div>
-                    <button onclick="switchCalcTab('vctable')" class="text-xs bg-olive-500 text-white font-bold px-2.5 py-1.5 rounded-lg shadow">
-                        Cari Nilai Vc
+                    <button onclick="switchCalcTab('vctable')" class="text-xs bg-olive-500 hover:bg-olive-600 text-white font-bold px-3 py-2 rounded-xl shadow shrink-0">
+                        Lihat Tabel Vc
                     </button>
                 </div>
 
                 <div class="space-y-3">
                     <div>
-                        <label class="text-xs font-bold text-slate-700 block mb-1">Kecepatan Potong / Cutting Speed [m/menit]</label>
+                        <label class="text-xs font-bold text-slate-700 block mb-1">Kecepatan Potong / Cutting Speed (Vc) [m/menit]</label>
                         <input id="spindle_vc" type="number" step="any" value="30" oninput="calculateSpindleMain()" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-olive-500 focus:outline-none text-sm font-bold">
                     </div>
                     <div>
-                        <label class="text-xs font-bold text-slate-700 block mb-1">Diameter Benda Kerja / Mata Bor [mm]</label>
+                        <label class="text-xs font-bold text-slate-700 block mb-1">Diameter Benda Kerja atau Mata Potong (d) [mm]</label>
                         <input id="spindle_d" type="number" step="any" value="25" oninput="calculateSpindleMain()" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-olive-500 focus:outline-none text-sm font-bold">
                     </div>
                 </div>
 
                 <div class="bg-gradient-to-r from-army-800 to-army-700 text-white p-4 rounded-2xl space-y-2">
                     <div class="flex justify-between items-center">
-                        <span class="text-xs text-army-200">Putaran Spindel Teoritis :</span>
-                        <span class="text-2xl font-extrabold text-olive-400"><span id="spindle_res_n">381.97</span> RPM</span>
+                        <span class="text-xs text-army-200">Putaran Spindel Teoritis (n):</span>
+                        <span class="text-2xl font-extrabold text-olive-400"><span id="spindle_res_n">381,97</span> RPM</span>
                     </div>
                     <div class="flex justify-between items-center text-xs border-t border-white/10 pt-2">
-                        <span class="text-army-200">Pembulatan Gearbox Standar:</span>
-                        <span class="font-bold text-white" id="spindle_res_round">382 RPM</span>
+                        <span class="text-army-200">Rekomendasi Setelan Gearbox Mesin:</span>
+                        <span class="font-bold text-white" id="spindle_res_round">382 putaran/menit (RPM)</span>
                     </div>
                 </div>
             </div>
 
-            <!-- 2. KALKULATOR BUBUT (LATHE) -->
+            <!-- 2. KALKULATOR BUBUT (TURNING / LATHE) -->
             <div id="calc-panel-bubut" class="calc-panel hidden bg-white p-4 rounded-2xl shadow-sm border border-army-200 space-y-3.5">
-                <div class="border-b pb-2">
+                <div class="border-b pb-2.5">
                     <h3 class="font-extrabold text-sm text-army-900">Kalkulator Mesin Bubut (Turning)</h3>
-                    <p class="text-[11px] text-slate-500">Menghitung, Kecepatan Makan, Waktu Pemesinan, dan</p>
+                    <div class="mt-1.5 bg-army-50 p-2.5 rounded-xl border border-army-200 text-[11px] font-mono text-army-900 space-y-0.5">
+                        <p>• Putaran Spindel: <b>n = (1000 × Vc) ÷ (π × d₀)</b> [RPM]</p>
+                        <p>• Kedalaman Potong: <b>a = (d₀ − dₘ) ÷ 2</b> [mm]</p>
+                        <p>• Kecepatan Pemakanan: <b>Vf = f × n</b> [mm/menit]</p>
+                        <p>• Waktu Pemesinan: <b>Tm = L ÷ (f × n)</b> [menit]</p>
+                        <p>• Penghasilan Beram: <b>Q = Vc × a × f</b> [cm³/menit]</p>
+                    </div>
                 </div>
                 <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label class="text-[11px] font-bold text-slate-700">Cutting Speed (m/mnt)</label>
+                        <label class="text-[11px] font-bold text-slate-700">Kecepatan Potong Vc (m/menit)</label>
                         <input id="lathe_vc" type="number" step="any" value="35" oninput="calculateLathe()" class="w-full mt-1 px-3 py-2 rounded-xl border text-xs font-bold">
                     </div>
                     <div>
-                        <label class="text-[11px] font-bold text-slate-700">Diameter Awal (mm)</label>
+                        <label class="text-[11px] font-bold text-slate-700">Diameter Awal d₀ (mm)</label>
                         <input id="lathe_d" type="number" step="any" value="40" oninput="calculateLathe()" class="w-full mt-1 px-3 py-2 rounded-xl border text-xs font-bold">
                     </div>
                     <div>
-                        <label class="text-[11px] font-bold text-slate-700">Gerak Makan (mm/put)</label>
-                        <input id="lathe_f" type="number" step="any" value="0.2" oninput="calculateLathe()" class="w-full mt-1 px-3 py-2 rounded-xl border text-xs font-bold">
+                        <label class="text-[11px] font-bold text-slate-700">Diameter Akhir dₘ (mm)</label>
+                        <input id="lathe_dm" type="number" step="any" value="37" oninput="calculateLathe()" class="w-full mt-1 px-3 py-2 rounded-xl border text-xs font-bold">
                     </div>
                     <div>
-                        <label class="text-[11px] font-bold text-slate-700">Panjang Bubut (mm)</label>
-                        <input id="lathe_l" type="number" step="any" value="120" oninput="calculateLathe()" class="w-full mt-1 px-3 py-2 rounded-xl border text-xs font-bold">
+                        <label class="text-[11px] font-bold text-slate-700">Gerak Makan f (mm/putaran)</label>
+                        <input id="lathe_f" type="number" step="any" value="0.2" oninput="calculateLathe()" class="w-full mt-1 px-3 py-2 rounded-xl border text-xs font-bold">
                     </div>
                     <div class="col-span-2">
-                        <label class="text-[11px] font-bold text-slate-700">Kedalaman Potong (mm)</label>
-                        <input id="lathe_ap" type="number" step="any" value="1.5" oninput="calculateLathe()" class="w-full mt-1 px-3 py-2 rounded-xl border text-xs font-bold">
+                        <label class="text-[11px] font-bold text-slate-700">Panjang Pembubutan L (mm)</label>
+                        <input id="lathe_l" type="number" step="any" value="120" oninput="calculateLathe()" class="w-full mt-1 px-3 py-2 rounded-xl border text-xs font-bold">
                     </div>
                 </div>
                 <div class="bg-army-800 text-white p-3.5 rounded-2xl grid grid-cols-2 gap-3 text-xs">
                     <div>
-                        <p class="text-army-200 text-[10px]">Putaran Spindel</p>
-                        <p class="font-extrabold text-base text-olive-400"><span id="lathe_res_n">278.5</span> RPM</p>
+                        <p class="text-army-200 text-[10px]">Putaran Spindel (n)</p>
+                        <p class="font-extrabold text-base text-olive-400"><span id="lathe_res_n">278,5</span> RPM</p>
                     </div>
                     <div>
-                        <p class="text-army-200 text-[10px]">Kecepatan Makan</p>
-                        <p class="font-extrabold text-base text-white"><span id="lathe_res_vf">55.7</span> mm/mnt</p>
+                        <p class="text-army-200 text-[10px]">Kedalaman Potong (a)</p>
+                        <p class="font-extrabold text-base text-white"><span id="lathe_res_a">1,50</span> mm</p>
                     </div>
                     <div>
-                        <p class="text-army-200 text-[10px]">Waktu Pemesinan</p>
-                        <p class="font-extrabold text-base text-amber-400"><span id="lathe_res_tm">2.15</span> menit</p>
+                        <p class="text-army-200 text-[10px]">Kecepatan Pemakanan (Vf)</p>
+                        <p class="font-extrabold text-base text-white"><span id="lathe_res_vf">55,7</span> mm/menit</p>
                     </div>
                     <div>
-                        <p class="text-army-200 text-[10px]">Penghilangan Bahan</p>
-                        <p class="font-extrabold text-base text-white"><span id="lathe_res_mrr">10.5</span> cm³/mnt</p>
+                        <p class="text-army-200 text-[10px]">Waktu Pemesinan (Tm)</p>
+                        <p class="font-extrabold text-base text-amber-400"><span id="lathe_res_tm">2,15</span> menit</p>
+                    </div>
+                    <div class="col-span-2 border-t border-white/10 pt-2 flex justify-between items-center">
+                        <span class="text-army-200 text-[11px]">Kecepatan Penghasilan Beram (Q):</span>
+                        <span class="font-extrabold text-sm text-olive-400"><span id="lathe_res_mrr">10,50</span> cm³/menit</span>
                     </div>
                 </div>
             </div>
 
             <!-- 3. KALKULATOR MILLING (FRAIS) -->
             <div id="calc-panel-milling" class="calc-panel hidden bg-white p-4 rounded-2xl shadow-sm border border-army-200 space-y-3.5">
-                <div class="border-b pb-2">
+                <div class="border-b pb-2.5">
                     <h3 class="font-extrabold text-sm text-army-900">Kalkulator Mesin Frais (Milling)</h3>
-                    <p class="text-[11px] text-slate-500">Rumus: n = 1000 \cdot V_c}{\pi \cdot d}$ dan $V_f = f_z \cdot z \cdot n$</p>
+                    <div class="mt-1.5 bg-army-50 p-2.5 rounded-xl border border-army-200 text-[11px] font-mono text-army-900 space-y-0.5">
+                        <p>• Putaran Spindel: <b>n = (1000 × Vc) ÷ (π × d)</b> [RPM]</p>
+                        <p>• Gerak Makan Meja: <b>Vf = fz × z × n</b> [mm/menit]</p>
+                        <p>• Waktu Pemesinan: <b>Tm = L ÷ Vf</b> [menit]</p>
+                    </div>
                 </div>
                 <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label class="text-[11px] font-bold text-slate-700">Cutting Speed $V_c$ (m/mnt)</label>
+                        <label class="text-[11px] font-bold text-slate-700">Kecepatan Potong Vc (m/menit)</label>
                         <input id="mill_vc" type="number" step="any" value="25" oninput="calculateMilling()" class="w-full mt-1 px-3 py-2 rounded-xl border text-xs font-bold">
                     </div>
                     <div>
-                        <label class="text-[11px] font-bold text-slate-700">Diameter Pisau $d$ (mm)</label>
+                        <label class="text-[11px] font-bold text-slate-700">Diameter Pisau Frais d (mm)</label>
                         <input id="mill_d" type="number" step="any" value="16" oninput="calculateMilling()" class="w-full mt-1 px-3 py-2 rounded-xl border text-xs font-bold">
                     </div>
                     <div>
-                        <label class="text-[11px] font-bold text-slate-700">Jumlah Mata Potong ($z$)</label>
+                        <label class="text-[11px] font-bold text-slate-700">Jumlah Gigi Pisau z (gigi)</label>
                         <input id="mill_z" type="number" step="1" value="4" oninput="calculateMilling()" class="w-full mt-1 px-3 py-2 rounded-xl border text-xs font-bold">
                     </div>
                     <div>
-                        <label class="text-[11px] font-bold text-slate-700">Feed per Gigi $f_z$ (mm/gigi)</label>
+                        <label class="text-[11px] font-bold text-slate-700">Gerak Makan per Gigi fz (mm/gigi)</label>
                         <input id="mill_fz" type="number" step="any" value="0.05" oninput="calculateMilling()" class="w-full mt-1 px-3 py-2 rounded-xl border text-xs font-bold">
                     </div>
                     <div class="col-span-2">
-                        <label class="text-[11px] font-bold text-slate-700">Panjang Langkah Meja $L$ (mm)</label>
+                        <label class="text-[11px] font-bold text-slate-700">Panjang Pemotongan Meja L (mm)</label>
                         <input id="mill_l" type="number" step="any" value="150" oninput="calculateMilling()" class="w-full mt-1 px-3 py-2 rounded-xl border text-xs font-bold">
                     </div>
                 </div>
                 <div class="bg-army-800 text-white p-3.5 rounded-2xl grid grid-cols-3 gap-2 text-xs">
                     <div>
-                        <p class="text-army-200 text-[10px]">Putaran ($n$)</p>
+                        <p class="text-army-200 text-[10px]">Putaran Spindel (n)</p>
                         <p class="font-extrabold text-sm text-olive-400"><span id="mill_res_n">497</span> RPM</p>
                     </div>
                     <div>
-                        <p class="text-army-200 text-[10px]">Feed Meja ($V_f$)</p>
-                        <p class="font-extrabold text-sm text-white"><span id="mill_res_vf">99.5</span> mm/m</p>
+                        <p class="text-army-200 text-[10px]">Gerak Makan (Vf)</p>
+                        <p class="font-extrabold text-sm text-white"><span id="mill_res_vf">99,5</span> mm/menit</p>
                     </div>
                     <div>
-                        <p class="text-army-200 text-[10px]">Waktu ($T_m$)</p>
-                        <p class="font-extrabold text-sm text-amber-400"><span id="mill_res_tm">1.51</span> mnt</p>
+                        <p class="text-army-200 text-[10px]">Waktu Frais (Tm)</p>
+                        <p class="font-extrabold text-sm text-amber-400"><span id="mill_res_tm">1,51</span> menit</p>
                     </div>
                 </div>
             </div>
 
             <!-- 4. KALKULATOR SHAPING (MESIN SEKRAP) -->
             <div id="calc-panel-shaping" class="calc-panel hidden bg-white p-4 rounded-2xl shadow-sm border border-army-200 space-y-3.5">
-                <div class="border-b pb-2">
+                <div class="border-b pb-2.5">
                     <h3 class="font-extrabold text-sm text-army-900">Kalkulator Mesin Sekrap (Shaping)</h3>
-                    <p class="text-[11px] text-slate-500">Menghitung jumlah langkah ganda/menit ($n_p$) & waktu sekrap</p>
+                    <div class="mt-1.5 bg-army-50 p-2.5 rounded-xl border border-army-200 text-[11px] font-mono text-army-900 space-y-0.5">
+                        <p>• Jumlah Langkah: <b>np = (1000 × Vc) ÷ (L × (1 + R))</b> [langkah/menit]</p>
+                        <p>• Waktu Pemesinan: <b>Tm = B ÷ (f × np)</b> [menit]</p>
+                    </div>
                 </div>
                 <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label class="text-[11px] font-bold text-slate-700">Kecepatan Potong $V_c$ (m/mnt)</label>
+                        <label class="text-[11px] font-bold text-slate-700">Kecepatan Potong Vc (m/menit)</label>
                         <input id="shape_vc" type="number" step="any" value="18" oninput="calculateShaping()" class="w-full mt-1 px-3 py-2 rounded-xl border text-xs font-bold">
                     </div>
                     <div>
-                        <label class="text-[11px] font-bold text-slate-700">Panjang Langkah $L$ (mm)</label>
+                        <label class="text-[11px] font-bold text-slate-700">Panjang Langkah Sekrap L (mm)</label>
                         <input id="shape_l" type="number" step="any" value="200" oninput="calculateShaping()" class="w-full mt-1 px-3 py-2 rounded-xl border text-xs font-bold">
                     </div>
                     <div>
-                        <label class="text-[11px] font-bold text-slate-700">Rasio Balik Cepat ($k = v_m/v_r$)</label>
+                        <label class="text-[11px] font-bold text-slate-700">Rasio Langkah Balik R (misal 0,6)</label>
                         <input id="shape_k" type="number" step="any" value="0.6" oninput="calculateShaping()" class="w-full mt-1 px-3 py-2 rounded-xl border text-xs font-bold">
                     </div>
                     <div>
-                        <label class="text-[11px] font-bold text-slate-700">Lebar Bidang Sekrap $B$ (mm)</label>
+                        <label class="text-[11px] font-bold text-slate-700">Lebar Bidang Sekrap B (mm)</label>
                         <input id="shape_b" type="number" step="any" value="80" oninput="calculateShaping()" class="w-full mt-1 px-3 py-2 rounded-xl border text-xs font-bold">
                     </div>
                     <div class="col-span-2">
-                        <label class="text-[11px] font-bold text-slate-700">Gerak Makan Meja per Langkah $s$ (mm/langkah)</label>
+                        <label class="text-[11px] font-bold text-slate-700">Gerak Makan per Langkah f (mm/langkah)</label>
                         <input id="shape_s" type="number" step="any" value="0.5" oninput="calculateShaping()" class="w-full mt-1 px-3 py-2 rounded-xl border text-xs font-bold">
                     </div>
                 </div>
                 <div class="bg-army-800 text-white p-3.5 rounded-2xl grid grid-cols-3 gap-2 text-xs">
                     <div>
-                        <p class="text-army-200 text-[10px]">Langkah ($n_p$)</p>
-                        <p class="font-extrabold text-sm text-olive-400"><span id="shape_res_np">56.3</span> /mnt</p>
+                        <p class="text-army-200 text-[10px]">Frekuensi (np)</p>
+                        <p class="font-extrabold text-sm text-olive-400"><span id="shape_res_np">56,3</span> langkah/mnt</p>
                     </div>
                     <div>
                         <p class="text-army-200 text-[10px]">Kecepatan Makan</p>
-                        <p class="font-extrabold text-sm text-white"><span id="shape_res_vf">28.1</span> mm/m</p>
+                        <p class="font-extrabold text-sm text-white"><span id="shape_res_vf">28,1</span> mm/menit</p>
                     </div>
                     <div>
-                        <p class="text-army-200 text-[10px]">Waktu ($T_m$)</p>
-                        <p class="font-extrabold text-sm text-amber-400"><span id="shape_res_tm">2.84</span> mnt</p>
+                        <p class="text-army-200 text-[10px]">Waktu Sekrap (Tm)</p>
+                        <p class="font-extrabold text-sm text-amber-400"><span id="shape_res_tm">2,84</span> menit</p>
                     </div>
                 </div>
             </div>
 
             <!-- 5. KALKULATOR FORGING (KERJA TEMPA) -->
             <div id="calc-panel-forging" class="calc-panel hidden bg-white p-4 rounded-2xl shadow-sm border border-army-200 space-y-3.5">
-                <div class="border-b pb-2">
-                    <h3 class="font-extrabold text-sm text-army-900">Kalkulator Perhitungan Forging (Tempa)</h3>
-                    <p class="text-[11px] text-slate-500">Kekekalan Volume ($V_1 = V_2$), Rasio Tempa & Estimasi Gaya Tempa ($F$)</p>
+                <div class="border-b pb-2.5">
+                    <h3 class="font-extrabold text-sm text-army-900">Kalkulator Perhitungan Tempa (Forging)</h3>
+                    <div class="mt-1.5 bg-army-50 p-2.5 rounded-xl border border-army-200 text-[11px] font-mono text-army-900 space-y-0.5">
+                        <p>• Volume Konstan: <b>V = A₀ × h₀ = A₁ × h₁</b> [mm³]</p>
+                        <p>• Regangan Sebenarnya: <b>ε = ln(h₀ ÷ h₁)</b></p>
+                        <p>• Gaya Tempa: <b>F = kf × Yf × A₁</b> [N, kN, dan Ton-force]</p>
+                    </div>
                 </div>
                 <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label class="text-[11px] font-bold text-slate-700">Diameter Awal $d_0$ (mm)</label>
+                        <label class="text-[11px] font-bold text-slate-700">Diameter Awal d₀ (mm)</label>
                         <input id="forge_d0" type="number" step="any" value="30" oninput="calculateForging()" class="w-full mt-1 px-3 py-2 rounded-xl border text-xs font-bold">
                     </div>
                     <div>
-                        <label class="text-[11px] font-bold text-slate-700">Tinggi Awal $h_0$ (mm)</label>
+                        <label class="text-[11px] font-bold text-slate-700">Tinggi Awal h₀ (mm)</label>
                         <input id="forge_h0" type="number" step="any" value="60" oninput="calculateForging()" class="w-full mt-1 px-3 py-2 rounded-xl border text-xs font-bold">
                     </div>
                     <div>
-                        <label class="text-[11px] font-bold text-slate-700">Tinggi Akhir Tempa $h_1$ (mm)</label>
+                        <label class="text-[11px] font-bold text-slate-700">Tinggi Akhir h₁ (mm)</label>
                         <input id="forge_h1" type="number" step="any" value="35" oninput="calculateForging()" class="w-full mt-1 px-3 py-2 rounded-xl border text-xs font-bold">
                     </div>
                     <div>
-                        <label class="text-[11px] font-bold text-slate-700">Tegangan Alir Panas $k_f$ (MPa)</label>
+                        <label class="text-[11px] font-bold text-slate-700">Tegangan Alir Material Yf (MPa)</label>
                         <input id="forge_kf" type="number" step="any" value="120" oninput="calculateForging()" class="w-full mt-1 px-3 py-2 rounded-xl border text-xs font-bold">
+                    </div>
+                    <div class="col-span-2">
+                        <label class="text-[11px] font-bold text-slate-700">Koefisien Gesek Tempa μ (Standar Tempa Panas ≈ 0,20)</label>
+                        <input id="forge_mu" type="number" step="any" value="0.20" oninput="calculateForging()" class="w-full mt-1 px-3 py-2 rounded-xl border text-xs font-bold">
                     </div>
                 </div>
                 <div class="bg-army-800 text-white p-3.5 rounded-2xl grid grid-cols-2 gap-3 text-xs">
                     <div>
-                        <p class="text-army-200 text-[10px]">Volume Benda ($V$)</p>
-                        <p class="font-extrabold text-sm text-white"><span id="forge_res_vol">42.41</span> cm³</p>
+                        <p class="text-army-200 text-[10px]">Volume Benda (V)</p>
+                        <p class="font-extrabold text-sm text-white"><span id="forge_res_vol">42.412</span> mm³ (<span id="forge_res_vol_cm">42,4</span> cm³)</p>
                     </div>
                     <div>
-                        <p class="text-army-200 text-[10px]">Diameter Akhir ($d_1$)</p>
-                        <p class="font-extrabold text-sm text-olive-400"><span id="forge_res_d1">39.28</span> mm</p>
+                        <p class="text-army-200 text-[10px]">Diameter Akhir (d₁) & Luas (A₁)</p>
+                        <p class="font-extrabold text-sm text-olive-400">Ø <span id="forge_res_d1">39,28</span> mm (<span id="forge_res_a1">1212</span> mm²)</p>
                     </div>
                     <div>
-                        <p class="text-army-200 text-[10px]">Reduksi Tinggi ($\Delta h$)</p>
-                        <p class="font-extrabold text-sm text-white"><span id="forge_res_red">41.7</span> %</p>
+                        <p class="text-army-200 text-[10px]">Regangan Sebenarnya (ε) & Faktor (kf)</p>
+                        <p class="font-extrabold text-sm text-white">ε = <span id="forge_res_strain">0,539</span> | kf = <span id="forge_res_kffactor">1,25</span></p>
                     </div>
                     <div>
-                        <p class="text-army-200 text-[10px]">Estimasi Gaya Tempa ($F$)</p>
-                        <p class="font-extrabold text-sm text-amber-400"><span id="forge_res_force">174.5</span> kN</p>
+                        <p class="text-army-200 text-[10px]">Gaya Tempa (F)</p>
+                        <p class="font-extrabold text-sm text-amber-400"><span id="forge_res_force">181,7</span> kN (<span id="forge_res_ton">18,5</span> Tonf)</p>
                     </div>
                 </div>
             </div>
@@ -652,8 +686,8 @@
             <div id="calc-panel-vctable" class="calc-panel hidden bg-white p-4 rounded-2xl shadow-sm border border-army-200 space-y-3">
                 <div class="flex items-center justify-between border-b pb-2">
                     <div>
-                        <h3 class="font-extrabold text-sm text-army-900">Tabel Standar Cutting Speed ($V_c$)</h3>
-                        <p class="text-[11px] text-slate-500">Klik angka pada tabel untuk langsung memasukkan nilai $V_c$ ke kalkulator!</p>
+                        <h3 class="font-extrabold text-sm text-army-900">Tabel Standar Kecepatan Potong (Vc)</h3>
+                        <p class="text-[11px] text-slate-500">Klik angka pada tabel untuk langsung memasukkan nilai Vc ke semua kalkulator!</p>
                     </div>
                 </div>
 
@@ -661,16 +695,16 @@
                 <div>
                     <h4 class="text-xs font-extrabold text-olive-600 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
                         <i class="fa-solid fa-bore-hole"></i>
-                        <span>A. Tabel Vc & Feed Rate untuk Mata Bor (Drilling)</span>
+                        <span>A. Tabel Vc & Gerak Makan (f) untuk Mata Bor (Drilling)</span>
                     </h4>
                     <div class="overflow-x-auto rounded-xl border border-army-200">
                         <table class="w-full text-left text-[11px]">
                             <thead class="bg-army-800 text-white">
                                 <tr>
                                     <th class="p-2">Material Benda Kerja</th>
-                                    <th class="p-2 text-center">Bor HSS (m/mnt)</th>
-                                    <th class="p-2 text-center">Bor Carbide (m/mnt)</th>
-                                    <th class="p-2 text-center">Feed (mm/put)</th>
+                                    <th class="p-2 text-center">Bor HSS (m/menit)</th>
+                                    <th class="p-2 text-center">Bor Karbida (m/menit)</th>
+                                    <th class="p-2 text-center">Gerak Makan f (mm/put)</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-slate-200">
@@ -778,9 +812,9 @@
                 <i class="fa-solid fa-chevron-down text-[10px]"></i>
             </div>
             <div id="deployGuideBox" class="hidden mt-2.5 pt-2.5 border-t border-army-200 space-y-1.5 text-[11px] leading-relaxed">
-                <p>1. <b>Akses HP:</b> website dapat dibuka melalui tautan HTTPS dari Netlify. Di HP, pilih menu browser dan "Tambahkan ke Layar Utama".</p>
-                <p>2. <b>Sinkronisasi:</b> data alat dan job sheet disimpan di Supabase, bukan hanya di perangkat admin. Mahasiswa dapat memuat ulang halaman untuk melihat perubahan.</p>
-                <p>3. <b>Keamanan:</b> akun dosen dibuat melalui Supabase. Tidak ada password admin bawaan.</p>
+                <p>1. <b>Penyimpanan Gambar Besar (IndexedDB):</b> Aplikasi ini sudah dilengkapi database <i>IndexedDB</i> yang sanggup menampung ratusan foto Job Sheet beresolusi tinggi tanpa batas sempit 5MB.</p>
+                <p>2. <b>Cara Membagikan ke HP Mahasiswa:</b> Simpan file ini sebagai <code>index.html</code>, lalu unggah gratis ke <b>Netlify Drop</b> (app.netlify.com/drop), <b>Vercel</b>, atau <b>GitHub Pages</b>. Mahasiswa cukup membuka link-nya di Chrome/Safari HP dan memilih <i>"Tambahkan ke Layar Utama"</i>.</p>
+                <p>3. <b>Akses Admin Tersembunyi:</b> Ketuk logo <b>GearUp</b> di kiri atas sebanyak 3 kali atau ikon perisai di kanan atas. Password bawaan: <code>admin123</code>.</p>
             </div>
         </section>
 
@@ -830,7 +864,7 @@
                     <span class="font-extrabold text-army-800 uppercase tracking-wider text-[11px]">
                         <i class="fa-regular fa-images text-olive-600 mr-1"></i>Gambar Kerja & Panduan Praktik
                     </span>
-                    <label id="detailUploadLabel" class="hidden cursor-pointer bg-olive-100 hover:bg-olive-200 text-army-800 font-bold px-2.5 py-1 rounded-lg text-[11px] items-center gap-1 transition">
+                    <label class="cursor-pointer bg-olive-100 hover:bg-olive-200 text-army-800 font-bold px-2.5 py-1 rounded-lg text-[11px] flex items-center gap-1 transition">
                         <i class="fa-solid fa-camera"></i>
                         <span>+ Tambah / Ganti Gambar</span>
                         <input type="file" accept="image/*" multiple class="hidden" onchange="handleDirectJobImageUpload(event)">
@@ -872,7 +906,7 @@
     </div>
 </div>
 
-<!-- ================= MODAL 2: PANEL ADMIN (LOGIN + CRUD ALAT & JOBSHEET + SUPABASE) ================= -->
+<!-- ================= MODAL 2: PANEL ADMIN (LOGIN + CRUD ALAT & JOBSHEET + INDEXEDDB) ================= -->
 <div id="adminModal" class="hidden fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
     <div class="bg-white w-full max-w-[480px] max-h-[92vh] rounded-t-3xl sm:rounded-3xl overflow-hidden flex flex-col shadow-2xl">
         <!-- Header -->
@@ -890,11 +924,7 @@
         <div id="adminLoginSection" class="p-5 space-y-4">
             <div class="bg-army-50 border border-army-200 rounded-2xl p-3.5 text-xs text-army-800">
                 <p class="font-bold mb-1"><i class="fa-solid fa-lock text-olive-600 mr-1"></i>Akses Terproteksi Dosen / Instruktur</p>
-                <p class="text-[11px] text-slate-600">Masuk menggunakan email dan password dosen yang dibuat di Supabase. Hanya akun yang terdaftar sebagai admin yang dapat mengubah data.</p>
-            </div>
-            <div>
-                <label class="text-xs font-bold text-slate-700 block mb-1">Email Admin</label>
-                <input id="adminEmailInput" type="email" placeholder="dosen@kampus.ac.id" autocomplete="username" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:border-olive-500 focus:outline-none">
+                <p class="text-[11px] text-slate-600">Masukkan password admin untuk menambah/mengganti foto Job Sheet beresolusi besar, menambah alat praktik, atau mengubah password. (Default: <code class="font-bold">admin123</code>)</p>
             </div>
             <div>
                 <label class="text-xs font-bold text-slate-700 block mb-1">Password Admin</label>
@@ -907,11 +937,11 @@
 
         <!-- View B: Admin Dashboard Content (Shown after login) -->
         <div id="adminDashboardSection" class="hidden p-4 overflow-y-auto space-y-4 text-xs">
-            <!-- Supabase Storage Storage Status Bar -->
+            <!-- IndexedDB Storage Status Bar -->
             <div class="bg-army-900 text-white p-3 rounded-2xl flex items-center justify-between">
                 <div>
-                    <p class="text-[10px] text-olive-400 font-bold uppercase">Database Online &amp; Penyimpanan Gambar</p>
-                    <p class="text-xs font-semibold mt-0.5" id="idbStorageStatus">Supabase • tersinkron untuk seluruh mahasiswa</p>
+                    <p class="text-[10px] text-olive-400 font-bold uppercase">Database File Besar (IndexedDB Aktif)</p>
+                    <p class="text-xs font-semibold mt-0.5" id="idbStorageStatus">Kapasitas Lega • Siap menampung banyak gambar</p>
                 </div>
                 <button onclick="logoutAdmin()" class="text-[11px] bg-red-500/20 text-red-300 border border-red-400/30 px-2.5 py-1 rounded-lg font-bold">
                     Keluar
@@ -965,19 +995,24 @@
             <div id="adminSub-formTool" class="hidden space-y-3">
                 <h4 class="font-extrabold text-army-900 text-xs" id="formToolHeading">Tambah / Edit Daftar Alat Kerja Praktik</h4>
                 <input type="hidden" id="editToolId">
-                <div class="grid grid-cols-2 gap-2.5">
+                <div class="grid grid-cols-1 gap-2.5">
                     <div>
                         <label class="font-bold text-slate-700 block mb-1">Sesi & Semester</label>
                         <select id="admToolSession" class="w-full px-2.5 py-2 rounded-xl border text-xs font-semibold bg-white"></select>
                     </div>
                     <div>
-                        <label class="font-bold text-slate-700 block mb-1">Golongan Kelas Alat</label>
+                        <label class="font-bold text-slate-700 block mb-1">Golongan Kelas Alat (10 Standar Bengkel Vokasi)</label>
                         <select id="admToolClass" class="w-full px-2.5 py-2 rounded-xl border text-xs font-semibold bg-white">
-                            <option value="Mesin Utama">Mesin Utama</option>
-                            <option value="Alat Potong & Sayat">Alat Potong & Sayat</option>
-                            <option value="Alat Ukur & Lukis">Alat Ukur & Lukis</option>
-                            <option value="Alat Cekam & Bantu">Alat Cekam & Bantu</option>
-                            <option value="Alat Tempa & Las">Alat Tempa & Las</option>
+                            <option value="Golongan 1: Alat Ukur & Pemeriksaan">Golongan 1: Alat Ukur & Pemeriksaan (Measuring & Inspection)</option>
+                            <option value="Golongan 2: Alat Penanda & Lukis">Golongan 2: Alat Penanda & Lukis (Marking & Layout)</option>
+                            <option value="Golongan 3: Alat Pemotong & Penyayat Manual">Golongan 3: Alat Pemotong & Penyayat Manual (Filing & Cutting)</option>
+                            <option value="Golongan 4: Alat Pencekam & Penjepit">Golongan 4: Alat Pencekam & Penjepit (Clamping & Workholding)</option>
+                            <option value="Golongan 5: Alat Pemukul & Pembentuk">Golongan 5: Alat Pemukul & Pembentuk (Striking, Forming & Forging)</option>
+                            <option value="Golongan 6: Alat Potong Mesin & Pahat">Golongan 6: Alat Potong Mesin & Pahat (Machine Cutting Tools)</option>
+                            <option value="Golongan 7: Alat Asah & Abrasive">Golongan 7: Alat Asah & Abrasive (Grinding & Abrasive Tools)</option>
+                            <option value="Golongan 8: Alat Penyambungan & Pengelasan">Golongan 8: Alat Penyambungan & Pengelasan (Welding Equipment)</option>
+                            <option value="Golongan 9: Alat Bantu Mesin & Pemegang Pahat">Golongan 9: Alat Bantu Mesin & Pemegang Pahat (Accessories & Holders)</option>
+                            <option value="Golongan 10: Alat Keselamatan Kerja (APD)">Golongan 10: Alat Keselamatan Kerja / APD (Workshop Safety & PPE)</option>
                         </select>
                     </div>
                 </div>
@@ -1009,11 +1044,6 @@
                     </button>
                 </div>
 
-                <div class="bg-olive-50 p-3.5 rounded-2xl border border-olive-200 space-y-2.5">
-                    <h4 class="font-extrabold text-army-900">Publikasikan 25 Alat &amp; 9 Job Sheet Bawaan</h4>
-                    <p class="text-[11px] text-slate-600">Klik sekali setelah akun admin selesai disiapkan. Data yang telah diedit tidak akan ditimpa.</p>
-                    <button onclick="publishInitialCatalog()" class="w-full bg-olive-600 text-white font-bold py-2 rounded-xl text-xs">Publikasikan Data Awal ke Cloud</button>
-                </div>
                 <div class="bg-slate-50 p-3.5 rounded-2xl border space-y-2.5">
                     <h4 class="font-extrabold text-army-900">Backup & Pulihkan Database (Termasuk Gambar)</h4>
                     <p class="text-[11px] text-slate-600">Ekspor seluruh data Alat dan Job Sheet beserta gambar ke file JSON atau muat ulang dari backup.</p>
@@ -1038,8 +1068,6 @@
     <span id="toastMessage">Berhasil disimpan</span>
 </div>
 
-<script src="./config.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
     /********************************************************************
      * 1. STRUKTUR DATA KURIKULUM 4 SEMESTER & 9 SESI PRAKTIK BENGKEL
@@ -1090,42 +1118,67 @@
         return 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
     }
 
-    // Default Comprehensive Tools Catalog across all 9 sessions
+    // Default Comprehensive Tools Catalog across all 9 sessions mapped to 10 Standard Vocational Classes
     const INITIAL_TOOLS = [
-        // 1. Kerja Bangku
-        { id: 't1', sessionId: 's1_bangku', name: 'Kikir Rata & Segitiga (Bastard/Halus)', cls: 'Alat Potong & Sayat', spec: 'Panjang 10 inch, Baja Karbon Tinggi untuk meratakan dan menyiku bidang benda kerja.', image: createTechnicalBlueprintSVG('Kikir Rata & Presisi', 'Golongan: Alat Sayat Bangku', 'KB-01') },
-        { id: 't2', sessionId: 's1_bangku', name: 'Jangka Sorong (Vernier Caliper) 0.02 mm', cls: 'Alat Ukur & Lukis', spec: 'Kapasitas 0-150 mm, ketelitian 0.02 mm untuk ukur diameter luar, dalam, dan kedalaman.', image: createTechnicalBlueprintSVG('Vernier Caliper 0.02mm', 'Golongan: Alat Ukur Presisi', 'KB-02') },
-        { id: 't3', sessionId: 's1_bangku', name: 'Ragum Kerja Bangku (Bench Vise)', cls: 'Alat Cekam & Bantu', spec: 'Lebar rahang 125 mm, besi tuang nodular untuk menjepit benda kerja saat mengikir/menggergaji.', image: createTechnicalBlueprintSVG('Ragum Bangku 125mm', 'Golongan: Alat Cekam', 'KB-03') },
-        { id: 't4', sessionId: 's1_bangku', name: 'Tap & Snei Set (M6 - M12)', cls: 'Alat Potong & Sayat', spec: 'HSS Hand Tap (No.1, 2, 3) dan Snei pembuatan ulir dalam serta ulir luar manual.', image: createTechnicalBlueprintSVG('Tap & Snei Set Metrik', 'Golongan: Alat Potong Ulir', 'KB-04') },
-        // 2. Kerja Plat
-        { id: 't5', sessionId: 's1_plat', name: 'Mesin Lipat Plat (Box & Pan Brake Bending)', cls: 'Mesin Utama', spec: 'Kapasitas tebal plat maks 2.0 mm, panjang kerja 1200 mm untuk penekukan sudut presisi.', image: createTechnicalBlueprintSVG('Mesin Bending Plat', 'Golongan: Mesin Pembentuk', 'KP-01') },
-        { id: 't6', sessionId: 's1_plat', name: 'Gunting Plat Tangan (Lurus & Lengkung)', cls: 'Alat Potong & Sayat', spec: 'Baja tempa keras untuk memotong lembaran baja tipis/galvanis hingga tebal 1.2 mm.', image: createTechnicalBlueprintSVG('Gunting Plat Manual', 'Golongan: Alat Potong Plat', 'KP-02') },
-        { id: 't7', sessionId: 's1_plat', name: 'Mesin Roll Silinder Plat (Slip Roll)', cls: 'Mesin Utama', spec: '3 Poros pengerol untuk membentuk silinder dan kerucut dari lembaran plat.', image: createTechnicalBlueprintSVG('Mesin Roll 3 Poros', 'Golongan: Mesin Utama Plat', 'KP-03') },
-        // 3. Kerja Tempa
-        { id: 't8', sessionId: 's1_tempa', name: 'Dapur Tempa (Forging Furnace) & Blower', cls: 'Mesin Utama', spec: 'Pemanas benda kerja hingga suhu tempa austenit (850°C - 1150°C).', image: createTechnicalBlueprintSVG('Dapur Tempa & Blower', 'Golongan: Pemanas Tempa', 'KT-01') },
-        { id: 't9', sessionId: 's1_tempa', name: 'Paron / Landasan Tempa (Anvil Baja)', cls: 'Alat Tempa & Las', spec: 'Berat 75 kg dengan tanduk kerucut (horn) dan lubang hardy untuk pembentukan panas.', image: createTechnicalBlueprintSVG('Paron Tempa (Anvil)', 'Golongan: Landasan Tempa', 'KT-02') },
-        { id: 't10', sessionId: 's1_tempa', name: 'Palu Tempa (Sledge Hammer) & Tang Penjepit', cls: 'Alat Tempa & Las', spec: 'Palu 1.5 - 3 kg dan Tongs penjepit baja membara.', image: createTechnicalBlueprintSVG('Palu & Tang Tempa', 'Golongan: Perkakas Tempa', 'KT-03') },
-        // 4. Gerinda
-        { id: 't11', sessionId: 's2_gerinda', name: 'Mesin Gerinda Datar (Surface Grinding)', cls: 'Mesin Utama', spec: 'Meja magnetik hidrolik, ketelitian 0.002 mm untuk penggerindaan rata presisi tinggi.', image: createTechnicalBlueprintSVG('Surface Grinding Machine', 'Golongan: Mesin Utama', 'GR-01') },
-        { id: 't12', sessionId: 's2_gerinda', name: 'Mesin Gerinda Duduk (Pedestal Grinder)', cls: 'Mesin Utama', spec: 'Roda gerinda kasar & halus untuk pengasahan sudut pahat bubut HSS dan pahat sekrap.', image: createTechnicalBlueprintSVG('Pedestal Tool Grinder', 'Golongan: Mesin Asah Pahat', 'GR-02') },
-        { id: 't13', sessionId: 's2_gerinda', name: 'Diamond Dresser & Batu Gerinda Silikon Karbida', cls: 'Alat Potong & Sayat', spec: 'Alat truing dan dressing permukaan batu gerinda agar tetap tajam dan silindris.', image: createTechnicalBlueprintSVG('Batu Gerinda & Dresser', 'Golongan: Alat Abrasive', 'GR-03') },
-        // 5. Shaping
-        { id: 't14', sessionId: 's2_shaping', name: 'Mesin Sekrap Horizontal (Shaper Machine)', cls: 'Mesin Utama', spec: 'Gerak langkah bolak-balik ram untuk menyekrap rata, bertingkat, dan alur pasak.', image: createTechnicalBlueprintSVG('Mesin Sekrap Horizontal', 'Golongan: Mesin Utama', 'SH-01') },
-        { id: 't15', sessionId: 's2_shaping', name: 'Pahat Sekrap HSS Kasar & Halus', cls: 'Alat Potong & Sayat', spec: 'Baja kecepatan tinggi (HSS) dengan sudut bebas dan sudut garuk khusus langkah sekrap.', image: createTechnicalBlueprintSVG('Pahat Sekrap HSS', 'Golongan: Alat Potong', 'SH-02') },
-        // 6. Bubut
-        { id: 't16', sessionId: 's2_bubut', name: 'Mesin Bubut Konvensional Presisi', cls: 'Mesin Utama', spec: 'Dilengkapi eretan memanjang, melintang, atas, kepala lepas, dan gearbox ulir metrik/inchi.', image: createTechnicalBlueprintSVG('Mesin Bubut Konvensional', 'Golongan: Mesin Utama', 'BB-01') },
-        { id: 't17', sessionId: 's2_bubut', name: 'Pahat Bubut HSS & Insert Carbide (Rata/Ulir/Dalam)', cls: 'Alat Potong & Sayat', spec: 'Pahat bubut luar, pahat alur, pahat ulir metrik 60°, dan boring bar.', image: createTechnicalBlueprintSVG('Set Pahat Bubut & Carbide', 'Golongan: Alat Potong', 'BB-02') },
-        { id: 't18', sessionId: 's2_bubut', name: 'Mikrometer Luar 0-25 mm & Dial Indicator', cls: 'Alat Ukur & Lukis', spec: 'Ketelitian 0.01 mm untuk kontrol kualitas dimensi silindris dan kesenteran benda kerja.', image: createTechnicalBlueprintSVG('Mikrometer Luar 0.01mm', 'Golongan: Alat Ukur Presisi', 'BB-03') },
-        // 7. Las
-        { id: 't19', sessionId: 's3_las', name: 'Mesin Las Busur Listrik SMAW & MIG/MAG', cls: 'Mesin Utama', spec: 'Inverter DC 200A-300A untuk pengelasan elektroda terbungkus (E6013/E7018) dan kawat CO2.', image: createTechnicalBlueprintSVG('Mesin Las SMAW & MIG', 'Golongan: Mesin Utama Las', 'LS-01') },
-        { id: 't20', sessionId: 's3_las', name: 'Helm Las Auto-Darkening, Apron Kulit & Palu Terak', cls: 'Alat Tempa & Las', spec: 'Pelindung radiasi sinar busur UV/IR dan alat pembersih slag hasil pengelasan.', image: createTechnicalBlueprintSVG('APD Las & Palu Terak', 'Golongan: Alat Las & K3', 'LS-02') },
-        // 8. Milling
-        { id: 't21', sessionId: 's3_milling', name: 'Mesin Frais Universal & Vertikal (Milling Machine)', cls: 'Mesin Utama', spec: 'Spindel vertikal/horizontal untuk pembuatan bidang rata, alur T, dan roda gigi.', image: createTechnicalBlueprintSVG('Mesin Frais Universal', 'Golongan: Mesin Utama', 'ML-01') },
-        { id: 't22', sessionId: 's3_milling', name: 'Endmill Cutter, Face Mill & Pisau Modul', cls: 'Alat Potong & Sayat', spec: 'Pisau frais HSS/Carbide 2-4 flute dan pisau modul pembuatan profil roda gigi lurus.', image: createTechnicalBlueprintSVG('Endmill & Pisau Frais', 'Golongan: Alat Potong Frais', 'ML-02') },
-        { id: 't23', sessionId: 's3_milling', name: 'Kepala Pembagi (Dividing Head) & Ragum Frais', cls: 'Alat Cekam & Bantu', spec: 'Rasio 40:1 untuk pembagian sudut keliling roda gigi dan segi banyak beraturan.', image: createTechnicalBlueprintSVG('Dividing Head 40:1', 'Golongan: Alat Bantu Frais', 'ML-03') },
-        // 9. Pabrikasi Ragum
-        { id: 't24', sessionId: 's4_ragum', name: 'Stasiun Pabrikasi Terpadu (Bubut, Frais, Gerinda, Las)', cls: 'Mesin Utama', spec: 'Integrasi seluruh mesin bengkel untuk memproduksi komponen Ragum Mesin Presisi.', image: createTechnicalBlueprintSVG('Lini Pabrikasi Ragum', 'Golongan: Stasiun Terpadu', 'PB-01') },
-        { id: 't25', sessionId: 's4_ragum', name: 'Pahat Bubut Ulir Trapesium (Trapezoidal Thread Tool)', cls: 'Alat Potong & Sayat', spec: 'Sudut profil 30° (Metrik Tr) untuk membuat poros ulir penggerak utama ragum.', image: createTechnicalBlueprintSVG('Pahat Ulir Trapesium 30°', 'Golongan: Alat Potong Khusus', 'PB-02') }
+        // ==================== SEMESTER 1: 1. KERJA BANGKU ====================
+        { id: 't_kb1', sessionId: 's1_bangku', name: 'Jangka Sorong (Vernier Caliper) 0,02 mm & Height Gauge', cls: 'Golongan 1: Alat Ukur & Pemeriksaan', spec: 'Alat ukur dimensi luar, dalam, kedalaman (ketelitian 0,02 mm), Penyiku Presisi (Try Square DIN 875), Mistar Baja, dan Pengukur Tinggi.', image: createTechnicalBlueprintSVG('Jangka Sorong & Penyiku', 'Gol. 1: Alat Ukur & Pemeriksaan', 'KB-01') },
+        { id: 't_kb2', sessionId: 's1_bangku', name: 'Penggores (Scriber), Penitik Pusat (Center Punch) & Meja Perata', cls: 'Golongan 2: Alat Penanda & Lukis', spec: 'Perangkat lukis benda kerja meliputi Penggores baja keras, Penitik 90°, Jangka Tusuk (Divider), Jangka Bengkok, Balok V, dan Meja Perata Granit/Besi Tuang.', image: createTechnicalBlueprintSVG('Penggores, Penitik & Meja Perata', 'Gol. 2: Alat Penanda & Lukis', 'KB-02') },
+        { id: 't_kb3', sessionId: 's1_bangku', name: 'Kikir Bangku (Rata, Setengah Bulat, Segitiga) & Gergaji Besi', cls: 'Golongan 3: Alat Pemotong & Penyayat Manual', spec: 'Kikir kasar (Bastard), sedang (Second Cut), halus (Smooth), Gergaji Besi (Hacksaw), Pahat Tangan (Flat Chisel), Reamer Tangan, serta Tap & Snei (M6–M12).', image: createTechnicalBlueprintSVG('Kikir, Gergaji, Tap & Snei', 'Gol. 3: Pemotong & Penyayat Manual', 'KB-03') },
+        { id: 't_kb4', sessionId: 's1_bangku', name: 'Ragum Kerja Bangku (Bench Vise) & Klem C / Klem F', cls: 'Golongan 4: Alat Pencekam & Penjepit', spec: 'Ragum bangku rahang baja keras 125 mm untuk mencekam benda kerja saat pengikiran, penggergajian, dan pengetapan.', image: createTechnicalBlueprintSVG('Ragum Kerja Bangku 125 mm', 'Gol. 4: Alat Pencekam & Penjepit', 'KB-04') },
+        { id: 't_kb5', sessionId: 's1_bangku', name: 'Palu Konde (Ball Peen Hammer) & Palu Lunak (Plastik/Tembaga)', cls: 'Golongan 5: Alat Pemukul & Pembentuk', spec: 'Palu konde 300–500 gram untuk penitikan/pemahatan serta palu lunak untuk penyetelan benda kerja tanpa merusak permukaan.', image: createTechnicalBlueprintSVG('Palu Konde & Palu Lunak', 'Gol. 5: Alat Pemukul & Pembentuk', 'KB-05') },
+        { id: 't_kb6', sessionId: 's1_bangku', name: 'Mata Bor Spiral (Twist Drill HSS) & Countersink', cls: 'Golongan 6: Alat Potong Mesin & Pahat', spec: 'Mata bor HSS sudut puncak 118° untuk pengeboran lubang pra-tap dan kontersing pembebas kepala sekrup pada mesin bor tiang.', image: createTechnicalBlueprintSVG('Twist Drill HSS & Countersink', 'Gol. 6: Alat Potong Mesin', 'KB-06') },
+        { id: 't_kb7', sessionId: 's1_bangku', name: 'Kacamata Safety Bening, Wearpack & Sepatu Safety Baja', cls: 'Golongan 10: Alat Keselamatan Kerja (APD)', spec: 'Perlengkapan K3 wajib praktik kerja bangku untuk melindungi mata dari beram dan kaki dari kejatuhan benda kerja berat.', image: createTechnicalBlueprintSVG('APD Standar Kerja Bangku', 'Gol. 10: Keselamatan Kerja (APD)', 'KB-07') },
+
+        // ==================== SEMESTER 1: 2. KERJA PLAT ====================
+        { id: 't_kp1', sessionId: 's1_plat', name: 'Mistar Baja, Roll Meter & Siku Gabungan (Combination Square)', cls: 'Golongan 1: Alat Ukur & Pemeriksaan', spec: 'Alat ukur panjang bentangan lembaran plat dan pemeriksa sudut tekukan 45°/90°.', image: createTechnicalBlueprintSVG('Mistar Baja & Combination Square', 'Gol. 1: Alat Ukur & Pemeriksaan', 'KP-01') },
+        { id: 't_kp2', sessionId: 's1_plat', name: 'Penggores Plat, Jangka Tusuk (Divider) & Penitik Garis', cls: 'Golongan 2: Alat Penanda & Lukis', spec: 'Alat lukis pola bentangan geometris silinder, kerucut, dan kotak perkakas di atas lembaran plat.', image: createTechnicalBlueprintSVG('Jangka Tusuk & Penggores Plat', 'Gol. 2: Alat Penanda & Lukis', 'KP-02') },
+        { id: 't_kp3', sessionId: 's1_plat', name: 'Gunting Plat Tangan (Lurus, Kiri, Kanan) & Gunting Tuas', cls: 'Golongan 3: Alat Pemotong & Penyayat Manual', spec: 'Aviation Snips dan gunting tuas bangku untuk memotong lembaran baja tipis BJLS/galvanis hingga tebal 1,5 mm.', image: createTechnicalBlueprintSVG('Gunting Plat Lurus & Lengkung', 'Gol. 3: Pemotong & Penyayat Manual', 'KP-03') },
+        { id: 't_kp4', sessionId: 's1_plat', name: 'Mesin Lipat Plat (Box & Pan Brake), Mesin Roll & Palu Kayu/Karet', cls: 'Golongan 5: Alat Pemukul & Pembentuk', spec: 'Mesin penekuk plat presisi, mesin pengerol 3 poros (Slip Roll), landasan Stake Anvil, dan palu pembentuk lipatan plat.', image: createTechnicalBlueprintSVG('Mesin Bending & Roll Plat', 'Gol. 5: Alat Pemukul & Pembentuk', 'KP-04') },
+        { id: 't_kp5', sessionId: 's1_plat', name: 'Tang Keling (Hand Riveter), Patri & Spot Welding Plat', cls: 'Golongan 8: Alat Penyambungan & Pengelasan', spec: 'Alat penyambung lembaran plat menggunakan paku keling (Blind Rivet), sambungan lipat (Grooved Seam), dan las titik.', image: createTechnicalBlueprintSVG('Alat Sambung Rivet & Spot Weld', 'Gol. 8: Penyambungan & Las', 'KP-05') },
+        { id: 't_kp6', sessionId: 's1_plat', name: 'Sarung Tangan Anti-Sayat (Cut Resistant) & Pelindung Telinga', cls: 'Golongan 10: Alat Keselamatan Kerja (APD)', spec: 'APD pelindung telapak tangan dari tepi lembaran plat yang tajam dan pelindung kebisingan saat pemukulan plat.', image: createTechnicalBlueprintSVG('APD Kerja Plat & Earplug', 'Gol. 10: Keselamatan Kerja (APD)', 'KP-06') },
+
+        // ==================== SEMESTER 1: 3. KERJA TEMPA ====================
+        { id: 't_kt1', sessionId: 's1_tempa', name: 'Jangka Ukur Panas (Outside/Inside Caliper) & Mistar Tempa', cls: 'Golongan 1: Alat Ukur & Pemeriksaan', spec: 'Jangka ukur luar tahan panas untuk memeriksa ketebalan dan diameter benda kerja selama proses penempaan.', image: createTechnicalBlueprintSVG('Caliper Ukur Tempa Panas', 'Gol. 1: Alat Ukur & Pemeriksaan', 'KT-01') },
+        { id: 't_kt2', sessionId: 's1_tempa', name: 'Tang Penjepit Tempa (Blacksmith Tongs: Flat, Bolt, Ring)', cls: 'Golongan 4: Alat Pencekam & Penjepit', spec: 'Tang penjepit khusus dengan rahang panjang untuk memegang baja membara (850°C–1150°C) dari dapur tempa ke paron.', image: createTechnicalBlueprintSVG('Tang Penjepit Tempa (Tongs)', 'Gol. 4: Alat Pencekam & Penjepit', 'KT-02') },
+        { id: 't_kt3', sessionId: 's1_tempa', name: 'Paron / Landasan Tempa (Anvil), Palu Tempa (Sledge) & Dapur Tempa', cls: 'Golongan 5: Alat Pemukul & Pembentuk', spec: 'Landasan baja paron 75 kg, Palu Tempa 2–5 kg, Fuller, Swage, dan Dapur Tempa (Forging Furnace) untuk proses Upsetting & Drawing Out.', image: createTechnicalBlueprintSVG('Paron (Anvil) & Palu Tempa', 'Gol. 5: Alat Pemukul & Pembentuk', 'KT-03') },
+        { id: 't_kt4', sessionId: 's1_tempa', name: 'Apron Kulit Tahan Panas, Sarung Tangan Tempa & Face Shield', cls: 'Golongan 10: Alat Keselamatan Kerja (APD)', spec: 'Perlengkapan pelindung radiasi panas tinggi dan percikan kerak oksida besi (scale) saat penempaan.', image: createTechnicalBlueprintSVG('APD Tempa Tahan Panas', 'Gol. 10: Keselamatan Kerja (APD)', 'KT-04') },
+
+        // ==================== SEMESTER 2: 4. GERINDA ====================
+        { id: 't_gr1', sessionId: 's2_gerinda', name: 'Mikrometer 0,001 mm, Dial Test Indicator (Pupitas) & Mal Sudut Pahat', cls: 'Golongan 1: Alat Ukur & Pemeriksaan', spec: 'Alat ukur kerataan permukaan hasil Surface Grinding serta Bevel Protractor/Mal Pahat untuk memeriksa sudut asah pahat HSS.', image: createTechnicalBlueprintSVG('Pupitas & Mal Sudut Pahat', 'Gol. 1: Alat Ukur & Pemeriksaan', 'GR-01') },
+        { id: 't_gr2', sessionId: 's2_gerinda', name: 'Meja Magnetik (Magnetic Chuck) & Ragum Sinus Presisi', cls: 'Golongan 4: Alat Pencekam & Penjepit', spec: 'Pencekam magnetik permanen/elektromagnetik pada mesin Surface Grinding untuk memegang benda kerja rata maupun miring.', image: createTechnicalBlueprintSVG('Meja Magnetik Surface Grinder', 'Gol. 4: Alat Pencekam & Penjepit', 'GR-02') },
+        { id: 't_gr3', sessionId: 's2_gerinda', name: 'Batu Gerinda (Al₂O₃ & SiC), Mesin Gerinda Datar/Duduk & Diamond Dresser', cls: 'Golongan 7: Alat Asah & Abrasive', spec: 'Roda gerinda Aluminium Oksida (baja HSS), Silikon Karbida (karbida), Mesin Surface Grinding, Gerinda Duduk, dan Diamond Dresser.', image: createTechnicalBlueprintSVG('Batu Gerinda & Diamond Dresser', 'Gol. 7: Alat Asah & Abrasive', 'GR-03') },
+        { id: 't_gr4', sessionId: 's2_gerinda', name: 'Kacamata Safety Anti-Kabut & Masker Debu Abrasive', cls: 'Golongan 10: Alat Keselamatan Kerja (APD)', spec: 'Pelindung mata wajib dari percikan bunga api gerinda dan respirator pelindung pernapasan dari debu batu gerinda.', image: createTechnicalBlueprintSVG('Kacamata & Respirator Gerinda', 'Gol. 10: Keselamatan Kerja (APD)', 'GR-04') },
+
+        // ==================== SEMESTER 2: 5. SHAPING (SEKRAP) ====================
+        { id: 't_sh1', sessionId: 's2_shaping', name: 'Dial Indicator, Jangka Sorong & Penyiku Presisi', cls: 'Golongan 1: Alat Ukur & Pemeriksaan', spec: 'Digunakan untuk meluruskan kesejajaran rahang ragum sekrap terhadap langkah ram serta memeriksa kesikuan balok bertingkat.', image: createTechnicalBlueprintSVG('Dial Indicator & Penyiku Sekrap', 'Gol. 1: Alat Ukur & Pemeriksaan', 'SH-01') },
+        { id: 't_sh2', sessionId: 's2_shaping', name: 'Ragum Mesin Sekrap Swivel Base & Blok Paralel (Parallel Pad)', cls: 'Golongan 4: Alat Pencekam & Penjepit', spec: 'Ragum mesin tugas berat dengan alas putar 360° dan sepasang bilah paralel baja yang dikeraskan.', image: createTechnicalBlueprintSVG('Ragum Mesin Sekrap & Paralel', 'Gol. 4: Alat Pencekam & Penjepit', 'SH-02') },
+        { id: 't_sh3', sessionId: 's2_shaping', name: 'Pahat Sekrap HSS (Kasar, Halus, Alur Pasak & Alur V)', cls: 'Golongan 6: Alat Potong Mesin & Pahat', spec: 'Pahat sekrap HSS tangkai lurus dan bengkok dengan sudut bebas (6°–8°) untuk penyekrapan bidang rata dan alur.', image: createTechnicalBlueprintSVG('Set Pahat Sekrap HSS', 'Gol. 6: Alat Potong Mesin & Pahat', 'SH-03') },
+        { id: 't_sh4', sessionId: 's2_shaping', name: 'Pemegang Pahat Sekrap (Clapper Box Tool Post)', cls: 'Golongan 9: Alat Bantu Mesin & Pemegang Pahat', spec: 'Rumah pemegang pahat berengsel (Clapper Box) yang memungkinkan pahat terangkat sedikit saat langkah balik (Return Stroke).', image: createTechnicalBlueprintSVG('Clapper Box Tool Post Sekrap', 'Gol. 9: Alat Bantu Mesin & Holder', 'SH-04') },
+
+        // ==================== SEMESTER 2: 6. BUBUT (TURNING) ====================
+        { id: 't_bb1', sessionId: 's2_bubut', name: 'Mikrometer Luar/Dalam (0,01 mm), Jangka Sorong & Mal Ulir (Thread Gauge)', cls: 'Golongan 1: Alat Ukur & Pemeriksaan', spec: 'Alat ukur dimensi silindris presisi, Dial Indicator (uji kesenteran benda), dan Thread Pitch Gauge Metrik 60° / Whitworth 55°.', image: createTechnicalBlueprintSVG('Mikrometer & Thread Pitch Gauge', 'Gol. 1: Alat Ukur & Pemeriksaan', 'BB-01') },
+        { id: 't_bb2', sessionId: 's2_bubut', name: 'Cekam Rahang 3 Universal, Cekam Rahang 4 Independen & Senter Putar', cls: 'Golongan 4: Alat Pencekam & Penjepit', spec: '3-Jaw Chuck (pemusatan otomatis), 4-Jaw Independent Chuck (benda eksentrik/asimetris), Collet Chuck, Pembawa (Lathe Dog), dan Live Center.', image: createTechnicalBlueprintSVG('Chuck 3 Rahang, 4 Rahang & Senter', 'Gol. 4: Alat Pencekam & Penjepit', 'BB-02') },
+        { id: 't_bb3', sessionId: 's2_bubut', name: 'Pahat Bubut HSS & Karbida (Rata, Alur, Ulir, Dalam/Boring, Kartel)', cls: 'Golongan 6: Alat Potong Mesin & Pahat', spec: 'Pahat bubut luar kanan/kiri, pahat potong/alur, pahat ulir luar/dalam, Boring Bar, Roda Kartel (Knurling), dan Center Drill.', image: createTechnicalBlueprintSVG('Pahat Bubut HSS, Karbida & Kartel', 'Gol. 6: Alat Potong Mesin & Pahat', 'BB-03') },
+        { id: 't_bb4', sessionId: 's2_bubut', name: 'Quick Change Tool Post, Chuck Bor Ekor Tirus & Sarung Pengurang (Sleeve)', cls: 'Golongan 9: Alat Bantu Mesin & Pemegang Pahat', spec: 'Rumah pahat bubut cepat ganti, Drill Chuck Morse Taper pada kepala lepas (Tailstock), dan Morse Taper Sleeve.', image: createTechnicalBlueprintSVG('Tool Post, Drill Chuck & Sleeve', 'Gol. 9: Alat Bantu Mesin & Holder', 'BB-04') },
+
+        // ==================== SEMESTER 3: 7. LAS (WELDING) ====================
+        { id: 't_ls1', sessionId: 's3_las', name: 'Welding Gauge (Pengukur Kampuh & Tinggi Manik Las)', cls: 'Golongan 1: Alat Ukur & Pemeriksaan', spec: 'Alat inspeksi dimensi sudut bevel kampuh V, celah akar (root gap), dan tinggi penguatan (reinforcement) hasil las.', image: createTechnicalBlueprintSVG('Welding Inspection Gauge', 'Gol. 1: Alat Ukur & Pemeriksaan', 'LS-01') },
+        { id: 't_ls2', sessionId: 's3_las', name: 'Klem C Las, Penjepit Magnetik Sudut (Magnetic Welding Square) & Ragum', cls: 'Golongan 4: Alat Pencekam & Penjepit', spec: 'Alat bantu pemegang pelat pada posisi sambungan 1G, 2F, 3G agar tidak mengalami distorsi sudut saat pengelasan.', image: createTechnicalBlueprintSVG('Magnetic Welding Clamp & Klem C', 'Gol. 4: Alat Pencekam & Penjepit', 'LS-02') },
+        { id: 't_ls3', sessionId: 's3_las', name: 'Palu Terak (Chipping Hammer) & Pahat Pembersih Percikan (Spatter)', cls: 'Golongan 5: Alat Pemukul & Pembentuk', spec: 'Palu terak berujung runcing dan pipih untuk memecah lapisan terak (slag) pada pengelasan SMAW.', image: createTechnicalBlueprintSVG('Palu Terak (Chipping Hammer)', 'Gol. 5: Alat Pemukul & Pembentuk', 'LS-03') },
+        { id: 't_ls4', sessionId: 's3_las', name: 'Mesin Las SMAW, GMAW (MIG/MAG), GTAW (TIG), OAW & Sikat Kawat Baja', cls: 'Golongan 8: Alat Penyambungan & Pengelasan', spec: 'Mesin las busur listrik, Pemegang Elektrode (Electrode Holder), Klem Massa, Torch MIG/TIG, Perangkat Oxy-Acetylene, dan Wire Brush.', image: createTechnicalBlueprintSVG('Mesin Las SMAW, MIG/MAG & TIG', 'Gol. 8: Penyambungan & Las', 'LS-04') },
+        { id: 't_ls5', sessionId: 's3_las', name: 'Kedok Las Auto-Darkening, Apron Kulit, Sarung Tangan Las & Sepatu Safety', cls: 'Golongan 10: Alat Keselamatan Kerja (APD)', spec: 'Pelindung mata dari sinar UV/IR busur listrik (DIN 9–13), apron kulit sapi tahan percikan logam cair, dan gauntlet las.', image: createTechnicalBlueprintSVG('Helm Las Auto-Darkening & Apron', 'Gol. 10: Keselamatan Kerja (APD)', 'LS-05') },
+
+        // ==================== SEMESTER 3: 8. MILLING (FRAIS) ====================
+        { id: 't_ml1', sessionId: 's3_milling', name: 'Dial Indicator, Edge Finder (Sentuh Titik Nol) & Jangka Sorong Roda Gigi', cls: 'Golongan 1: Alat Ukur & Pemeriksaan', spec: 'Alat penentu koordinat sumbu X-Y benda kerja dan pengukur tebal gigi (Gear Tooth Vernier Caliper).', image: createTechnicalBlueprintSVG('Edge Finder & Gear Tooth Caliper', 'Gol. 1: Alat Ukur & Pemeriksaan', 'ML-01') },
+        { id: 't_ml2', sessionId: 's3_milling', name: 'Ragum Frais Presisi, Klem Meja Alur T (T-Slot Clamping Kit) & Cekam', cls: 'Golongan 4: Alat Pencekam & Penjepit', spec: 'Ragum mesin frais presisi tinggi dan set baut alur T (T-Bolt, Step Block, Strap Clamp) untuk mengikat benda langsung di meja frais.', image: createTechnicalBlueprintSVG('Ragum Frais & T-Slot Clamp Set', 'Gol. 4: Alat Pencekam & Penjepit', 'ML-02') },
+        { id: 't_ml3', sessionId: 's3_milling', name: 'Pisau Frais: End Mill, Face Mill, Side & Face Cutter, Pisau Modul Roda Gigi', cls: 'Golongan 6: Alat Potong Mesin & Pahat', spec: 'Pisau frais jari (End Mill HSS/Karbida 2–4 flute), pisau frais muka (Face Mill), T-Slot Cutter, dan Pisau Frais Modul (No. 1–8).', image: createTechnicalBlueprintSVG('End Mill, Face Mill & Pisau Modul', 'Gol. 6: Alat Potong Mesin & Pahat', 'ML-03') },
+        { id: 't_ml4', sessionId: 's3_milling', name: 'Arbor Frais, Collet Chuck ER32, Kepala Pembagi (Dividing Head) & Rotary Table', cls: 'Golongan 9: Alat Bantu Mesin & Pemegang Pahat', spec: 'Arbor panjang/pendek, Collet Holder, Kepala Pembagi Universal rasio 40:1 beserta piringan indeks, Mandrel, dan Meja Putar.', image: createTechnicalBlueprintSVG('Dividing Head 40:1, Arbor & Collet', 'Gol. 9: Alat Bantu Mesin & Holder', 'ML-04') },
+
+        // ==================== SEMESTER 4: 9. PABRIKASI (PEMBUATAN RAGUM) ====================
+        { id: 't_pb1', sessionId: 's4_ragum', name: 'Set Lengkap Alat Ukur Kualitas (Mikrometer, Dial Indicator, Penyiku, Mal Ulir Tr)', cls: 'Golongan 1: Alat Ukur & Pemeriksaan', spec: 'Instrumen Quality Control untuk menguji kesejajaran mulut ragum (maks 0,02 mm), suaian jalan rahang geser, dan profil ulir Trapesium.', image: createTechnicalBlueprintSVG('Quality Control Pabrikasi Ragum', 'Gol. 1: Alat Ukur & Pemeriksaan', 'PB-01') },
+        { id: 't_pb2', sessionId: 's4_ragum', name: 'Pahat Ulir Trapesium 30° (Tr), End Mill Karbida, Tap & Reamer Pin Penepat', cls: 'Golongan 6: Alat Potong Mesin & Pahat', spec: 'Pahat bubut ulir Trapesium (ISO Metric Trapezoidal 30°) untuk poros penggerak ragum, pisau frais alur T/ekor burung, dan Reamer Dowel Pin.', image: createTechnicalBlueprintSVG('Pahat Ulir Trapesium 30° & EndMill', 'Gol. 6: Alat Potong Mesin & Pahat', 'PB-02') },
+        { id: 't_pb3', sessionId: 's4_ragum', name: 'Batu Gerinda Datar (Surface Grinding Wheel) & Batu Honing Halus', cls: 'Golongan 7: Alat Asah & Abrasive', spec: 'Digunakan untuk menggerinda rata permukaan Jaw Plate (pelat mulut ragum) yang telah dikeraskan dan bidang geser ragum.', image: createTechnicalBlueprintSVG('Surface Grinding Jaw Plate Ragum', 'Gol. 7: Alat Asah & Abrasive', 'PB-03') },
+        { id: 't_pb4', sessionId: 's4_ragum', name: 'Perangkat Pengelasan Perakitan & Kunci L / Kunci Momen Perakitan', cls: 'Golongan 8: Alat Penyambungan & Pengelasan', spec: 'Digunakan pada proses penyambungan elemen landasan dan pengencangan baut pengikat komponen ragum presisi.', image: createTechnicalBlueprintSVG('Perakitan & Pengikatan Ragum', 'Gol. 8: Penyambungan & Las', 'PB-04') }
     ];
 
     // Default Job Sheets across all 9 sessions
@@ -1133,22 +1186,22 @@
         {
             id: 'j1', sessionId: 's1_bangku',
             title: 'Job Sheet 01: Pengikiran Bidang Rata, Siku & Pembuatan Mal Radius/Tap',
-            material: 'Baja Lunak St37 (60 x 50 x 12 mm)',
+            material: 'Baja Lunak St37 (60 × 50 × 12 mm)',
             k3: 'Wearpack, Sepatu Safety, Kacamata Bening, Bersihkan beram dengan sikat (bukan ditiup).',
             steps: [
-                'Periksa ukuran awal pelat St37 menggunakan jangka sorong.',
+                'Periksa ukuran awal pelat St37 menggunakan jangka sorong (ketelitian 0,02 mm).',
                 'Jepit benda kerja pada ragum kerja bangku dan kikir bidang dasar (Bidang I) hingga rata menggunakan kikir kasar lalu kikir halus.',
                 'Kikir bidang samping (Bidang II dan III) hingga mencapai kesikuan 90° terhadap Bidang I (periksa dengan penyiku presisi).',
                 'Lakukan pelukisan benda kerja menggunakan cairan pelukis, meja perata, height gauge, dan penitik pusat lubang.',
-                'Lakukan pengeboran bertahap (Ø5 mm dan Ø8.5 mm), countersink, lalu buat ulir dalam M10 x 1.5 menggunakan Tap No.1, 2, dan 3 secara tegak lurus.'
+                'Lakukan pengeboran bertahap (Ø5 mm dan Ø8,5 mm), countersink, lalu buat ulir dalam M10 × 1,5 menggunakan Tap No. 1, 2, dan 3 secara tegak lurus.'
             ],
             images: [createTechnicalBlueprintSVG('GAMBAR KERJA BANGKU & TAP M10', 'Semester 1 - Kerja Bangku', 'JS-KB01')]
         },
         {
             id: 'j2', sessionId: 's1_plat',
             title: 'Job Sheet 02: Pembuatan Kotak Perkakas (Toolbox) & Sambungan Lipat Plat',
-            material: 'Plat Baja Lapis Seng / BJLS Tebal 0.8 mm (400 x 300 mm)',
-            k3: 'Sarung tangan kulit anti-gores, Sepatu Safety, Kacamata.',
+            material: 'Plat Baja Lapis Seng / BJLS Tebal 0,8 mm (400 × 300 mm)',
+            k3: 'Sarung tangan anti-sayat, Sepatu Safety, Kacamata.',
             steps: [
                 'Hitung bentangan plat (allowance penekukan) dan lukis pola bentangan di atas lembaran plat menggunakan penggores dan mistar baja.',
                 'Potong bagian luar dan coakan sudut menggunakan gunting plat tangan atau mesin potong guillotine.',
@@ -1156,12 +1209,12 @@
                 'Tekuk ke-4 sisi dinding kotak sebesar 90° menggunakan mesin lipat Box & Pan Brake sesuai urutan tekukan.',
                 'Rapatkan sambungan lipat/keling paku rivet pada sudut-sudut kotak dan periksa kerataan.'
             ],
-            images: [createTechnicalBlueprintSVG('BENTANGAN TOOLBOX PLAT 0.8MM', 'Semester 1 - Kerja Plat', 'JS-KP02')]
+            images: [createTechnicalBlueprintSVG('BENTANGAN TOOLBOX PLAT 0,8MM', 'Semester 1 - Kerja Plat', 'JS-KP02')]
         },
         {
             id: 'j3', sessionId: 's1_tempa',
             title: 'Job Sheet 03: Penempaan Pahat Tangan & Pembentukan Upsetting-Drawing Out',
-            material: 'Baja Karbon Sedang S45C Ø22 x 160 mm',
+            material: 'Baja Karbon Sedang S45C Ø22 × 160 mm',
             k3: 'Apron kulit tahan panas, Sarung tangan tahan panas, Pelindung wajah, Sepatu Safety.',
             steps: [
                 'Nyalakan dapur tempa dan panaskan ujung baja S45C hingga berwarna merah cerah kekuningan (±1000°C).',
@@ -1175,12 +1228,12 @@
         {
             id: 'j4', sessionId: 's2_gerinda',
             title: 'Job Sheet 04: Pengasahan Geometri Pahat Bubut HSS & Surface Grinding Presisi',
-            material: 'Batang HSS 12 x 12 x 100 mm & Blok Baja параллел',
+            material: 'Batang HSS 12 × 12 × 100 mm & Blok Baja Paralel',
             k3: 'Kacamata pelindung wajib, Masker debu gerinda, Cek celah penahan (tool rest) maks 2 mm dari batu.',
             steps: [
                 'Periksa kondisi batu gerinda duduk dan lakukan dressing jika permukaan batu tidak rata.',
-                'Asah bidang bebas ujung (end relief angle 8°-10°) dan bidang bebas sisi (side relief angle 8°-10°) pahat HSS.',
-                'Asah sudut garuk atas (back/side rake angle 12°-14°) dan beri sedikit radius ujung (nose radius 0.4 mm).',
+                'Asah bidang bebas ujung (end relief angle 8°–10°) dan bidang bebas sisi (side relief angle 8°–10°) pahat HSS.',
+                'Asah sudut garuk atas (back/side rake angle 12°–14°) dan beri sedikit radius ujung (nose radius 0,4 mm).',
                 'Dinginkan pahat HSS secara berkala ke dalam air pendingin agar struktur kekerasan baja HSS tidak turun akibat overheat.',
                 'Ukur seluruh sudut geometri pahat menggunakan busur derajat dan mal pahat, lalu lanjutkan praktik Surface Grinding blok paralel.'
             ],
@@ -1189,12 +1242,12 @@
         {
             id: 'j5', sessionId: 's2_shaping',
             title: 'Job Sheet 05: Penyekrapan Balok Bertingkat & Alur V pada Mesin Sekrap',
-            material: 'Besi Tuang / Baja St37 (100 x 60 x 50 mm)',
+            material: 'Besi Tuang / Baja St37 (100 × 60 × 50 mm)',
             k3: 'Kacamata safety, Pastikan kunci ragum dilepas sebelum mesin dinyalakan, Jangan berdiri tepat di depan langkah ram.',
             steps: [
                 'Jepit benda kerja pada ragum mesin sekrap di atas paralel blok dan luruskan dengan dial indicator.',
-                'Atur panjang langkah ram ($L = l + l_a + l_u$) dan posisi titik mati depan/belakang.',
-                'Hitung dan atur jumlah langkah ganda per menit ($n_p$) berdasarkan kecepatan potong $V_c$.',
+                'Atur panjang langkah ram (L = panjang benda + langkah awal + langkah akhir) dan posisi titik mati depan/belakang.',
+                'Hitung dan atur jumlah langkah per menit (np) berdasarkan kecepatan potong Vc.',
                 'Lakukan penyekrapan rata seluruh 6 bidang hingga siku 90° satu sama lain.',
                 'Miringkan eretan pahat sebesar 45° untuk menyekrap alur V dan bidang bertingkat sesuai gambar kerja.'
             ],
@@ -1203,41 +1256,41 @@
         {
             id: 'j6', sessionId: 's2_bubut',
             title: 'Job Sheet 06: Pembubutan Poros Bertingkat, Tirus, Alur, Kartel & Ulir Metrik',
-            material: 'Baja St37 Ø38 x 150 mm',
+            material: 'Baja St37 Ø38 × 150 mm',
             k3: 'Kacamata safety, Dilarang memakai sarung tangan kain saat mengoperasikan spindel berputar, Lepas kunci chuck segera.',
             steps: [
-                'Hitung putaran spindel $n = (1000 \cdot V_c)/(\pi \cdot d)$ dan atur tuas kecepatan mesin bubut.',
+                'Hitung putaran spindel n = (1000 × Vc) ÷ (π × d) dan atur tuas kecepatan mesin bubut.',
                 'Lakukan pembubutan muka (facing) kedua ujung dan pembuatan lubang senter (center drill).',
-                'Bubut rata bertingkat Ø35 mm, Ø28 mm, dan Ø20 mm dengan toleransi ukuran ±0.05 mm menggunakan mikrometer.',
+                'Bubut rata bertingkat Ø35 mm, Ø28 mm, dan Ø20 mm dengan toleransi ukuran ±0,05 mm menggunakan mikrometer.',
                 'Buat kartel (knurling) pada bagian pemegang Ø35 mm dengan putaran rendah (±1/3 putaran normal) dan lumasi oli.',
-                'Miringkan eretan atas untuk membubut tirus, buat alur bebas pahat, lalu bubut ulir luar Metrik M20 x 2.5.'
+                'Miringkan eretan atas untuk membubut tirus, buat alur bebas pahat, lalu bubut ulir luar Metrik M20 × 2,5.'
             ],
             images: [createTechnicalBlueprintSVG('POROS BUBUT BERTINGKAT & ULIR M20', 'Semester 2 - Bubut', 'JS-BB06')]
         },
         {
             id: 'j7', sessionId: 's3_las',
             title: 'Job Sheet 07: Pengelasan Sambungan Tumpul (Butt Joint 1G) & Sudut (Fillet 1F/2F)',
-            material: 'Plat Baja Karbon Rendah St37 Tebal 6 mm & Elektroda E6013 Ø3.2 mm',
+            material: 'Plat Baja Karbon Rendah St37 Tebal 6 mm & Elektrode E6013 Ø3,2 mm',
             k3: 'Kedok las/Helm Auto-Darkening, Apron kulit, Sarung tangan las kulit panjang, Exhaust fan menyala.',
             steps: [
                 'Siapkan dua bilah plat St37, buat kampuh V (sudut bevel 30° tiap sisi) untuk sambungan Butt Joint 1G.',
-                'Atur kuat arus mesin las SMAW pada kisaran 90A - 115A untuk elektroda Ø3.2 mm.',
+                'Atur kuat arus mesin las SMAW pada kisaran 90 A – 115 A untuk elektrode Ø3,2 mm.',
                 'Lakukan las catat (tack weld) pada kedua ujung pelat dengan celah akar (root gap) 2 mm.',
-                'Lakukan pengelasan tembusan (root pass) diikuti pengisian (filler) dan penutup (capping) dengan sudut elektroda 70°-80°.',
-                'Bersihkan terak (slag) menggunakan palu terak dan sikat baja, lalu lakukan inspeksi visual cacat las (undercut, porosity, spatter).'
+                'Lakukan pengelasan tembusan (root pass) diikuti pengisian (filler) dan penutup (capping) dengan sudut elektrode 70°–80°.',
+                'Bersihkan terak (slag) menggunakan palu terak dan sikat kawat baja, lalu lakukan inspeksi visual cacat las (undercut, porosity, spatter).'
             ],
             images: [createTechnicalBlueprintSVG('SAMBUNGAN LAS 1G KAMPUH V & FILLET', 'Semester 3 - Las SMAW', 'JS-LS07')]
         },
         {
             id: 'j8', sessionId: 's3_milling',
             title: 'Job Sheet 08: Pengefraisan Balok Persegi Enam & Pembuatan Roda Gigi Lurus',
-            material: 'Bakalan Roda Gigi Baja S45C Ø66 x 20 mm (Modul m = 2, Jumlah Gigi z = 30)',
+            material: 'Bakalan Roda Gigi Baja S45C Ø66 × 20 mm (Modul m = 2, Jumlah Gigi z = 30)',
             k3: 'Kacamata safety, Pastikan arbor dan kepala pembagi terkunci kokoh sebelum pisau menyentuh benda.',
             steps: [
-                'Periksa diameter luar bakalan roda gigi: $D_k = m \cdot (z + 2) = 2 \cdot (30 + 2) = 64.0\text{ mm}$.',
+                'Periksa diameter luar bakalan roda gigi: Dk = m × (z + 2) = 2 × (30 + 2) = 64,0 mm.',
                 'Pasang bakalan pada mandrel di antara kepala pembagi (Dividing Head rasio 40:1) dan kepala lepas.',
-                'Hitung putaran engkol pembagi: $N_c = 40 / z = 40 / 30 = 1\text{ putaran penuh} + 6\text{ lubang pada piringan 18 lubang}$.',
-                'Setting titik tengah pisau frais modul $m=2$ No. 5 tepat di sumbu benda dan atur kedalaman pemotongan $h = 2.25 \cdot m = 4.50\text{ mm}$.',
+                'Hitung putaran engkol pembagi: Nc = 40 ÷ z = 40 ÷ 30 = 1 putaran penuh + 6 lubang pada piringan 18 lubang.',
+                'Setting titik tengah pisau frais modul m = 2 No. 5 tepat di sumbu benda dan atur kedalaman pemotongan h = 2,25 × m = 4,50 mm.',
                 'Frais profil gigi satu per satu secara berurutan hingga 30 gigi terbentuk sempurna.'
             ],
             images: [createTechnicalBlueprintSVG('FRAIS RODA GIGI LURUS M=2 Z=30', 'Semester 3 - Milling', 'JS-ML08')]
@@ -1245,170 +1298,132 @@
         {
             id: 'j9', sessionId: 's4_ragum',
             title: 'Job Sheet 09 (Proyek Pabrikasi): Pembuatan & Perakitan Ragum Mesin Presisi',
-            material: 'Baja St37 & S45C (Landasan, Rahang Tetap, Rahang Geser, Poros Ulir Tr16x4)',
+            material: 'Baja St37 & S45C (Landasan, Rahang Tetap, Rahang Geser, Poros Ulir Tr16×4)',
             k3: 'Seluruh standar APD bengkel pemesinan & fabrikasi wajib dipatuhi.',
             steps: [
                 'Tahap 1 (Pemotongan & Sekrap/Milling): Potong bahan untuk Base Plate, Rahang Tetap, dan Rahang Geser, lalu frais bidang jalan (sliding way) hingga presisi dan sejajar.',
                 'Tahap 2 (Pengeboran & Ulir): Bor dan tap lubang pengikat mur pengantar serta pelat penjepit mulut ragum (jaw plate).',
-                'Tahap 3 (Bubut Poros Utama): Bubut poros penggerak utama dan buat ulir Trapesium luar Tr16x4 serta mur pasangannya dari perunggu/baja.',
+                'Tahap 3 (Bubut Poros Utama): Bubut poros penggerak utama dan buat ulir Trapesium luar Tr16×4 serta mur pasangannya dari perunggu/baja.',
                 'Tahap 4 (Gerinda Datar): Haluskan permukaan jaw plate yang telah dikeraskan pada mesin Surface Grinding.',
-                'Tahap 5 (Perakitan & Quality Control): Rakit seluruh komponen ragum, uji kelancaran putaran ulir, dan ukur kesejajaran mulut ragum menggunakan Dial Indicator (toleransi maks 0.03 mm).'
+                'Tahap 5 (Perakitan & Quality Control): Rakit seluruh komponen ragum, uji kelancaran putaran ulir, dan ukur kesejajaran mulut ragum menggunakan Dial Indicator (toleransi maks 0,02 mm).'
             ],
             images: [createTechnicalBlueprintSVG('ASSEMBLY PABRIKASI RAGUM MESIN', 'Semester 4 - Pabrikasi Ragum', 'JS-PB09')]
         }
     ];
 
     /********************************************************************
-     * 2. SUPABASE CLOUD ENGINE — DATA BISA DILIHAT SELURUH MAHASISWA
-     * Publik boleh membaca. Hanya admin terdaftar boleh mengubah.
+     * 2. INDEXEDDB ENGINE (KAPASITAS PENAMPUNGAN FILE GAMBAR BESAR)
      ********************************************************************/
-    const conf = window.GEARUP_CONFIG || {};
-    const cloudConfigured = /^https:\/\/.+\.supabase\.co\/?$/.test(conf.supabaseUrl || '')
-        && typeof conf.supabaseAnonKey === 'string' && conf.supabaseAnonKey.length > 40;
-    let cloud = null;
-    const tableName = { tools: 'gearup_tools', jobsheets: 'gearup_jobsheets' };
+    const DB_NAME = 'GearUpWorkshopDB_v2';
+    const DB_VERSION = 1;
+    let dbInstance = null;
 
     let appState = {
-        tools: [], jobsheets: [], activeToolsSem: 1, activeToolsSession: 's1_bangku',
-        activeToolClass: 'ALL', activeJobsSem: 1, activeJobsSession: 'ALL',
-        currentViewingJobId: null, isAdminAuthenticated: false,
-        pendingJobImages: [], pendingToolImage: null
+        tools: [],
+        jobsheets: [],
+        activeToolsSem: 1,
+        activeToolsSession: 's1_bangku',
+        activeToolClass: 'ALL',
+        activeJobsSem: 1,
+        activeJobsSession: 'ALL',
+        currentViewingJobId: null,
+        isAdminAuthenticated: false,
+        pendingJobImages: [],
+        pendingToolImage: null
     };
 
-    function escapeHtml(value) {
-        return String(value ?? '').replace(/[&<>"']/g, char => ({
-            '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
-        }[char]));
+    function openIndexedDB() {
+        return new Promise((resolve, reject) => {
+            const request = indexedDB.open(DB_NAME, DB_VERSION);
+            request.onupgradeneeded = (e) => {
+                const db = e.target.result;
+                if (!db.objectStoreNames.contains('tools')) {
+                    db.createObjectStore('tools', { keyPath: 'id' });
+                }
+                if (!db.objectStoreNames.contains('jobsheets')) {
+                    db.createObjectStore('jobsheets', { keyPath: 'id' });
+                }
+                if (!db.objectStoreNames.contains('settings')) {
+                    db.createObjectStore('settings', { keyPath: 'key' });
+                }
+            };
+            request.onsuccess = (e) => {
+                dbInstance = e.target.result;
+                resolve(dbInstance);
+            };
+            request.onerror = (e) => reject(e.target.error);
+        });
     }
 
-    function displayNotice(message, isProblem = true) {
-        const el = document.getElementById('cloudNotice');
-        if (!el) return;
-        el.textContent = message;
-        el.classList.remove('hidden');
-        el.className = isProblem
-            ? 'mx-4 mt-3 rounded-xl px-3 py-2 text-[11px] font-semibold bg-amber-50 text-amber-900 border border-amber-300'
-            : 'mx-4 mt-3 rounded-xl px-3 py-2 text-[11px] font-semibold bg-olive-50 text-army-800 border border-olive-200';
+    function idbGetAll(storeName) {
+        return new Promise((resolve, reject) => {
+            const tx = dbInstance.transaction(storeName, 'readonly');
+            const store = tx.objectStore(storeName);
+            const req = store.getAll();
+            req.onsuccess = () => resolve(req.result);
+            req.onerror = () => reject(req.error);
+        });
     }
 
-    function encodeRow(storeName, obj) {
-        if (storeName === 'tools') return {
-            id: obj.id, session_id: obj.sessionId, name: obj.name,
-            cls: obj.cls, spec: obj.spec, image: obj.image || ''
-        };
-        return {
-            id: obj.id, session_id: obj.sessionId, title: obj.title,
-            material: obj.material || '', k3: obj.k3 || '',
-            steps: obj.steps || [], images: obj.images || []
-        };
+    function idbPut(storeName, item) {
+        return new Promise((resolve, reject) => {
+            const tx = dbInstance.transaction(storeName, 'readwrite');
+            const store = tx.objectStore(storeName);
+            const req = store.put(item);
+            req.onsuccess = () => resolve(req.result);
+            req.onerror = () => reject(req.error);
+        });
     }
 
-    function decodeRow(storeName, obj) {
-        if (storeName === 'tools') return {
-            id: obj.id, sessionId: obj.session_id, name: obj.name,
-            cls: obj.cls, spec: obj.spec, image: obj.image || ''
-        };
-        return {
-            id: obj.id, sessionId: obj.session_id, title: obj.title,
-            material: obj.material || '', k3: obj.k3 || '',
-            steps: obj.steps || [], images: obj.images || []
-        };
-    }
-
-    async function idbGetAll(storeName) {
-        if (!cloud) throw new Error('Supabase belum dikonfigurasi.');
-        const { data, error } = await cloud.from(tableName[storeName]).select('*').limit(1000);
-        if (error) throw error;
-        return (data || []).map(item => decodeRow(storeName, item));
-    }
-
-    async function idbPut(storeName, item) {
-        if (!cloud || !appState.isAdminAuthenticated) throw new Error('Hanya admin online yang dapat menyimpan data.');
-        const { error } = await cloud.from(tableName[storeName]).upsert(encodeRow(storeName, item));
-        if (error) throw error;
-    }
-
-    async function idbDelete(storeName, key) {
-        if (!cloud || !appState.isAdminAuthenticated) throw new Error('Hanya admin online yang dapat menghapus data.');
-        const { error } = await cloud.from(tableName[storeName]).delete().eq('id', key);
-        if (error) throw error;
-    }
-
-    async function reloadCloudData() {
-        const [tools, jobs] = await Promise.all([idbGetAll('tools'), idbGetAll('jobsheets')]);
-        // Perlihatkan modul bawaan saat tabel cloud belum diisi.
-        appState.tools = tools.length ? tools : [...INITIAL_TOOLS];
-        appState.jobsheets = jobs.length ? jobs : [...INITIAL_JOBSHEETS];
-        renderAllViews();
-    }
-
-    async function restoreAdminSession() {
-        const { data: { session } } = await cloud.auth.getSession();
-        if (!session) return;
-        const { data: isAdmin, error } = await cloud.rpc('gearup_is_admin');
-        if (!error && isAdmin === true) {
-            appState.isAdminAuthenticated = true;
-            document.getElementById('adminBadgeHeader').classList.remove('hidden');
-        }
+    function idbDelete(storeName, key) {
+        return new Promise((resolve, reject) => {
+            const tx = dbInstance.transaction(storeName, 'readwrite');
+            const store = tx.objectStore(storeName);
+            const req = store.delete(key);
+            req.onsuccess = () => resolve();
+            req.onerror = () => reject(req.error);
+        });
     }
 
     async function loadOrSeedDatabase() {
-        if (!cloudConfigured || typeof supabase === 'undefined') {
-            appState.tools = [...INITIAL_TOOLS];
-            appState.jobsheets = [...INITIAL_JOBSHEETS];
-            displayNotice('MODE CONTOH: Website bisa dilihat, tetapi pengelolaan admin dan penyimpanan online belum aktif. Lengkapi config.js dan setup_database.sql.');
-            return;
+        await openIndexedDB();
+        let tools = await idbGetAll('tools');
+        let jobs = await idbGetAll('jobsheets');
+
+        if (!tools || tools.length === 0) {
+            for (const t of INITIAL_TOOLS) {
+                await idbPut('tools', t);
+            }
+            tools = INITIAL_TOOLS;
         }
-        try {
-            cloud = supabase.createClient(conf.supabaseUrl, conf.supabaseAnonKey);
-            await reloadCloudData();
-            await restoreAdminSession();
-            if (appState.isAdminAuthenticated) renderAllViews();
-            displayNotice('GearUp terhubung ke database online. Pembaruan dari dosen tersedia untuk mahasiswa saat halaman dimuat ulang.', false);
-        } catch (err) {
-            console.error('Supabase error:', err);
-            appState.tools = [...INITIAL_TOOLS];
-            appState.jobsheets = [...INITIAL_JOBSHEETS];
-            displayNotice('Koneksi database gagal: ' + err.message + '. Konten contoh tetap bisa dilihat; pemeriksaan config.js / SQL diperlukan.');
+        if (!jobs || jobs.length === 0) {
+            for (const j of INITIAL_JOBSHEETS) {
+                await idbPut('jobsheets', j);
+            }
+            jobs = INITIAL_JOBSHEETS;
         }
+
+        // Ensure default admin password exists
+        const settings = await idbGetAll('settings');
+        const passObj = settings.find(s => s.key === 'adminPassword');
+        if (!passObj) {
+            await idbPut('settings', { key: 'adminPassword', value: 'admin123' });
+        }
+
+        appState.tools = tools;
+        appState.jobsheets = jobs;
+        updateStorageEstimate();
     }
 
     async function updateStorageEstimate() {
-        const el = document.getElementById('idbStorageStatus');
-        if (el) el.textContent = 'Supabase Storage • Semua mahasiswa melihat gambar yang sama';
-    }
-
-    async function uploadMediaFiles(fileList, folder) {
-        if (!cloud || !appState.isAdminAuthenticated) throw new Error('Akses upload hanya untuk admin.');
-        const allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
-        const urls = [];
-        for (const file of Array.from(fileList)) {
-            if (!allowed.includes(file.type)) throw new Error('Gambar harus JPG, PNG, WEBP, atau GIF.');
-            if (file.size > 8 * 1024 * 1024) throw new Error('Ukuran maksimal 8 MB per gambar.');
-            const extension = ({'image/jpeg':'jpg','image/png':'png','image/webp':'webp','image/gif':'gif'})[file.type];
-            const unique = crypto.randomUUID ? crypto.randomUUID() : Date.now() + '-' + Math.random().toString(36).slice(2);
-            const path = `${folder}/${unique}.${extension}`;
-            const { error } = await cloud.storage.from('gearup-media').upload(path, file, {
-                cacheControl: '3600', upsert: false, contentType: file.type
-            });
-            if (error) throw error;
-            urls.push(cloud.storage.from('gearup-media').getPublicUrl(path).data.publicUrl);
-        }
-        return urls;
-    }
-
-    async function publishInitialCatalog(options = {}) {
-        if (!appState.isAdminAuthenticated || !cloud) return showToast('Masuk sebagai admin terlebih dahulu.');
-        try {
-            for (const [type, list] of [['tools', INITIAL_TOOLS], ['jobsheets', INITIAL_JOBSHEETS]]) {
-                const records = list.map(item => encodeRow(type, item));
-                const { error } = await cloud.from(tableName[type]).upsert(records, { onConflict: 'id', ignoreDuplicates: true });
-                if (error) throw error;
+        if (navigator.storage && navigator.storage.estimate) {
+            const est = await navigator.storage.estimate();
+            const usedMB = ((est.usage || 0) / (1024 * 1024)).toFixed(2);
+            const quotaMB = est.quota ? Math.round(est.quota / (1024 * 1024)) : 'Ribuan ';
+            const el = document.getElementById('idbStorageStatus');
+            if (el) {
+                el.textContent = `Terpakai: ${usedMB} MB dari kuota ~${quotaMB} MB`;
             }
-            await reloadCloudData();
-            if (!options.quiet) showToast('25 alat dan 9 job sheet tersedia di database online.');
-        } catch (err) {
-            showToast('Publikasi gagal: ' + err.message);
         }
     }
 
@@ -1500,7 +1515,7 @@
                         <img src="${(job.images && job.images[0]) || ''}" alt="Job" class="w-14 h-14 rounded-xl object-cover border border-army-200 shrink-0">
                         <div>
                             <span class="text-[10px] font-bold text-olive-600 uppercase">Semester ${sess.sem} • ${sess.name}</span>
-                            <h4 class="font-bold text-xs text-army-900 line-clamp-1">${escapeHtml(job.title)}</h4>
+                            <h4 class="font-bold text-xs text-army-900 line-clamp-1">${job.title}</h4>
                             <p class="text-[10px] text-slate-500 mt-0.5"><i class="fa-solid fa-file-arrow-down mr-1"></i>Klik untuk lihat & unduh panduan</p>
                         </div>
                     </div>
@@ -1537,11 +1552,15 @@
 
     function filterToolClass(cls) {
         appState.activeToolClass = cls;
+        const badge = document.getElementById('activeClassBadge');
+        if (badge) {
+            badge.textContent = cls === 'ALL' ? 'Semua Golongan (10)' : cls.replace('Golongan ', 'Gol. ');
+        }
         document.querySelectorAll('.cls-btn').forEach(btn => {
             if (btn.dataset.cls === cls) {
-                btn.className = 'cls-btn px-3 py-1 rounded-lg text-[11px] font-bold bg-olive-600 text-white';
+                btn.className = 'cls-btn shrink-0 px-3 py-1.5 rounded-xl text-[11px] font-bold bg-olive-600 text-white shadow-sm';
             } else {
-                btn.className = 'cls-btn px-3 py-1 rounded-lg text-[11px] font-semibold bg-white text-slate-700 border';
+                btn.className = 'cls-btn shrink-0 px-3 py-1.5 rounded-xl text-[11px] font-semibold bg-army-50 text-army-800 border border-army-200';
             }
         });
         renderToolsView();
@@ -1575,14 +1594,14 @@
         const currentSess = SESSIONS_CONFIG.find(s => s.id === appState.activeToolsSession);
         listEl.innerHTML = filteredTools.map(tool => `
             <div class="bg-white rounded-2xl p-3.5 shadow-sm border border-army-200 flex gap-3 items-start">
-                <img src="${escapeHtml(tool.image)}" alt="${escapeHtml(tool.name)}" class="w-20 h-20 rounded-xl object-cover border border-army-200 shrink-0">
+                <img src="${tool.image}" alt="${tool.name}" class="w-20 h-20 rounded-xl object-cover border border-army-200 shrink-0">
                 <div class="flex-1 min-w-0">
                     <div class="flex items-center justify-between gap-1">
-                        <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-md bg-army-100 text-army-800">${escapeHtml(tool.cls)}</span>
+                        <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-md bg-army-100 text-army-800">${tool.cls}</span>
                         <span class="text-[10px] text-slate-400 font-semibold">Sem ${currentSess.sem}</span>
                     </div>
-                    <h4 class="font-extrabold text-xs text-army-900 mt-1">${escapeHtml(tool.name)}</h4>
-                    <p class="text-[11px] text-slate-600 mt-1 leading-relaxed">${escapeHtml(tool.spec)}</p>
+                    <h4 class="font-extrabold text-xs text-army-900 mt-1">${tool.name}</h4>
+                    <p class="text-[11px] text-slate-600 mt-1 leading-relaxed">${tool.spec}</p>
                     ${appState.isAdminAuthenticated ? `
                         <div class="mt-2 pt-2 border-t flex gap-2">
                             <button onclick="editToolInAdmin('${tool.id}')" class="text-[11px] font-bold text-olive-600"><i class="fa-solid fa-pen mr-1"></i>Edit/Ganti Foto</button>
@@ -1636,7 +1655,7 @@
             return `
                 <div class="bg-white rounded-2xl overflow-hidden shadow-sm border border-army-200">
                     <div class="relative h-40 bg-army-900 cursor-pointer" onclick="openJobDetailModal('${job.id}')">
-                        <img src="${escapeHtml(coverImg)}" alt="${escapeHtml(job.title)}" class="w-full h-full object-cover">
+                        <img src="${coverImg}" alt="${job.title}" class="w-full h-full object-cover">
                         <div class="absolute top-2.5 left-2.5 bg-army-900/85 backdrop-blur-sm text-olive-400 text-[10px] font-extrabold px-2.5 py-1 rounded-full border border-olive-400/30">
                             Semester ${sess.sem} • ${sess.name}
                         </div>
@@ -1645,20 +1664,19 @@
                         </div>
                     </div>
                     <div class="p-3.5">
-                        <h3 class="font-extrabold text-sm text-army-900 leading-snug">${escapeHtml(job.title)}</h3>
-                        <p class="text-[11px] text-slate-500 mt-1"><i class="fa-solid fa-cube text-olive-600 mr-1"></i>Bahan: ${escapeHtml(job.material)}</p>
+                        <h3 class="font-extrabold text-sm text-army-900 leading-snug">${job.title}</h3>
+                        <p class="text-[11px] text-slate-500 mt-1"><i class="fa-solid fa-cube text-olive-600 mr-1"></i>Bahan: ${job.material}</p>
                         <div class="mt-3 flex items-center gap-2">
                             <button onclick="openJobDetailModal('${job.id}')" class="flex-1 bg-army-800 hover:bg-army-700 text-white font-bold text-xs py-2 rounded-xl transition flex items-center justify-center gap-1.5">
                                 <i class="fa-solid fa-eye"></i>
                                 <span>Buka & Unduh Job Sheet</span>
                             </button>
-                            ${appState.isAdminAuthenticated ? `<label class="cursor-pointer bg-olive-100 hover:bg-olive-200 text-army-900 font-bold text-xs py-2 px-3 rounded-xl transition flex items-center gap-1" title="Ganti / Tambah Gambar Panduan">
+                            <label class="cursor-pointer bg-olive-100 hover:bg-olive-200 text-army-900 font-bold text-xs py-2 px-3 rounded-xl transition flex items-center gap-1" title="Ganti / Tambah Gambar Panduan">
                                 <i class="fa-solid fa-camera text-olive-600"></i>
                                 <span>Ganti Gambar</span>
                                 <input type="file" accept="image/*" multiple class="hidden" onchange="quickReplaceJobImage('${job.id}', event)">
-                            </label>` : ''}
+                            </label>
                             ${appState.isAdminAuthenticated ? `
-                                 <button onclick="editJobInAdmin('${job.id}')" class="bg-olive-100 text-olive-700 text-xs font-bold px-2 py-2 rounded-xl">Edit</button>
                                 <button onclick="deleteJobItem('${job.id}')" class="bg-red-100 text-red-600 p-2 rounded-xl"><i class="fa-solid fa-trash"></i></button>
                             ` : ''}
                         </div>
@@ -1669,7 +1687,7 @@
     }
 
     /********************************************************************
-     * 5. MODAL JOB SHEET & UPLOAD GAMBAR BERUKURAN BESAR (SUPABASE)
+     * 5. MODAL JOB SHEET & UPLOAD GAMBAR BERUKURAN BESAR (INDEXEDDB)
      ********************************************************************/
     function openJobDetailModal(jobId) {
         const job = appState.jobsheets.find(j => j.id === jobId);
@@ -1683,11 +1701,9 @@
         document.getElementById('modalJobMaterial').textContent = job.material;
 
         const stepsEl = document.getElementById('modalJobSteps');
-        stepsEl.innerHTML = (job.steps || []).map(st => `<li>${escapeHtml(st)}</li>`).join('');
+        stepsEl.innerHTML = (job.steps || []).map(st => `<li>${st}</li>`).join('');
 
         renderModalJobGallery(job);
-        document.getElementById('detailUploadLabel').classList.toggle('hidden', !appState.isAdminAuthenticated);
-        document.getElementById('detailUploadLabel').classList.toggle('flex', appState.isAdminAuthenticated);
         document.getElementById('jobDetailModal').classList.remove('hidden');
     }
 
@@ -1696,14 +1712,14 @@
         const imgs = job.images || [];
         gal.innerHTML = imgs.map((imgData, idx) => `
             <div class="relative rounded-2xl overflow-hidden border border-army-200 bg-army-900">
-                <img src="${escapeHtml(imgData)}" alt="Gambar Kerja ${idx + 1}" class="w-full max-h-72 object-contain mx-auto">
+                <img src="${imgData}" alt="Gambar Kerja ${idx + 1}" class="w-full max-h-72 object-contain mx-auto">
                 <div class="bg-army-800/90 text-white px-3 py-1.5 flex items-center justify-between text-[11px]">
                     <span>Gambar Panduan #${idx + 1}</span>
                     <div class="flex items-center space-x-3">
-                        <a href="${escapeHtml(imgData)}" download="Gambar-JobSheet-${job.id}-${idx+1}.png" class="text-olive-400 font-bold hover:underline">
+                        <a href="${imgData}" download="Gambar-JobSheet-${job.id}-${idx+1}.png" class="text-olive-400 font-bold hover:underline">
                             <i class="fa-solid fa-download mr-1"></i>Unduh Gambar
                         </a>
-                        ${appState.isAdminAuthenticated && imgs.length > 1 ? `<button onclick="removeSingleJobImage('${job.id}', ${idx})" class="text-red-300 hover:text-red-400"><i class="fa-solid fa-trash"></i></button>` : ''}
+                        ${imgs.length > 1 ? `<button onclick="removeSingleJobImage('${job.id}', ${idx})" class="text-red-300 hover:text-red-400"><i class="fa-solid fa-trash"></i></button>` : ''}
                     </div>
                 </div>
             </div>
@@ -1714,7 +1730,7 @@
         document.getElementById('jobDetailModal').classList.add('hidden');
     }
 
-    // Read multiple large image files as DataURLs and store in Supabase Storage
+    // Read multiple large image files as DataURLs and store in IndexedDB
     function readFilesAsDataURLs(fileList) {
         const promises = Array.from(fileList).map(file => {
             return new Promise((resolve) => {
@@ -1726,71 +1742,65 @@
         return Promise.all(promises);
     }
 
-
-async function handleDirectJobImageUpload(event) {
-    if (!appState.isAdminAuthenticated) return showToast('Hanya admin yang dapat mengganti gambar.');
-    const files = event.target.files;
-    if (!files || !files.length || !appState.currentViewingJobId) return;
-    try {
+    async function handleDirectJobImageUpload(event) {
+        const files = event.target.files;
+        if (!files || files.length === 0 || !appState.currentViewingJobId) return;
+        const dataUrls = await readFilesAsDataURLs(files);
         const job = appState.jobsheets.find(j => j.id === appState.currentViewingJobId);
         if (!job) return;
-        const imageUrls = await uploadMediaFiles(files, `jobs/${job.id}`);
-        job.images = job.images?.length === 1 && job.images[0].startsWith('data:image/svg+xml')
-            ? imageUrls : [...(job.images || []), ...imageUrls];
+
+        // Replace default blueprint if it had only 1 SVG, or append new images
+        if (job.images && job.images.length === 1 && job.images[0].startsWith('data:image/svg+xml')) {
+            job.images = dataUrls;
+        } else {
+            job.images = [...(job.images || []), ...dataUrls];
+        }
+
         await idbPut('jobsheets', job);
         renderModalJobGallery(job);
         renderAllViews();
-        showToast('Gambar berhasil diunggah online!');
-    } catch (err) { showToast('Upload gagal: ' + err.message); }
-    finally { event.target.value = ''; }
-}
+        updateStorageEstimate();
+        showToast('Gambar panduan Job Sheet berhasil disimpan di IndexedDB!');
+    }
 
-
-async function quickReplaceJobImage(jobId, event) {
-    if (!appState.isAdminAuthenticated) return showToast('Hanya admin yang dapat mengganti gambar.');
-    const files = event.target.files;
-    if (!files || !files.length) return;
-    try {
+    async function quickReplaceJobImage(jobId, event) {
+        const files = event.target.files;
+        if (!files || files.length === 0) return;
+        const dataUrls = await readFilesAsDataURLs(files);
         const job = appState.jobsheets.find(j => j.id === jobId);
         if (!job) return;
-        const urls = await uploadMediaFiles(files, `jobs/${jobId}`);
-        job.images = urls;
+        job.images = dataUrls;
         await idbPut('jobsheets', job);
         renderAllViews();
-        showToast('Gambar Job Sheet berhasil diganti online!');
-    } catch (err) { showToast('Upload gagal: ' + err.message); }
-}
+        updateStorageEstimate();
+        showToast('Gambar Job Sheet berhasil diganti!');
+    }
 
-
-async function removeSingleJobImage(jobId, imgIndex) {
-    if (!appState.isAdminAuthenticated) return showToast('Akses ditolak.');
-    const job = appState.jobsheets.find(j => j.id === jobId);
-    if (!job || !job.images || job.images.length <= 1) return;
-    try {
-        const updated = {...job, images: job.images.filter((_, i) => i !== imgIndex)};
-        await idbPut('jobsheets', updated);
-        appState.jobsheets = appState.jobsheets.map(j => j.id === jobId ? updated : j);
-        renderModalJobGallery(updated);
+    async function removeSingleJobImage(jobId, imgIndex) {
+        const job = appState.jobsheets.find(j => j.id === jobId);
+        if (!job || !job.images) return;
+        job.images.splice(imgIndex, 1);
+        await idbPut('jobsheets', job);
+        renderModalJobGallery(job);
         renderAllViews();
-        showToast('Gambar dihapus dari daftar Job Sheet.');
-    } catch (err) { showToast('Gagal menghapus: ' + err.message); }
-}
+        showToast('Gambar dihapus');
+    }
 
     function downloadJobSheetHTML() {
         const job = appState.jobsheets.find(j => j.id === appState.currentViewingJobId);
         if (!job) return;
         const sess = SESSIONS_CONFIG.find(s => s.id === job.sessionId) || SESSIONS_CONFIG[0];
-        const imagesHtml = (job.images || []).map((src, i) => `<div style="margin-bottom:16px;text-align:center;"><img src="${escapeHtml(src)}" style="max-width:100%;border:2px solid #3B4D2B;border-radius:8px;"/><p>Gambar Panduan #${i+1}</p></div>`).join('');
-        const stepsHtml = (job.steps || []).map(s => `<li style="margin-bottom:8px;">${escapeHtml(s)}</li>`).join('');
+        const imagesHtml = (job.images || []).map((src, i) => `<div style="margin-bottom:16px;text-align:center;"><img src="${src}" style="max-width:100%;border:2px solid #3B4D2B;border-radius:8px;"/><p>Gambar Panduan #${i+1}</p></div>`).join('');
+        const stepsHtml = (job.steps || []).map(s => `<li style="margin-bottom:8px;">${s}</li>`).join('');
 
-        const docContent = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${escapeHtml(job.title)}</title>
+        const docContent = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${job.title}</title>
         <style>body{font-family:Arial,sans-serif;max-width:800px;margin:20px auto;padding:20px;color:#1D2614}
         .hdr{background:#2A361E;color:white;padding:16px;border-radius:10px;margin-bottom:20px}
         .box{background:#F4F6F0;padding:12px;border-left:5px solid #556B2F;margin-bottom:16px}</style></head>
         <body>
             <div class="hdr"><h2>GEARUP - JOB SHEET PRAKTIK BENGKEL</h2><p>Semester ${sess.sem} | Sesi: ${sess.name}</p></div>
-            <h3>${escapeHtml(job.title)}</h3>
-            <div class="box"><b>Bahan & Dimensi:</b> ${escapeHtml(job.material)}<br><b>Keselamatan Kerja (K3):</b> ${escapeHtml(job.k3)}</div>
+            <h3>${job.title}</h3>
+            <div class="box"><b>Bahan & Dimensi:</b> ${job.material}<br><b>Keselamatan Kerja (K3):</b> ${job.k3}</div>
             <h4>Gambar Kerja & Panduan:</h4>${imagesHtml}
             <h4>Langkah Kerja:</h4><ol>${stepsHtml}</ol>
         </body></html>`;
@@ -1806,6 +1816,11 @@ async function removeSingleJobImage(jobId, imgIndex) {
     /********************************************************************
      * 6. KALKULATOR PERMESINAN LENGKAP (SPINDEL, BUBUT, MILL, SEKRAP, FORGING)
      ********************************************************************/
+    function fmtID(num, decimals = 2) {
+        if (!isFinite(num)) return '0';
+        return Number(num).toFixed(decimals).replace('.', ',');
+    }
+
     function switchCalcTab(tabName) {
         document.querySelectorAll('.calc-panel').forEach(p => p.classList.add('hidden'));
         document.getElementById(`calc-panel-${tabName}`).classList.remove('hidden');
@@ -1829,35 +1844,37 @@ async function removeSingleJobImage(jobId, imgIndex) {
         document.getElementById('quickRpmResult').textContent = Math.round(n);
     }
 
-    // 1. Main Spindle n = (1000 * Vc) / (pi * d)
+    // 1. Main Spindle: n = (1000 × Vc) ÷ (π × d)
     function calculateSpindleMain() {
         const vc = parseFloat(document.getElementById('spindle_vc').value) || 0;
         const d = parseFloat(document.getElementById('spindle_d').value) || 1;
         const n = (1000 * vc) / (Math.PI * d);
-        document.getElementById('spindle_res_n').textContent = n.toFixed(2);
-        document.getElementById('spindle_res_round').textContent = `${Math.round(n)} RPM`;
+        document.getElementById('spindle_res_n').textContent = fmtID(n, 2);
+        document.getElementById('spindle_res_round').textContent = `${Math.round(n)} putaran/menit (RPM)`;
     }
 
-    // 2. Lathe (Bubut)
+    // 2. Lathe (Bubut): n, a = (d0 - dm)/2, Vf = f * n, Tm = L / (f * n), Q = Vc * a * f
     function calculateLathe() {
         const vc = parseFloat(document.getElementById('lathe_vc').value) || 0;
-        const d = parseFloat(document.getElementById('lathe_d').value) || 1;
+        const d0 = parseFloat(document.getElementById('lathe_d').value) || 1;
+        const dm = parseFloat(document.getElementById('lathe_dm').value) || 0;
         const f = parseFloat(document.getElementById('lathe_f').value) || 0.1;
         const l = parseFloat(document.getElementById('lathe_l').value) || 0;
-        const ap = parseFloat(document.getElementById('lathe_ap').value) || 0;
 
-        const n = (1000 * vc) / (Math.PI * d);
+        const n = (1000 * vc) / (Math.PI * d0);
+        const a = Math.max(0, (d0 - dm) / 2);
         const vf = f * n;
         const tm = vf > 0 ? (l / vf) : 0;
-        const mrr = vc * ap * f; // cm3/min
+        const mrr = vc * a * f; // cm³/menit
 
-        document.getElementById('lathe_res_n').textContent = n.toFixed(1);
-        document.getElementById('lathe_res_vf').textContent = vf.toFixed(1);
-        document.getElementById('lathe_res_tm').textContent = tm.toFixed(2);
-        document.getElementById('lathe_res_mrr').textContent = mrr.toFixed(2);
+        document.getElementById('lathe_res_n').textContent = fmtID(n, 1);
+        document.getElementById('lathe_res_a').textContent = fmtID(a, 2);
+        document.getElementById('lathe_res_vf').textContent = fmtID(vf, 1);
+        document.getElementById('lathe_res_tm').textContent = fmtID(tm, 2);
+        document.getElementById('lathe_res_mrr').textContent = fmtID(mrr, 2);
     }
 
-    // 3. Milling (Frais)
+    // 3. Milling (Frais): n = (1000 × Vc) ÷ (π × d), Vf = fz × z × n, Tm = L ÷ Vf
     function calculateMilling() {
         const vc = parseFloat(document.getElementById('mill_vc').value) || 0;
         const d = parseFloat(document.getElementById('mill_d').value) || 1;
@@ -1870,46 +1887,56 @@ async function removeSingleJobImage(jobId, imgIndex) {
         const tm = vf > 0 ? (l / vf) : 0;
 
         document.getElementById('mill_res_n').textContent = Math.round(n);
-        document.getElementById('mill_res_vf').textContent = vf.toFixed(1);
-        document.getElementById('mill_res_tm').textContent = tm.toFixed(2);
+        document.getElementById('mill_res_vf').textContent = fmtID(vf, 1);
+        document.getElementById('mill_res_tm').textContent = fmtID(tm, 2);
     }
 
-    // 4. Shaping (Sekrap)
+    // 4. Shaping (Sekrap): np = (1000 × Vc) ÷ (L × (1 + R)), Tm = B ÷ (f × np)
     function calculateShaping() {
         const vc = parseFloat(document.getElementById('shape_vc').value) || 0;
         const l = parseFloat(document.getElementById('shape_l').value) || 1;
-        const k = parseFloat(document.getElementById('shape_k').value) || 0.6;
+        const r = parseFloat(document.getElementById('shape_k').value) || 0.6;
         const b = parseFloat(document.getElementById('shape_b').value) || 0;
-        const s = parseFloat(document.getElementById('shape_s').value) || 0.5;
+        const f = parseFloat(document.getElementById('shape_s').value) || 0.5;
 
-        const np = (1000 * vc) / (l * (1 + k));
-        const vf = np * s;
+        const np = (1000 * vc) / (l * (1 + r));
+        const vf = np * f;
         const tm = vf > 0 ? (b / vf) : 0;
 
-        document.getElementById('shape_res_np').textContent = np.toFixed(1);
-        document.getElementById('shape_res_vf').textContent = vf.toFixed(1);
-        document.getElementById('shape_res_tm').textContent = tm.toFixed(2);
+        document.getElementById('shape_res_np').textContent = fmtID(np, 1);
+        document.getElementById('shape_res_vf').textContent = fmtID(vf, 1);
+        document.getElementById('shape_res_tm').textContent = fmtID(tm, 2);
     }
 
-    // 5. Forging (Tempa)
+    // 5. Forging (Tempa): V = A0*h0 = A1*h1, ε = ln(h0/h1), kf = 1 + (2*μ*r1)/(3*h1), F = kf * Yf * A1
     function calculateForging() {
         const d0 = parseFloat(document.getElementById('forge_d0').value) || 1;
         const h0 = parseFloat(document.getElementById('forge_h0').value) || 1;
         const h1 = parseFloat(document.getElementById('forge_h1').value) || 1;
-        const kf = parseFloat(document.getElementById('forge_kf').value) || 100;
+        const yf = parseFloat(document.getElementById('forge_kf').value) || 100;
+        const mu = parseFloat(document.getElementById('forge_mu').value) || 0.2;
 
-        const volMm3 = (Math.PI / 4) * d0 * d0 * h0;
+        const a0Mm2 = (Math.PI / 4) * d0 * d0;
+        const volMm3 = a0Mm2 * h0;
         const a1Mm2 = volMm3 / h1;
         const d1 = Math.sqrt((4 * a1Mm2) / Math.PI);
-        const reductionPct = ((h0 - h1) / h0) * 100;
-        // Shape factor with friction approx: 1 + 0.15 * (d1 / h1)
-        const shapeFactor = 1 + 0.15 * (d1 / h1);
-        const forceKN = (kf * shapeFactor * a1Mm2) / 1000;
+        const trueStrain = h0 > 0 && h1 > 0 ? Math.abs(Math.log(h0 / h1)) : 0;
 
-        document.getElementById('forge_res_vol').textContent = (volMm3 / 1000).toFixed(2);
-        document.getElementById('forge_res_d1').textContent = d1.toFixed(2);
-        document.getElementById('forge_res_red').textContent = reductionPct.toFixed(1);
-        document.getElementById('forge_res_force').textContent = forceKN.toFixed(1);
+        // Faktor bentuk tempa silinder (kf = 1 + (2 * μ * r1) / (3 * h1))
+        const r1 = d1 / 2;
+        const kfFactor = 1 + (2 * mu * r1) / (3 * h1);
+        const forceN = kfFactor * yf * a1Mm2; // Newton (1 MPa * 1 mm² = 1 N)
+        const forceKN = forceN / 1000;
+        const forceTonf = forceN / 9806.65;
+
+        document.getElementById('forge_res_vol').textContent = Math.round(volMm3).toLocaleString('id-ID');
+        document.getElementById('forge_res_vol_cm').textContent = fmtID(volMm3 / 1000, 1);
+        document.getElementById('forge_res_d1').textContent = fmtID(d1, 2);
+        document.getElementById('forge_res_a1').textContent = Math.round(a1Mm2);
+        document.getElementById('forge_res_strain').textContent = fmtID(trueStrain, 3);
+        document.getElementById('forge_res_kffactor').textContent = fmtID(kfFactor, 2);
+        document.getElementById('forge_res_force').textContent = fmtID(forceKN, 1);
+        document.getElementById('forge_res_ton').textContent = fmtID(forceTonf, 1);
     }
 
     // Click Vc value from table to populate calculators
@@ -1961,48 +1988,43 @@ async function removeSingleJobImage(jobId, imgIndex) {
         document.getElementById('adminModal').classList.add('hidden');
     }
 
+    async function verifyAdminLogin() {
+        const inputPass = document.getElementById('adminPasswordInput').value;
+        const settings = await idbGetAll('settings');
+        const savedObj = settings.find(s => s.key === 'adminPassword');
+        const currentPass = savedObj ? savedObj.value : 'admin123';
 
-async function verifyAdminLogin() {
-    if (!cloud) return showToast('Aktifkan Supabase di config.js terlebih dahulu.');
-    const email = document.getElementById('adminEmailInput').value.trim();
-    const password = document.getElementById('adminPasswordInput').value;
-    if (!email || !password) return showToast('Masukkan email dan password admin.');
-    const { error } = await cloud.auth.signInWithPassword({ email, password });
-    if (error) return showToast('Login gagal: ' + error.message);
-    const { data: allowed, error: roleError } = await cloud.rpc('gearup_is_admin');
-    if (roleError || allowed !== true) {
-        await cloud.auth.signOut();
-        return showToast('Akun ini belum didaftarkan sebagai admin GearUp.');
+        if (inputPass === currentPass) {
+            appState.isAdminAuthenticated = true;
+            document.getElementById('adminBadgeHeader').classList.remove('hidden');
+            document.getElementById('adminLoginSection').classList.add('hidden');
+            document.getElementById('adminDashboardSection').classList.remove('hidden');
+            document.getElementById('adminPasswordInput').value = '';
+            renderAllViews();
+            showToast('Login Admin berhasil! Mode Edit Aktif.');
+        } else {
+            showToast('Password Admin salah!');
+        }
     }
-    appState.isAdminAuthenticated = true;
-    document.getElementById('adminBadgeHeader').classList.remove('hidden');
-    document.getElementById('adminLoginSection').classList.add('hidden');
-    document.getElementById('adminDashboardSection').classList.remove('hidden');
-    document.getElementById('adminPasswordInput').value = '';
-    renderAllViews();
-    showToast('Login admin berhasil. Data kini tersimpan online.');
-}
 
+    function logoutAdmin() {
+        appState.isAdminAuthenticated = false;
+        document.getElementById('adminBadgeHeader').classList.add('hidden');
+        closeAdminModal();
+        renderAllViews();
+        showToast('Keluar dari Mode Admin');
+    }
 
-async function logoutAdmin() {
-    if (cloud) await cloud.auth.signOut();
-    appState.isAdminAuthenticated = false;
-    document.getElementById('adminBadgeHeader').classList.add('hidden');
-    closeAdminModal();
-    renderAllViews();
-    showToast('Berhasil keluar dari akun admin.');
-}
-
-
-async function changeAdminPassword() {
-    if (!appState.isAdminAuthenticated) return showToast('Login admin diperlukan.');
-    const newPass = document.getElementById('newAdminPassInput').value.trim();
-    if (newPass.length < 10) return showToast('Gunakan password baru minimal 10 karakter.');
-    const { error } = await cloud.auth.updateUser({ password: newPass });
-    if (error) return showToast('Gagal mengganti password: ' + error.message);
-    document.getElementById('newAdminPassInput').value = '';
-    showToast('Password Supabase admin berhasil diperbarui.');
-}
+    async function changeAdminPassword() {
+        const newPass = document.getElementById('newAdminPassInput').value.trim();
+        if (newPass.length < 4) {
+            showToast('Password baru minimal 4 karakter!');
+            return;
+        }
+        await idbPut('settings', { key: 'adminPassword', value: newPass });
+        document.getElementById('newAdminPassInput').value = '';
+        showToast('Password Admin berhasil diperbarui!');
+    }
 
     function switchAdminSubTab(tab) {
         ['formJob', 'formTool', 'settings'].forEach(t => {
@@ -2020,87 +2042,106 @@ async function changeAdminPassword() {
         document.getElementById('admToolSession').innerHTML = opts;
     }
 
+    async function previewAdminJobImages(e) {
+        const files = e.target.files;
+        if (!files || files.length === 0) return;
+        appState.pendingJobImages = await readFilesAsDataURLs(files);
+        document.getElementById('admJobImagePreview').innerHTML = appState.pendingJobImages.map(src =>
+            `<img src="${src}" class="w-16 h-16 rounded-lg object-cover border">`
+        ).join('');
+    }
 
-async function previewAdminJobImages(e) {
-    if (!appState.isAdminAuthenticated) return;
-    const files = Array.from(e.target.files || []);
-    appState.pendingJobImages = files;
-    document.getElementById('admJobImagePreview').innerHTML = files.map(f =>
-        `<img src="${URL.createObjectURL(f)}" class="w-16 h-16 rounded-lg object-cover border">`
-    ).join('');
-}
+    async function previewAdminToolImage(e) {
+        const files = e.target.files;
+        if (!files || files.length === 0) return;
+        const urls = await readFilesAsDataURLs(files);
+        appState.pendingToolImage = urls[0];
+        document.getElementById('admToolImagePreview').innerHTML = `<img src="${urls[0]}" class="w-20 h-20 rounded-xl object-cover border">`;
+    }
 
+    async function saveJobSheetFromAdmin() {
+        const sessionId = document.getElementById('admJobSession').value;
+        const title = document.getElementById('admJobTitle').value.trim();
+        const material = document.getElementById('admJobMaterial').value.trim() || 'Standar Bengkel';
+        const k3 = document.getElementById('admJobK3').value.trim() || 'APD Standar Bengkel Mesin';
+        const stepsRaw = document.getElementById('admJobSteps').value.trim();
 
-async function previewAdminToolImage(e) {
-    if (!appState.isAdminAuthenticated) return;
-    const file = (e.target.files || [])[0];
-    if (!file) return;
-    appState.pendingToolImage = file;
-    document.getElementById('admToolImagePreview').innerHTML =
-        `<img src="${URL.createObjectURL(file)}" class="w-20 h-20 rounded-xl object-cover border">`;
-}
-
-
-async function saveJobSheetFromAdmin() {
-    if (!appState.isAdminAuthenticated) return showToast('Login admin diperlukan.');
-    const editId = document.getElementById('editJobId').value;
-    const sessionId = document.getElementById('admJobSession').value;
-    const title = document.getElementById('admJobTitle').value.trim();
-    const material = document.getElementById('admJobMaterial').value.trim() || 'Standar Bengkel';
-    const k3 = document.getElementById('admJobK3').value.trim() || 'APD Standar Bengkel Mesin';
-    const stepsRaw = document.getElementById('admJobSteps').value.trim();
-    if (!title) return showToast('Judul Job Sheet wajib diisi!');
-    try {
-        const existing = editId ? appState.jobsheets.find(j => j.id === editId) : null;
-        const id = editId || 'job_' + Date.now();
+        if (!title) {
+            showToast('Judul Job Sheet wajib diisi!');
+            return;
+        }
         const steps = stepsRaw ? stepsRaw.split('\n').map(s => s.trim()).filter(Boolean) : ['Siapkan alat dan bahan sesuai SOP.'];
-        const images = appState.pendingJobImages.length
-            ? await uploadMediaFiles(appState.pendingJobImages, `jobs/${id}`)
-            : existing?.images || [createTechnicalBlueprintSVG(title.toUpperCase(), 'Job Sheet Praktik', 'JS-NEW')];
-        const job = { id, sessionId, title, material, k3, steps, images };
-        await idbPut('jobsheets', job);
-        appState.jobsheets = editId
-            ? appState.jobsheets.map(j => j.id === id ? job : j)
-            : [job, ...appState.jobsheets];
+        const images = appState.pendingJobImages.length > 0
+            ? appState.pendingJobImages
+            : [createTechnicalBlueprintSVG(title.toUpperCase(), 'Job Sheet Praktik', 'JS-NEW')];
+
+        const newJob = {
+            id: 'job_' + Date.now(),
+            sessionId,
+            title,
+            material,
+            k3,
+            steps,
+            images
+        };
+
+        await idbPut('jobsheets', newJob);
+        appState.jobsheets.unshift(newJob);
         appState.pendingJobImages = [];
-        ['editJobId', 'admJobTitle', 'admJobSteps', 'admJobMaterial', 'admJobK3'].forEach(x => document.getElementById(x).value = '');
-        document.getElementById('admJobImagesInput').value = '';
+        document.getElementById('admJobTitle').value = '';
+        document.getElementById('admJobSteps').value = '';
         document.getElementById('admJobImagePreview').innerHTML = '';
+
         renderAllViews();
+        updateStorageEstimate();
         closeAdminModal();
-        showToast(editId ? 'Job Sheet berhasil diperbarui online.' : 'Job Sheet berhasil ditambahkan online.');
-    } catch (err) { showToast('Gagal menyimpan: ' + err.message); }
-}
+        showToast('Job Sheet & Gambar berhasil ditambahkan!');
+    }
 
+    async function saveToolFromAdmin() {
+        const editId = document.getElementById('editToolId').value;
+        const sessionId = document.getElementById('admToolSession').value;
+        const cls = document.getElementById('admToolClass').value;
+        const name = document.getElementById('admToolName').value.trim();
+        const spec = document.getElementById('admToolDesc').value.trim() || 'Alat praktik standar bengkel.';
 
-async function saveToolFromAdmin() {
-    if (!appState.isAdminAuthenticated) return showToast('Login admin diperlukan.');
-    const editId = document.getElementById('editToolId').value;
-    const sessionId = document.getElementById('admToolSession').value;
-    const cls = document.getElementById('admToolClass').value;
-    const name = document.getElementById('admToolName').value.trim();
-    const spec = document.getElementById('admToolDesc').value.trim() || 'Alat praktik standar bengkel.';
-    if (!name) return showToast('Nama alat wajib diisi.');
-    try {
-        const existing = editId ? appState.tools.find(t => t.id === editId) : null;
-        const id = editId || ('tool_' + Date.now());
+        if (!name) {
+            showToast('Nama alat wajib diisi!');
+            return;
+        }
+
+        const existingTool = editId ? appState.tools.find(t => t.id === editId) : null;
         const image = appState.pendingToolImage
-            ? (await uploadMediaFiles([appState.pendingToolImage], `tools/${id}`))[0]
-            : (existing?.image || createTechnicalBlueprintSVG(name, cls, 'ALAT'));
-        const item = { id, sessionId, cls, name, spec, image };
-        await idbPut('tools', item);
-        appState.tools = editId ? appState.tools.map(t => t.id === id ? item : t) : [item, ...appState.tools];
+            || (existingTool ? existingTool.image : createTechnicalBlueprintSVG(name, cls, 'ALAT'));
+
+        const toolObj = {
+            id: editId || ('tool_' + Date.now()),
+            sessionId,
+            name,
+            cls,
+            spec,
+            image
+        };
+
+        await idbPut('tools', toolObj);
+        if (editId) {
+            const idx = appState.tools.findIndex(t => t.id === editId);
+            if (idx > -1) appState.tools[idx] = toolObj;
+        } else {
+            appState.tools.unshift(toolObj);
+        }
+
         document.getElementById('editToolId').value = '';
         document.getElementById('admToolName').value = '';
         document.getElementById('admToolDesc').value = '';
-        document.getElementById('admToolImageInput').value = '';
         document.getElementById('admToolImagePreview').innerHTML = '';
         appState.pendingToolImage = null;
+
         renderAllViews();
+        updateStorageEstimate();
         closeAdminModal();
-        showToast('Data alat praktik tersimpan online!');
-    } catch (err) { showToast('Gagal menyimpan: ' + err.message); }
-}
+        showToast('Data alat praktik berhasil disimpan!');
+    }
 
     function editToolInAdmin(toolId) {
         const t = appState.tools.find(x => x.id === toolId);
@@ -2110,50 +2151,25 @@ async function saveToolFromAdmin() {
         document.getElementById('admToolClass').value = t.cls;
         document.getElementById('admToolName').value = t.name;
         document.getElementById('admToolDesc').value = t.spec;
-        document.getElementById('admToolImagePreview').innerHTML = `<img src="${escapeHtml(t.image)}" class="w-20 h-20 rounded-xl object-cover border">`;
+        document.getElementById('admToolImagePreview').innerHTML = `<img src="${t.image}" class="w-20 h-20 rounded-xl object-cover border">`;
         openAdminModal('tool');
     }
 
-    function editJobInAdmin(jobId) {
-        if (!appState.isAdminAuthenticated) return;
-        const job = appState.jobsheets.find(j => j.id === jobId);
-        if (!job) return;
-        openAdminModal('jobsheet');
-        document.getElementById('editJobId').value = job.id;
-        document.getElementById('admJobSession').value = job.sessionId;
-        document.getElementById('admJobTitle').value = job.title;
-        document.getElementById('admJobMaterial').value = job.material;
-        document.getElementById('admJobK3').value = job.k3;
-        document.getElementById('admJobSteps').value = (job.steps || []).join('\n');
-        document.getElementById('admJobImagePreview').innerHTML = (job.images || []).map(src =>
-            `<img src="${escapeHtml(src)}" class="w-16 h-16 rounded-lg object-cover border">`
-        ).join('');
-        appState.pendingJobImages = [];
-        document.getElementById('formJobHeading').textContent = 'Edit Job Sheet & Gambar Panduan';
-    }
-
-
-async function deleteToolItem(toolId) {
-    if (!appState.isAdminAuthenticated || !confirm('Hapus alat ini dari semua mahasiswa?')) return;
-    try {
+    async function deleteToolItem(toolId) {
         await idbDelete('tools', toolId);
         appState.tools = appState.tools.filter(t => t.id !== toolId);
         renderAllViews();
-        showToast('Alat berhasil dihapus online.');
-    } catch (err) { showToast('Gagal menghapus: ' + err.message); }
-}
+        showToast('Alat dihapus dari database');
+    }
 
-
-async function deleteJobItem(jobId) {
-    if (!appState.isAdminAuthenticated || !confirm('Hapus Job Sheet ini dari semua mahasiswa?')) return;
-    try {
+    async function deleteJobItem(jobId) {
         await idbDelete('jobsheets', jobId);
         appState.jobsheets = appState.jobsheets.filter(j => j.id !== jobId);
         renderAllViews();
-        showToast('Job Sheet berhasil dihapus online.');
-    } catch (err) { showToast('Gagal menghapus: ' + err.message); }
-}
+        showToast('Job Sheet dihapus dari database');
+    }
 
+    // Export & Import JSON Backup
     function exportFullDatabase() {
         const payload = {
             exportedAt: new Date().toISOString(),
@@ -2168,30 +2184,33 @@ async function deleteJobItem(jobId) {
         showToast('Backup database berhasil diunduh!');
     }
 
+    function importFullDatabase(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = async (e) => {
+            try {
+                const data = JSON.parse(e.target.result);
+                if (Array.isArray(data.tools)) {
+                    for (const t of data.tools) await idbPut('tools', t);
+                    appState.tools = data.tools;
+                }
+                if (Array.isArray(data.jobsheets)) {
+                    for (const j of data.jobsheets) await idbPut('jobsheets', j);
+                    appState.jobsheets = data.jobsheets;
+                }
+                renderAllViews();
+                showToast('Database berhasil dipulihkan!');
+            } catch (err) {
+                showToast('Format file JSON tidak valid');
+            }
+        };
+        reader.readAsText(file);
+    }
 
-function importFullDatabase(event) {
-    if (!appState.isAdminAuthenticated) return showToast('Login admin diperlukan.');
-    const file = event.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = async e => {
-        try {
-            const data = JSON.parse(e.target.result);
-            if (!Array.isArray(data.tools) || !Array.isArray(data.jobsheets))
-                throw new Error('JSON harus memiliki tools dan jobsheets.');
-            for (const t of data.tools) await idbPut('tools', t);
-            for (const j of data.jobsheets) await idbPut('jobsheets', j);
-            await reloadCloudData();
-            showToast('Data berhasil diimpor ke Supabase.');
-        } catch (err) { showToast('Import gagal: ' + err.message); }
-    };
-    reader.readAsText(file);
-}
-
-/********************************************************************
- * 8. PENCARIAN GLOBAL & NAVIGASI BAWAH
- ********************************************************************/
-
+    /********************************************************************
+     * 8. PENCARIAN GLOBAL & NAVIGASI BAWAH
+     ********************************************************************/
     function handleGlobalSearch(query) {
         const q = query.trim().toLowerCase();
         const panel = document.getElementById('searchResultsPanel');
@@ -2216,19 +2235,19 @@ function importFullDatabase(event) {
         let html = '';
         matchedJobs.forEach(j => {
             html += `<div onclick="openJobDetailModal('${j.id}')" class="bg-white p-2.5 rounded-xl border flex items-center justify-between cursor-pointer">
-                <div><span class="text-[10px] font-bold text-olive-600 uppercase">Job Sheet</span><p class="text-xs font-bold text-army-900">${escapeHtml(j.title)}</p></div>
+                <div><span class="text-[10px] font-bold text-olive-600 uppercase">Job Sheet</span><p class="text-xs font-bold text-army-900">${j.title}</p></div>
                 <i class="fa-solid fa-arrow-up-right-from-square text-xs text-slate-400"></i>
             </div>`;
         });
         matchedTools.forEach(t => {
             const s = SESSIONS_CONFIG.find(x => x.id === t.sessionId) || SESSIONS_CONFIG[0];
             html += `<div onclick="openSessionDirectly('${t.sessionId}', ${s.sem}); clearGlobalSearch();" class="bg-white p-2.5 rounded-xl border flex items-center justify-between cursor-pointer">
-                <div><span class="text-[10px] font-bold text-army-600 uppercase">Alat • ${s.name}</span><p class="text-xs font-bold text-army-900">${escapeHtml(t.name)}</p></div>
-                <span class="text-[10px] bg-army-100 px-2 py-0.5 rounded font-semibold">${escapeHtml(t.cls)}</span>
+                <div><span class="text-[10px] font-bold text-army-600 uppercase">Alat • ${s.name}</span><p class="text-xs font-bold text-army-900">${t.name}</p></div>
+                <span class="text-[10px] bg-army-100 px-2 py-0.5 rounded font-semibold">${t.cls}</span>
             </div>`;
         });
 
-        listEl.innerHTML = html || `<p class="text-xs text-slate-500 py-2">Tidak ditemukan alat atau job sheet untuk "${escapeHtml(query)}".</p>`;
+        listEl.innerHTML = html || `<p class="text-xs text-slate-500 py-2">Tidak ditemukan alat atau job sheet untuk "${query}".</p>`;
     }
 
     function clearGlobalSearch() {
@@ -2266,9 +2285,6 @@ function importFullDatabase(event) {
         calculateMilling();
         calculateShaping();
         calculateForging();
-        if ('serviceWorker' in navigator && location.protocol === 'https:') {
-            navigator.serviceWorker.register('./sw.js').catch(err => console.warn('Service Worker:', err));
-        }
     });
 </script>
 </body>
