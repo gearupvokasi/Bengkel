@@ -1,0 +1,426 @@
+/* GearUp Cloud Adapter - untuk mempertahankan index.html GearUp yang sudah dikustomisasi.
+   Require: ./config.js, @supabase/supabase-js@2, lalu script ini SEBELUM </body>.
+   Hanya publishable/anon key (tidak ada password rahasia di browser).
+*/
+(() => {
+  'use strict';
+  const config = window.GEARUP_CONFIG || {};
+  const tables = { tools: 'gearup_tools', jobsheets: 'gearup_jobsheets' };
+  let client = null;
+  const $ = id => document.getElementById(id);
+  const escapeHTML = val => String(val ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+  const notice = (msg, good = false) => {
+    let el = $('gearupCloudNotice');
+    if (!el) {
+      el = document.createElement('div');
+      el.id = 'gearupCloudNotice';
+      el.className = 'mx-4 mt-3 px-3 py-2 rounded-xl text-xs font-semibold border';
+      const header = document.querySelector('#appShell header');
+      if (header) header.after(el);
+    }
+    el.textContent = msg;
+    el.style.background = good ? '#e6ecd9' : '#fef3c7';
+    el.style.borderColor = good ? '#8fbc36' : '#d97706';
+    el.style.color = '#2a361e';
+  };
+  const configured = /^https:\/\/[a-z0-9-]+\.supabase\.co\/?$/i.test(config.supabaseUrl || '')
+    && typeof config.supabaseAnonKey === 'string'
+    && config.supabaseAnonKey.length > 40
+    && !config.supabaseAnonKey.includes('ISI_');
+
+  function toCloud(type, obj) {
+    if (type === 'tools') return {
+      id: obj.id, session_id: obj.sessionId, name: obj.name,
+      cls: obj.cls, spec: obj.spec || '', image: obj.image || ''
+    };
+    return {id: obj.id, session_id: obj.sessionId, title: obj.title,
+      material: obj.material || '', k3: obj.k3 || '', steps: obj.steps || [], images: obj.images || []};
+  }
+  function fromCloud(type, obj) {
+    if (type === 'tools') return {
+      id: obj.id, sessionId: obj.session_id, name: obj.name,
+      cls: obj.cls, spec: obj.spec || '', image: obj.image || ''
+    };
+    return {id: obj.id, sessionId: obj.session_id, title: obj.title,
+      material: obj.material || '', k3: obj.k3 || '', steps: obj.steps || [], images: obj.images || []};
+  }
+  const authenticated = () => Boolean(client && appState.isAdminAuthenticated);
+  const requireAdmin = () => {
+    if (!authenticated()) throw new Error('Hanya dosen yang login sebagai admin online dapat mengubah materi.');
+  };
+  const setAdmin = value => {
+    appState.isAdminAuthenticated = Boolean(value);
+    document.body.classList.toggle('gearup-admin-online', Boolean(value));
+    $('adminBadgeHeader')?.classList.toggle('hidden', !value);
+    renderAllViews();
+  };
+  const fail = (label, error) => {
+    console.error(label, error);
+    showToast(`${label}: ${error.message || error}`);
+  };
+  async function fetchRows(type) {
+    if (!client) throw new Error('Supabase belum terhubung.');
+    const {data, error} = await client.from(tables[type]).select('*').limit(1000);
+    if (error) throw error;
+    return (data || []).map(row => fromCloud(type, row));
+  }
+  async function refreshData() {
+    const [tools, jobsheets] = await Promise.all([fetchRows('tools'), fetchRows('jobsheets')]);
+    appState.tools = tools.length ? tools : [...INITIAL_TOOLS];
+    appState.jobsheets = jobsheets.length ? jobsheets : [...INITIAL_JOBSHEETS];
+    renderAllViews();
+  }
+  window.idbGetAll = fetchRows;
+  window.idbPut = async (type, item) => {
+    requireAdmin();
+    const {error} = await client.from(tables[type]).upsert(toCloud(type, item));
+    if (error) throw error;
+  };
+  window.idbDelete = async (type, id) => {
+    requireAdmin();
+    const {error} = await client.from(tables[type]).delete().eq('id', id);
+    if (error) throw error;
+  };
+  window.loadOrSeedDatabase = async () => {
+    if (!configured || !window.supabase?.createClient) {
+      appState.tools = [...INITIAL_TOOLS];
+      appState.jobsheets = [...INITIAL_JOBSHEETS];
+      notice('MODE CONTOH: koneksi Supabase belum aktif. Isi Project URL dan Publishable Key dalam config.js, lalu pastikan script Supabase termuat.');
+      return;
+    }
+    try {
+      client = window.supabase.createClient(config.supabaseUrl, config.supabaseAnonKey);
+      await refreshData();
+      const {data: {session}, error: authErr} = await client.auth.getSession();
+      if (authErr) throw authErr;
+      if (session) {
+        const {data, error} = await client.rpc('gearup_is_admin');
+        if (error) throw error;
+        if (data === true) setAdmin(true);
+      }
+      notice('Database online aktif. Materi dosen dapat diakses seluruh mahasiswa.', true);
+    } catch (e) {
+      appState.tools = [...INITIAL_TOOLS];
+      appState.jobsheets = [...INITIAL_JOBSHEETS];
+      notice('Koneksi Supabase gagal: ' + e.message + '. Cek config.js dan setup_database.sql.');
+      console.error('GearUp Supabase:', e);
+    }
+  };
+  window.updateStorageEstimate = async () => {
+    if ($('idbStorageStatus')) $('idbStorageStatus').textContent = 'Supabase Storage - foto dibagikan ke seluruh mahasiswa';
+  };
+
+  // Jadikan UI login email + password, bukan password IndexedDB.
+  const loginSection = $('adminLoginSection');
+  if (loginSection && !$('gearupAdminEmail')) {
+    // querySelector di atas hanya bantuan; perbarui seluruh paragraf deskripsi dengan aman.
+    const prose = loginSection.querySelector('.bg-army-50 p:last-child');
+    if (prose) prose.textContent = 'Masuk menggunakan akun email dosen yang telah didaftarkan sebagai admin pada Supabase. Tidak ada lagi password bawaan admin123.';
+    const input = document.createElement('div');
+    input.innerHTML = '<label class="text-xs font-bold text-slate-700 block mb-1" for="gearupAdminEmail">Email Admin</label><input id="gearupAdminEmail" type="email" autocomplete="username" placeholder="dosen@kampus.ac.id" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm">';
+    const passWrapper = $('adminPasswordInput')?.parentElement;
+    if (passWrapper) loginSection.insertBefore(input, passWrapper);
+    $('adminPasswordInput')?.setAttribute('autocomplete', 'current-password');
+  }
+  const oldDeployGuide = $('deployGuideBox');
+  if (oldDeployGuide) {
+    oldDeployGuide.querySelectorAll('p').forEach(p => {
+      if (p.textContent.includes('admin123')) {
+        p.textContent = 'Akses admin: klik ikon perisai, lalu masuk dengan email dan password dosen yang telah didaftarkan di Supabase.';
+      } else if (p.textContent.includes('IndexedDB')) {
+        p.textContent = 'Penyimpanan materi bersama menggunakan database dan Storage Supabase. Mahasiswa melihat data setelah halaman dimuat ulang.';
+      }
+    });
+  }
+  const storageTitle = $('adminDashboardSection')?.querySelector('.bg-army-900 p:first-child');
+  if (storageTitle) storageTitle.textContent = 'PENYIMPANAN ONLINE SUPABASE';
+
+  window.verifyAdminLogin = async () => {
+    if (!client) return showToast('Supabase belum terhubung; periksa config.js dan SQL.');
+    const email = ($('gearupAdminEmail')?.value || '').trim();
+    const password = $('adminPasswordInput')?.value || '';
+    if (!email || !password) return showToast('Isi email dan password Supabase.');
+    try {
+      const {error} = await client.auth.signInWithPassword({email, password});
+      if (error) throw error;
+      const {data, error: roleErr} = await client.rpc('gearup_is_admin');
+      if (roleErr) throw roleErr;
+      if (data !== true) {
+        await client.auth.signOut();
+        return showToast('Email ini belum masuk tabel gearup_admins.');
+      }
+      setAdmin(true);
+      $('adminLoginSection').classList.add('hidden');
+      $('adminDashboardSection').classList.remove('hidden');
+      $('adminPasswordInput').value = '';
+      showToast('Login dosen berhasil. Penyimpanan online aktif.');
+    } catch (e) { fail('Login gagal', e); }
+  };
+  window.logoutAdmin = async () => {
+    if (client) await client.auth.signOut();
+    setAdmin(false);
+    closeAdminModal();
+    showToast('Berhasil keluar dari mode admin.');
+  };
+  window.changeAdminPassword = async () => {
+    if (!authenticated()) return showToast('Login dosen dahulu.');
+    const next = $('newAdminPassInput')?.value || '';
+    if (next.length < 10) return showToast('Password baru minimal 10 karakter.');
+    try {
+      const {error} = await client.auth.updateUser({password: next});
+      if (error) throw error;
+      $('newAdminPassInput').value = '';
+      showToast('Password akun Supabase berhasil diubah.');
+    } catch (e) { fail('Gagal mengubah password', e); }
+  };
+
+  async function uploadImages(files, folder) {
+    requireAdmin();
+    const urls = [];
+    const mimeToExt = {'image/jpeg':'jpg','image/png':'png','image/webp':'webp','image/gif':'gif'};
+    for (const file of Array.from(files || [])) {
+      if (!mimeToExt[file.type]) throw new Error('Gambar harus berupa JPG, PNG, WEBP, atau GIF.');
+      if (file.size > 8 * 1024 * 1024) throw new Error('Ukuran maksimal 8 MB per gambar.');
+      const unique = (crypto.randomUUID?.() || `${Date.now()}-${Math.random().toString(36).slice(2)}`);
+      const path = `${folder}/${unique}.${mimeToExt[file.type]}`;
+      const {error} = await client.storage.from('gearup-media').upload(path, file, {contentType:file.type, upsert:false});
+      if (error) throw error;
+      urls.push(client.storage.from('gearup-media').getPublicUrl(path).data.publicUrl);
+    }
+    return urls;
+  }
+  window.handleDirectJobImageUpload = async event => {
+    try {
+      requireAdmin();
+      const files = event.target.files;
+      if (!files?.length || !appState.currentViewingJobId) return;
+      const job = appState.jobsheets.find(j => j.id === appState.currentViewingJobId);
+      if (!job) return;
+      const urls = await uploadImages(files, 'jobsheets');
+      const onlyPlaceholder = job.images?.length === 1 && job.images[0].startsWith('data:image/svg+xml');
+      const saved = {...job, images: onlyPlaceholder ? urls : [...(job.images || []), ...urls]};
+      await idbPut('jobsheets', saved);
+      Object.assign(job, saved);
+      renderModalJobGallery(job);
+      renderAllViews();
+      showToast('Gambar tersimpan di Supabase.');
+    } catch (e) { fail('Gagal mengunggah gambar', e); }
+    finally { event.target.value = ''; }
+  };
+  window.quickReplaceJobImage = async (jobId, event) => {
+    try {
+      requireAdmin();
+      const files = event.target.files;
+      if (!files?.length) return;
+      const job = appState.jobsheets.find(j => j.id === jobId);
+      if (!job) return;
+      const urls = await uploadImages(files, 'jobsheets');
+      const saved = {...job, images:urls};
+      await idbPut('jobsheets', saved);
+      Object.assign(job, saved);
+      renderAllViews();
+      showToast('Gambar job sheet diganti secara online.');
+    } catch (e) { fail('Gagal mengganti gambar', e); }
+    finally { event.target.value = ''; }
+  };
+  window.removeSingleJobImage = async (jobId, idx) => {
+    try {
+      requireAdmin();
+      const job = appState.jobsheets.find(j => j.id === jobId);
+      if (!job) return;
+      const next = {...job, images: (job.images || []).filter((_, i) => i !== idx)};
+      await idbPut('jobsheets', next);
+      Object.assign(job, next);
+      renderModalJobGallery(job);
+      renderAllViews();
+      showToast('Gambar dihapus dari job sheet.');
+    } catch (e) { fail('Gagal menghapus gambar', e); }
+  };
+
+  window.previewAdminJobImages = event => {
+    if (!authenticated()) return showToast('Login admin diperlukan.');
+    const files = Array.from(event.target.files || []);
+    appState.pendingJobImages = files;
+    $('admJobImagePreview').innerHTML = '';
+    files.forEach(file => {
+      const img = document.createElement('img');
+      img.src = URL.createObjectURL(file);
+      img.onload = () => URL.revokeObjectURL(img.src);
+      img.className = 'w-16 h-16 rounded-lg object-cover border';
+      $('admJobImagePreview').append(img);
+    });
+  };
+  window.previewAdminToolImage = event => {
+    if (!authenticated()) return showToast('Login admin diperlukan.');
+    appState.pendingToolImage = event.target.files?.[0] || null;
+    $('admToolImagePreview').innerHTML = '';
+    if (appState.pendingToolImage) {
+      const img = document.createElement('img');
+      img.src = URL.createObjectURL(appState.pendingToolImage);
+      img.onload = () => URL.revokeObjectURL(img.src);
+      img.className = 'w-20 h-20 rounded-lg object-cover border';
+      $('admToolImagePreview').append(img);
+    }
+  };
+  window.saveJobSheetFromAdmin = async () => {
+    try {
+      requireAdmin();
+      const id = $('editJobId')?.value || ('job_' + Date.now());
+      const title = $('admJobTitle').value.trim();
+      if (!title) return showToast('Judul job sheet wajib diisi.');
+      const existing = appState.jobsheets.find(j => j.id === id);
+      let images = existing?.images || [];
+      if (appState.pendingJobImages.length) images = await uploadImages(appState.pendingJobImages, 'jobsheets');
+      if (!images.length) images = [createTechnicalBlueprintSVG(title, 'Job Sheet Praktik', id)];
+      const job = {id, sessionId:$('admJobSession').value, title,
+        material:$('admJobMaterial').value.trim() || 'Standar Bengkel',
+        k3:$('admJobK3').value.trim() || 'APD Standar Bengkel Mesin',
+        steps:$('admJobSteps').value.trim().split('\n').map(x=>x.trim()).filter(Boolean), images};
+      await idbPut('jobsheets', job);
+      appState.pendingJobImages = [];
+      $('editJobId').value = '';
+      $('admJobTitle').value = '';
+      $('admJobMaterial').value = '';
+      $('admJobK3').value = '';
+      $('admJobSteps').value = '';
+      $('admJobImagesInput').value = '';
+      $('admJobImagePreview').innerHTML = '';
+      await refreshData();
+      closeAdminModal();
+      showToast('Materi job sheet tersimpan online.');
+    } catch (e) { fail('Gagal menyimpan job sheet', e); }
+  };
+  window.saveToolFromAdmin = async () => {
+    try {
+      requireAdmin();
+      const id = $('editToolId').value || ('tool_' + Date.now());
+      const name = $('admToolName').value.trim();
+      if (!name) return showToast('Nama alat wajib diisi.');
+      const existing = appState.tools.find(t => t.id === id);
+      let image = existing?.image || '';
+      if (appState.pendingToolImage instanceof File) image = (await uploadImages([appState.pendingToolImage], 'tools'))[0];
+      if (!image) image = createTechnicalBlueprintSVG(name, $('admToolClass').value, id);
+      const tool = {id, sessionId:$('admToolSession').value, cls:$('admToolClass').value, name,
+        spec:$('admToolDesc').value.trim() || 'Alat praktik standar bengkel.', image};
+      await idbPut('tools', tool);
+      appState.pendingToolImage = null;
+      $('editToolId').value = '';
+      $('admToolName').value = '';
+      $('admToolDesc').value = '';
+      $('admToolImageInput').value = '';
+      $('admToolImagePreview').innerHTML = '';
+      await refreshData();
+      closeAdminModal();
+      showToast('Alat praktik tersimpan online.');
+    } catch (e) { fail('Gagal menyimpan alat', e); }
+  };
+  window.editJobInAdmin = jobId => {
+    if (!authenticated()) return showToast('Login admin terlebih dahulu.');
+    const job = appState.jobsheets.find(j => j.id === jobId);
+    if (!job) return;
+    openAdminModal('jobsheet');
+    $('editJobId').value = job.id;
+    $('admJobSession').value = job.sessionId;
+    $('admJobTitle').value = job.title;
+    $('admJobMaterial').value = job.material || '';
+    $('admJobK3').value = job.k3 || '';
+    $('admJobSteps').value = (job.steps || []).join('\n');
+    $('admJobImagePreview').innerHTML = (job.images||[]).map(src=>`<img src="${escapeHTML(src)}" class="w-16 h-16 rounded-lg object-cover border">`).join('');
+    appState.pendingJobImages = [];
+    $('admJobImagesInput').value = '';
+    if ($('formJobHeading')) $('formJobHeading').textContent = 'Edit Data Job Sheet';
+  };
+
+  const originalEditTool = window.editToolInAdmin;
+  window.editToolInAdmin = function(id) {
+    if (!authenticated()) return showToast('Login dosen terlebih dahulu.');
+    appState.pendingToolImage = null;
+    originalEditTool(id);
+  };
+  const oldRenderJobs = window.renderJobsheetsView;
+  window.renderJobsheetsView = function(...args) {
+    oldRenderJobs(...args);
+    document.querySelectorAll('#jobsListContainer label').forEach(label => {
+      if (label.querySelector('input[type=file]')) label.style.display = authenticated() ? '' : 'none';
+    });
+    if (authenticated()) {
+      document.querySelectorAll('#jobsListContainer button[onclick^="openJobDetailModal"]').forEach(btn => {
+        const match = btn.getAttribute('onclick')?.match(/'([^']+)'/);
+        if (!match) return;
+        const row = btn.parentElement;
+        if (!row || row.querySelector('.gearup-cloud-edit')) return;
+        const edit = document.createElement('button');
+        edit.className = 'gearup-cloud-edit bg-olive-100 text-army-800 px-3 py-2 rounded-xl text-xs font-bold';
+        edit.textContent = 'Edit Materi';
+        edit.addEventListener('click', () => window.editJobInAdmin(match[1]));
+        row.append(edit);
+      });
+    }
+  };
+  const oldRenderGallery = window.renderModalJobGallery;
+  window.renderModalJobGallery = function(job) {
+    oldRenderGallery(job);
+    if (!authenticated()) $('modalJobGallery')?.querySelectorAll('button').forEach(btn=>btn.style.display='none');
+    $('jobDetailModal')?.querySelectorAll('label').forEach(label => {
+      if (label.querySelector('input[type=file]')) label.style.display=authenticated()?'':'none';
+    });
+  };
+  const oldOpenJobDetail = window.openJobDetailModal;
+  window.openJobDetailModal = function(jobId) {
+    oldOpenJobDetail(jobId);
+    $('jobDetailModal')?.querySelectorAll('label').forEach(label => {
+      if (label.querySelector('input[type=file]')) label.style.display=authenticated()?'':'none';
+    });
+  };
+  window.deleteToolItem = async id => {
+    if (!authenticated() || !confirm('Hapus alat ini dari database online?')) return;
+    try { await idbDelete('tools', id); await refreshData(); showToast('Alat terhapus online.'); }
+    catch(e) { fail('Hapus alat gagal', e); }
+  };
+  window.deleteJobItem = async id => {
+    if (!authenticated() || !confirm('Hapus job sheet ini dari database online?')) return;
+    try { await idbDelete('jobsheets', id); await refreshData(); showToast('Job sheet terhapus online.'); }
+    catch(e) { fail('Hapus job sheet gagal', e); }
+  };
+  window.importFullDatabase = event => {
+    if (!authenticated()) return showToast('Login dosen terlebih dahulu.');
+    const file = event.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = async e => {
+      try {
+        const obj = JSON.parse(e.target.result);
+        if (!Array.isArray(obj.tools) || !Array.isArray(obj.jobsheets)) throw new Error('Format backup harus memiliki tools dan jobsheets.');
+        for (const tool of obj.tools) await idbPut('tools', tool);
+        for (const job of obj.jobsheets) await idbPut('jobsheets', job);
+        await refreshData();
+        showToast('Backup diimpor ke database online.');
+      } catch(err) { fail('Import gagal', err); }
+    };
+    reader.readAsText(file);
+  };
+  window.resetDatabaseToFactory = async () => showToast('Reset cloud dinonaktifkan demi keamanan data. Gunakan backup atau SQL Editor.');
+
+  window.publishInitialCatalog = async () => {
+    try {
+      requireAdmin();
+      for (const [type, items] of [['tools', INITIAL_TOOLS], ['jobsheets', INITIAL_JOBSHEETS]]) {
+        const records = items.map(item => toCloud(type, item));
+        const {error} = await client.from(tables[type]).upsert(records, {onConflict:'id', ignoreDuplicates:true});
+        if (error) throw error;
+      }
+      await refreshData();
+      showToast('25 alat dan 9 job sheet bawaan dipublikasikan.');
+    } catch(e) { fail('Gagal mempublikasikan materi awal', e); }
+  };
+  const settings = $('adminSub-settings');
+  if (settings && !$('gearupSeedWrapper')) {
+    const div = document.createElement('div');
+    div.id = 'gearupSeedWrapper';
+    div.className = 'p-3 rounded-xl border bg-army-50 space-y-2';
+    div.innerHTML = '<h4 class="font-bold">Publikasikan Data Awal ke Cloud</h4><p class="text-[11px]">Klik sekali setelah database aktif. Data yang sudah Anda ubah tidak akan ditimpa.</p><button id="gearupSeedNow" class="bg-olive-600 text-white font-bold px-3 py-2 rounded-lg">Publikasikan 25 Alat &amp; 9 Job Sheet</button>';
+    settings.append(div);
+    $('gearupSeedNow').addEventListener('click', window.publishInitialCatalog);
+  }
+  window.GEARUP_CLOUD_ADAPTER_READY = true;
+})();
