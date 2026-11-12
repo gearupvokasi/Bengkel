@@ -543,6 +543,7 @@
                         <p>• Putaran Spindel: <b>n = (1000 × Vc) ÷ (π × d)</b> [RPM]</p>
                         <p>• Gerak Makan Meja: <b>Vf = fz × z × n</b> [mm/menit]</p>
                         <p>• Waktu Pemesinan: <b>Tm = L ÷ Vf</b> [menit]</p>
+                        <p>• Penghasilan Beram: <b>Q = (a × b × Vf) ÷ 1000</b> [cm³/menit]</p>
                     </div>
                 </div>
                 <div class="grid grid-cols-2 gap-3">
@@ -562,23 +563,35 @@
                         <label class="text-[11px] font-bold text-slate-700">Gerak Makan per Gigi fz (mm/gigi)</label>
                         <input id="mill_fz" type="number" step="any" value="0.05" oninput="calculateMilling()" class="w-full mt-1 px-3 py-2 rounded-xl border text-xs font-bold">
                     </div>
+                    <div>
+                        <label class="text-[11px] font-bold text-slate-700">Kedalaman Potong a (mm)</label>
+                        <input id="mill_a" type="number" step="any" value="3" oninput="calculateMilling()" class="w-full mt-1 px-3 py-2 rounded-xl border text-xs font-bold">
+                    </div>
+                    <div>
+                        <label class="text-[11px] font-bold text-slate-700">Lebar Pemotongan b (mm)</label>
+                        <input id="mill_b" type="number" step="any" value="12" oninput="calculateMilling()" class="w-full mt-1 px-3 py-2 rounded-xl border text-xs font-bold">
+                    </div>
                     <div class="col-span-2">
                         <label class="text-[11px] font-bold text-slate-700">Panjang Pemotongan Meja L (mm)</label>
                         <input id="mill_l" type="number" step="any" value="150" oninput="calculateMilling()" class="w-full mt-1 px-3 py-2 rounded-xl border text-xs font-bold">
                     </div>
                 </div>
-                <div class="bg-army-800 text-white p-3.5 rounded-2xl grid grid-cols-3 gap-2 text-xs">
+                <div class="bg-army-800 text-white p-3.5 rounded-2xl grid grid-cols-2 gap-3 text-xs">
                     <div>
                         <p class="text-army-200 text-[10px]">Putaran Spindel (n)</p>
                         <p class="font-extrabold text-sm text-olive-400"><span id="mill_res_n">497</span> RPM</p>
                     </div>
                     <div>
-                        <p class="text-army-200 text-[10px]">Gerak Makan (Vf)</p>
+                        <p class="text-army-200 text-[10px]">Gerak Makan Meja (Vf)</p>
                         <p class="font-extrabold text-sm text-white"><span id="mill_res_vf">99,5</span> mm/menit</p>
                     </div>
                     <div>
-                        <p class="text-army-200 text-[10px]">Waktu Frais (Tm)</p>
+                        <p class="text-army-200 text-[10px]">Waktu Pemesinan (Tm)</p>
                         <p class="font-extrabold text-sm text-amber-400"><span id="mill_res_tm">1,51</span> menit</p>
+                    </div>
+                    <div>
+                        <p class="text-army-200 text-[10px]">Penghasilan Beram (Q)</p>
+                        <p class="font-extrabold text-sm text-olive-400"><span id="mill_res_q">3,58</span> cm³/menit</p>
                     </div>
                 </div>
             </div>
@@ -588,7 +601,8 @@
                 <div class="border-b pb-2.5">
                     <h3 class="font-extrabold text-sm text-army-900">Kalkulator Mesin Sekrap (Shaping)</h3>
                     <div class="mt-1.5 bg-army-50 p-2.5 rounded-xl border border-army-200 text-[11px] font-mono text-army-900 space-y-0.5">
-                        <p>• Jumlah Langkah: <b>np = (1000 × Vc) ÷ (L × (1 + R))</b> [langkah/menit]</p>
+                        <p>• Jumlah Langkah Ganda: <b>np = (1000 × Vc) ÷ (L × (1 + k))</b> [langkah/menit]</p>
+                        <p>• Kecepatan Makan Meja: <b>Vf = f × np</b> [mm/menit]</p>
                         <p>• Waktu Pemesinan: <b>Tm = B ÷ (f × np)</b> [menit]</p>
                     </div>
                 </div>
@@ -602,7 +616,7 @@
                         <input id="shape_l" type="number" step="any" value="200" oninput="calculateShaping()" class="w-full mt-1 px-3 py-2 rounded-xl border text-xs font-bold">
                     </div>
                     <div>
-                        <label class="text-[11px] font-bold text-slate-700">Rasio Langkah Balik R (misal 0,6)</label>
+                        <label class="text-[11px] font-bold text-slate-700">Rasio Langkah Balik k (misal 0,6)</label>
                         <input id="shape_k" type="number" step="any" value="0.6" oninput="calculateShaping()" class="w-full mt-1 px-3 py-2 rounded-xl border text-xs font-bold">
                     </div>
                     <div>
@@ -620,7 +634,7 @@
                         <p class="font-extrabold text-sm text-olive-400"><span id="shape_res_np">56,3</span> langkah/mnt</p>
                     </div>
                     <div>
-                        <p class="text-army-200 text-[10px]">Kecepatan Makan</p>
+                        <p class="text-army-200 text-[10px]">Kecepatan Makan (Vf)</p>
                         <p class="font-extrabold text-sm text-white"><span id="shape_res_vf">28,1</span> mm/menit</p>
                     </div>
                     <div>
@@ -630,54 +644,165 @@
                 </div>
             </div>
 
-            <!-- 5. KALKULATOR FORGING (KERJA TEMPA) -->
-            <div id="calc-panel-forging" class="calc-panel hidden bg-white p-4 rounded-2xl shadow-sm border border-army-200 space-y-3.5">
-                <div class="border-b pb-2.5">
-                    <h3 class="font-extrabold text-sm text-army-900">Kalkulator Perhitungan Tempa (Forging)</h3>
-                    <div class="mt-1.5 bg-army-50 p-2.5 rounded-xl border border-army-200 text-[11px] font-mono text-army-900 space-y-0.5">
-                        <p>• Volume Konstan: <b>V = A₀ × h₀ = A₁ × h₁</b> [mm³]</p>
-                        <p>• Regangan Sebenarnya: <b>ε = ln(h₀ ÷ h₁)</b></p>
-                        <p>• Gaya Tempa: <b>F = kf × Yf × A₁</b> [N, kN, dan Ton-force]</p>
+            <!-- 5. KALKULATOR FORGING (KERJA TEMPA - DUAL MODULE: UPSETTING & DRAWING OUT) -->
+            <div id="calc-panel-forging" class="calc-panel hidden space-y-4">
+                <!-- MODUL A: KALKULATOR GAYA TEMPA & UPSETTING -->
+                <div class="bg-white p-4 rounded-2xl shadow-sm border border-army-200 space-y-3.5">
+                    <div class="border-b pb-2.5">
+                        <span class="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded bg-olive-100 text-army-800">Modul A • Penempaan Tekan (Upsetting)</span>
+                        <h3 class="font-extrabold text-sm text-army-900 mt-1">Kalkulator Gaya Tempa & Upsetting</h3>
+                        <div class="mt-1.5 bg-army-50 p-2.5 rounded-xl border border-army-200 text-[11px] font-mono text-army-900 space-y-0.5">
+                            <p>• Volume Konstan: <b>V = A₀ × h₀ = A₁ × h₁</b> [mm³]</p>
+                            <p>• Regangan Sejati: <b>ε = ln(h₀ ÷ h₁)</b></p>
+                            <p>• Gaya Tempa: <b>F = kf × Yf × A₁</b> [kN dan Tonf]</p>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="text-[11px] font-bold text-slate-700">Diameter Awal d₀ (mm)</label>
+                            <input id="forge_d0" type="number" step="any" value="30" oninput="calculateForging()" class="w-full mt-1 px-3 py-2 rounded-xl border text-xs font-bold">
+                        </div>
+                        <div>
+                            <label class="text-[11px] font-bold text-slate-700">Tinggi Awal h₀ (mm)</label>
+                            <input id="forge_h0" type="number" step="any" value="60" oninput="calculateForging()" class="w-full mt-1 px-3 py-2 rounded-xl border text-xs font-bold">
+                        </div>
+                        <div>
+                            <label class="text-[11px] font-bold text-slate-700">Tinggi Akhir h₁ (mm)</label>
+                            <input id="forge_h1" type="number" step="any" value="35" oninput="calculateForging()" class="w-full mt-1 px-3 py-2 rounded-xl border text-xs font-bold">
+                        </div>
+                        <div>
+                            <label class="text-[11px] font-bold text-slate-700">Tegangan Alir Material Yf (MPa)</label>
+                            <input id="forge_kf" type="number" step="any" value="120" oninput="calculateForging()" class="w-full mt-1 px-3 py-2 rounded-xl border text-xs font-bold">
+                        </div>
+                        <div class="col-span-2">
+                            <label class="text-[11px] font-bold text-slate-700">Koefisien Gesek Tempa μ (Standar Tempa Panas ≈ 0,20)</label>
+                            <input id="forge_mu" type="number" step="any" value="0.20" oninput="calculateForging()" class="w-full mt-1 px-3 py-2 rounded-xl border text-xs font-bold">
+                        </div>
+                    </div>
+                    <div class="bg-army-800 text-white p-3.5 rounded-2xl grid grid-cols-2 gap-3 text-xs">
+                        <div>
+                            <p class="text-army-200 text-[10px]">Volume Benda (V)</p>
+                            <p class="font-extrabold text-sm text-white"><span id="forge_res_vol">42.412</span> mm³ (<span id="forge_res_vol_cm">42,4</span> cm³)</p>
+                        </div>
+                        <div>
+                            <p class="text-army-200 text-[10px]">Diameter Akhir (d₁) & Luas (A₁)</p>
+                            <p class="font-extrabold text-sm text-olive-400">Ø <span id="forge_res_d1">39,28</span> mm (<span id="forge_res_a1">1212</span> mm²)</p>
+                        </div>
+                        <div>
+                            <p class="text-army-200 text-[10px]">Regangan Sejati (ε) & Faktor (kf)</p>
+                            <p class="font-extrabold text-sm text-white">ε = <span id="forge_res_strain">0,539</span> | kf = <span id="forge_res_kffactor">1,25</span></p>
+                        </div>
+                        <div>
+                            <p class="text-army-200 text-[10px]">Gaya Tempa (F)</p>
+                            <p class="font-extrabold text-sm text-amber-400"><span id="forge_res_force">181,7</span> kN (<span id="forge_res_ton">18,5</span> Tonf)</p>
+                        </div>
                     </div>
                 </div>
-                <div class="grid grid-cols-2 gap-3">
-                    <div>
-                        <label class="text-[11px] font-bold text-slate-700">Diameter Awal d₀ (mm)</label>
-                        <input id="forge_d0" type="number" step="any" value="30" oninput="calculateForging()" class="w-full mt-1 px-3 py-2 rounded-xl border text-xs font-bold">
+
+                <!-- MODUL B: KALKULATOR PERTAMBAHAN PANJANG FORGING (DRAWING OUT / PEREGANGAN) -->
+                <div class="forging-length-card bg-white p-4 rounded-2xl shadow-sm border-2 border-olive-600/50 space-y-3.5">
+                    <div class="bg-gradient-to-r from-army-800 to-olive-600 text-white p-3.5 rounded-xl">
+                        <span class="text-[10px] font-extrabold uppercase bg-white/20 px-2 py-0.5 rounded">Modul B • Peregangan Tempa (Drawing Out)</span>
+                        <h3 class="font-extrabold text-sm mt-1">Kalkulator Pertambahan Panjang Forging</h3>
+                        <p class="text-[11px] text-army-100 font-mono mt-0.5">Hukum Kekekalan Volume: V₀ = V₁ &nbsp;|&nbsp; L₁ = L₀ × (A₀ ÷ A₁)</p>
                     </div>
+
+                    <!-- Pilihan Bentuk Penampang Benda Kerja -->
                     <div>
-                        <label class="text-[11px] font-bold text-slate-700">Tinggi Awal h₀ (mm)</label>
-                        <input id="forge_h0" type="number" step="any" value="60" oninput="calculateForging()" class="w-full mt-1 px-3 py-2 rounded-xl border text-xs font-bold">
+                        <label class="block text-xs font-extrabold text-army-900 mb-1">Bentuk Penampang Benda Kerja:</label>
+                        <select id="forgeShapeType" onchange="toggleForgeShapeInputs()" class="w-full px-3 py-2.5 rounded-xl border border-army-200 bg-army-50 text-xs font-bold text-army-900 focus:border-olive-500 focus:outline-none">
+                            <option value="rect">1. Persegi / Pelat (Tebal h₀ × Lebar b₀ → h₁ × b₁)</option>
+                            <option value="round">2. Silinder / Bulat (Diameter d₀ → d₁)</option>
+                            <option value="area">3. Luas Penampang Langsung (A₀ & A₁)</option>
+                        </select>
                     </div>
-                    <div>
-                        <label class="text-[11px] font-bold text-slate-700">Tinggi Akhir h₁ (mm)</label>
-                        <input id="forge_h1" type="number" step="any" value="35" oninput="calculateForging()" class="w-full mt-1 px-3 py-2 rounded-xl border text-xs font-bold">
+
+                    <!-- Input Panjang Awal (L0) & Kerak / Scale Loss (%) -->
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-700 mb-1">Panjang Awal L₀ (mm)</label>
+                            <input type="number" id="forge_L0" value="100" min="0.1" step="any" oninput="hitungPanjangForging()" class="w-full px-3 py-2 rounded-xl border text-xs font-bold">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-700 mb-1">Kerak / Scale Loss (%)</label>
+                            <input type="number" id="forge_loss" value="0" min="0" max="30" step="0.5" oninput="hitungPanjangForging()" title="Kehilangan volume akibat terak/oksidasi panas (umumnya 0% - 5%)" class="w-full px-3 py-2 rounded-xl border text-xs font-bold">
+                        </div>
                     </div>
-                    <div>
-                        <label class="text-[11px] font-bold text-slate-700">Tegangan Alir Material Yf (MPa)</label>
-                        <input id="forge_kf" type="number" step="any" value="120" oninput="calculateForging()" class="w-full mt-1 px-3 py-2 rounded-xl border text-xs font-bold">
+
+                    <!-- OPSI 1: Input Penampang Persegi / Pelat -->
+                    <div id="inputShapeRect" class="grid grid-cols-2 gap-2.5 bg-army-50 p-3 rounded-xl border border-army-200">
+                        <div>
+                            <label class="text-[11px] font-bold text-army-900">Tebal Awal h₀ (mm)</label>
+                            <input type="number" id="forge_len_h0" value="40" min="0.1" step="any" oninput="hitungPanjangForging()" class="w-full mt-1 px-2.5 py-1.5 rounded-lg border bg-white text-xs font-bold">
+                        </div>
+                        <div>
+                            <label class="text-[11px] font-bold text-army-900">Lebar Awal b₀ (mm)</label>
+                            <input type="number" id="forge_len_b0" value="40" min="0.1" step="any" oninput="hitungPanjangForging()" class="w-full mt-1 px-2.5 py-1.5 rounded-lg border bg-white text-xs font-bold">
+                        </div>
+                        <div>
+                            <label class="text-[11px] font-bold text-army-900">Tebal Akhir h₁ (mm)</label>
+                            <input type="number" id="forge_len_h1" value="25" min="0.1" step="any" oninput="hitungPanjangForging()" class="w-full mt-1 px-2.5 py-1.5 rounded-lg border bg-white text-xs font-bold">
+                        </div>
+                        <div>
+                            <label class="text-[11px] font-bold text-army-900">Lebar Akhir b₁ (mm)</label>
+                            <input type="number" id="forge_len_b1" value="40" min="0.1" step="any" oninput="hitungPanjangForging()" class="w-full mt-1 px-2.5 py-1.5 rounded-lg border bg-white text-xs font-bold">
+                        </div>
                     </div>
-                    <div class="col-span-2">
-                        <label class="text-[11px] font-bold text-slate-700">Koefisien Gesek Tempa μ (Standar Tempa Panas ≈ 0,20)</label>
-                        <input id="forge_mu" type="number" step="any" value="0.20" oninput="calculateForging()" class="w-full mt-1 px-3 py-2 rounded-xl border text-xs font-bold">
+
+                    <!-- OPSI 2: Input Penampang Silinder / Bulat -->
+                    <div id="inputShapeRound" class="hidden grid-cols-2 gap-2.5 bg-army-50 p-3 rounded-xl border border-army-200">
+                        <div>
+                            <label class="text-[11px] font-bold text-army-900">Diameter Awal d₀ (mm)</label>
+                            <input type="number" id="forge_len_d0" value="50" min="0.1" step="any" oninput="hitungPanjangForging()" class="w-full mt-1 px-2.5 py-1.5 rounded-lg border bg-white text-xs font-bold">
+                        </div>
+                        <div>
+                            <label class="text-[11px] font-bold text-army-900">Diameter Akhir d₁ (mm)</label>
+                            <input type="number" id="forge_len_d1" value="35" min="0.1" step="any" oninput="hitungPanjangForging()" class="w-full mt-1 px-2.5 py-1.5 rounded-lg border bg-white text-xs font-bold">
+                        </div>
                     </div>
-                </div>
-                <div class="bg-army-800 text-white p-3.5 rounded-2xl grid grid-cols-2 gap-3 text-xs">
-                    <div>
-                        <p class="text-army-200 text-[10px]">Volume Benda (V)</p>
-                        <p class="font-extrabold text-sm text-white"><span id="forge_res_vol">42.412</span> mm³ (<span id="forge_res_vol_cm">42,4</span> cm³)</p>
+
+                    <!-- OPSI 3: Input Luas Penampang Langsung -->
+                    <div id="inputShapeArea" class="hidden grid-cols-2 gap-2.5 bg-army-50 p-3 rounded-xl border border-army-200">
+                        <div>
+                            <label class="text-[11px] font-bold text-army-900">Luas Awal A₀ (mm²)</label>
+                            <input type="number" id="forge_A0_direct" value="1600" min="0.1" step="any" oninput="hitungPanjangForging()" class="w-full mt-1 px-2.5 py-1.5 rounded-lg border bg-white text-xs font-bold">
+                        </div>
+                        <div>
+                            <label class="text-[11px] font-bold text-army-900">Luas Akhir A₁ (mm²)</label>
+                            <input type="number" id="forge_A1_direct" value="1000" min="0.1" step="any" oninput="hitungPanjangForging()" class="w-full mt-1 px-2.5 py-1.5 rounded-lg border bg-white text-xs font-bold">
+                        </div>
                     </div>
-                    <div>
-                        <p class="text-army-200 text-[10px]">Diameter Akhir (d₁) & Luas (A₁)</p>
-                        <p class="font-extrabold text-sm text-olive-400">Ø <span id="forge_res_d1">39,28</span> mm (<span id="forge_res_a1">1212</span> mm²)</p>
-                    </div>
-                    <div>
-                        <p class="text-army-200 text-[10px]">Regangan Sebenarnya (ε) & Faktor (kf)</p>
-                        <p class="font-extrabold text-sm text-white">ε = <span id="forge_res_strain">0,539</span> | kf = <span id="forge_res_kffactor">1,25</span></p>
-                    </div>
-                    <div>
-                        <p class="text-army-200 text-[10px]">Gaya Tempa (F)</p>
-                        <p class="font-extrabold text-sm text-amber-400"><span id="forge_res_force">181,7</span> kN (<span id="forge_res_ton">18,5</span> Tonf)</p>
+
+                    <button type="button" onclick="hitungPanjangForging()" class="w-full bg-olive-600 hover:bg-olive-500 text-white font-extrabold py-2.5 rounded-xl text-xs shadow transition">
+                        Hitung Pertambahan Panjang (ΔL & L₁)
+                    </button>
+
+                    <!-- Kotak Hasil Perhitungan Pertambahan Panjang Forging -->
+                    <div class="bg-army-50 border-l-4 border-army-700 rounded-xl p-3.5 text-xs space-y-1.5">
+                        <div class="flex justify-between py-1 border-b border-dashed border-army-200">
+                            <span class="text-slate-600">Luas Penampang Awal (A₀):</span>
+                            <strong id="res_forge_A0" class="text-army-900">1600,00 mm²</strong>
+                        </div>
+                        <div class="flex justify-between py-1 border-b border-dashed border-army-200">
+                            <span class="text-slate-600">Luas Penampang Akhir (A₁):</span>
+                            <strong id="res_forge_A1" class="text-army-900">1000,00 mm²</strong>
+                        </div>
+                        <div class="flex justify-between py-1 border-b border-dashed border-army-200">
+                            <span class="text-slate-600">Volume Benda Kerja (V):</span>
+                            <strong id="res_forge_V" class="text-army-900">160.000,00 mm³</strong>
+                        </div>
+                        <div class="flex justify-between py-1.5 border-b border-dashed border-army-200 text-sm">
+                            <span class="font-extrabold text-army-900">Panjang Akhir (L₁):</span>
+                            <strong id="res_forge_L1" class="text-army-800 font-extrabold">160,00 mm</strong>
+                        </div>
+                        <div class="flex justify-between py-1.5 border-b border-dashed border-army-200 text-sm">
+                            <span class="font-extrabold text-army-900">Pertambahan Panjang (ΔL = L₁ − L₀):</span>
+                            <strong id="res_forge_dL" class="text-olive-600 font-extrabold">+60,00 mm (+60,00%)</strong>
+                        </div>
+                        <div class="flex justify-between pt-1">
+                            <span class="text-slate-600">Rasio Tempa (y = A₀ ÷ A₁) | Regangan (φ):</span>
+                            <strong id="res_forge_ratio" class="text-army-900">1,60 : 1 &nbsp;|&nbsp; φ = 0,470</strong>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1056,6 +1181,9 @@
                             <input type="file" accept=".json" class="hidden" onchange="importFullDatabase(event)">
                         </label>
                     </div>
+                    <button onclick="resetDatabaseToFactory()" class="w-full mt-2 bg-red-600 hover:bg-red-500 text-white font-bold py-2 rounded-xl text-xs shadow">
+                        <i class="fa-solid fa-rotate-left mr-1"></i>Reset Semua Data ke Default Pabrik
+                    </button>
                 </div>
             </div>
         </div>
@@ -1874,24 +2002,29 @@
         document.getElementById('lathe_res_mrr').textContent = fmtID(mrr, 2);
     }
 
-    // 3. Milling (Frais): n = (1000 × Vc) ÷ (π × d), Vf = fz × z × n, Tm = L ÷ Vf
+    // 3. Milling (Frais): n = (1000 × Vc) ÷ (π × d), Vf = fz × z × n, Tm = L ÷ Vf, Q = (a × b × Vf) ÷ 1000
     function calculateMilling() {
         const vc = parseFloat(document.getElementById('mill_vc').value) || 0;
         const d = parseFloat(document.getElementById('mill_d').value) || 1;
         const z = parseFloat(document.getElementById('mill_z').value) || 1;
         const fz = parseFloat(document.getElementById('mill_fz').value) || 0.05;
+        const a = parseFloat(document.getElementById('mill_a').value) || 0;
+        const b = parseFloat(document.getElementById('mill_b').value) || 0;
         const l = parseFloat(document.getElementById('mill_l').value) || 0;
 
         const n = (1000 * vc) / (Math.PI * d);
         const vf = fz * z * n;
         const tm = vf > 0 ? (l / vf) : 0;
+        const q = (a * b * vf) / 1000;
 
         document.getElementById('mill_res_n').textContent = Math.round(n);
         document.getElementById('mill_res_vf').textContent = fmtID(vf, 1);
         document.getElementById('mill_res_tm').textContent = fmtID(tm, 2);
+        const qEl = document.getElementById('mill_res_q');
+        if (qEl) qEl.textContent = fmtID(q, 2);
     }
 
-    // 4. Shaping (Sekrap): np = (1000 × Vc) ÷ (L × (1 + R)), Tm = B ÷ (f × np)
+    // 4. Shaping (Sekrap): np = (1000 × Vc) ÷ (L × (1 + k)), Tm = B ÷ (f × np)
     function calculateShaping() {
         const vc = parseFloat(document.getElementById('shape_vc').value) || 0;
         const l = parseFloat(document.getElementById('shape_l').value) || 1;
@@ -1937,6 +2070,67 @@
         document.getElementById('forge_res_kffactor').textContent = fmtID(kfFactor, 2);
         document.getElementById('forge_res_force').textContent = fmtID(forceKN, 1);
         document.getElementById('forge_res_ton').textContent = fmtID(forceTonf, 1);
+    }
+
+    // 5B. Modul Pertambahan Panjang Forging (Drawing Out / Peregangan): V0 = V1 | L1 = L0 * (A0 / A1)
+    function toggleForgeShapeInputs() {
+        const shape = document.getElementById('forgeShapeType').value;
+        const rectEl = document.getElementById('inputShapeRect');
+        const roundEl = document.getElementById('inputShapeRound');
+        const areaEl = document.getElementById('inputShapeArea');
+
+        rectEl.style.display  = (shape === 'rect')  ? 'grid' : 'none';
+        roundEl.style.display = (shape === 'round') ? 'grid' : 'none';
+        areaEl.style.display  = (shape === 'area')  ? 'grid' : 'none';
+        hitungPanjangForging();
+    }
+
+    function hitungPanjangForging() {
+        const shapeEl = document.getElementById('forgeShapeType');
+        if (!shapeEl) return;
+        const shape = shapeEl.value;
+        const L0 = parseFloat(document.getElementById('forge_L0').value) || 0;
+        const scaleLossPct = parseFloat(document.getElementById('forge_loss').value) || 0;
+
+        let A0 = 0, A1 = 0;
+        if (shape === 'rect') {
+            const h0 = parseFloat(document.getElementById('forge_len_h0').value) || 0;
+            const b0 = parseFloat(document.getElementById('forge_len_b0').value) || 0;
+            const h1 = parseFloat(document.getElementById('forge_len_h1').value) || 0;
+            const b1 = parseFloat(document.getElementById('forge_len_b1').value) || 0;
+            A0 = h0 * b0;
+            A1 = h1 * b1;
+        } else if (shape === 'round') {
+            const d0 = parseFloat(document.getElementById('forge_len_d0').value) || 0;
+            const d1 = parseFloat(document.getElementById('forge_len_d1').value) || 0;
+            A0 = (Math.PI / 4) * Math.pow(d0, 2);
+            A1 = (Math.PI / 4) * Math.pow(d1, 2);
+        } else {
+            A0 = parseFloat(document.getElementById('forge_A0_direct').value) || 0;
+            A1 = parseFloat(document.getElementById('forge_A1_direct').value) || 0;
+        }
+
+        if (L0 <= 0 || A0 <= 0 || A1 <= 0) {
+            document.getElementById('res_forge_L1').innerText = 'Input tidak valid';
+            document.getElementById('res_forge_dL').innerText = '-';
+            return;
+        }
+
+        const V0 = A0 * L0;
+        const V_efektif = V0 * (1 - (scaleLossPct / 100));
+        const L1 = V_efektif / A1;
+        const deltaL = L1 - L0;
+        const persenTambah = (deltaL / L0) * 100;
+        const forgingRatio = A0 / A1;
+        const trueStrain = Math.log(L1 / L0);
+
+        document.getElementById('res_forge_A0').innerText = fmtID(A0, 2) + ' mm²';
+        document.getElementById('res_forge_A1').innerText = fmtID(A1, 2) + ' mm²';
+        document.getElementById('res_forge_V').innerText  = V_efektif.toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' mm³';
+        document.getElementById('res_forge_L1').innerText = fmtID(L1, 2) + ' mm';
+        const tanda = deltaL >= 0 ? '+' : '';
+        document.getElementById('res_forge_dL').innerText = `${tanda}${fmtID(deltaL, 2)} mm (${tanda}${fmtID(persenTambah, 2)}%)`;
+        document.getElementById('res_forge_ratio').innerText = `${fmtID(forgingRatio, 2)} : 1  |  φ = ${fmtID(trueStrain, 3)}`;
     }
 
     // Click Vc value from table to populate calculators
@@ -2208,6 +2402,27 @@
         reader.readAsText(file);
     }
 
+    async function resetDatabaseToFactory() {
+        for (const t of appState.tools) {
+            await idbDelete('tools', t.id);
+        }
+        for (const j of appState.jobsheets) {
+            await idbDelete('jobsheets', j.id);
+        }
+        for (const t of INITIAL_TOOLS) {
+            await idbPut('tools', t);
+        }
+        for (const j of INITIAL_JOBSHEETS) {
+            await idbPut('jobsheets', j);
+        }
+        appState.tools = [...INITIAL_TOOLS];
+        appState.jobsheets = [...INITIAL_JOBSHEETS];
+        renderAllViews();
+        updateStorageEstimate();
+        closeAdminModal();
+        showToast('Database berhasil di-reset ke standar pabrik!');
+    }
+
     /********************************************************************
      * 8. PENCARIAN GLOBAL & NAVIGASI BAWAH
      ********************************************************************/
@@ -2285,6 +2500,7 @@
         calculateMilling();
         calculateShaping();
         calculateForging();
+        hitungPanjangForging();
     });
 </script>
 </body>
